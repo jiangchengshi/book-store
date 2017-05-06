@@ -2,10 +2,10 @@
     <div class="shelf">
         <header class="mui-bar mui-bar-nav">
             <h1 class="mui-title">{{title}}</h1>
-            <a class="mui-pull-right">整理</a>
+            <a class="mui-pull-right" @tap.stop="handleTapTidy">整理</a>
         </header>
         <div class="mui-content">
-            <div class="stage" v-for="book in books">
+            <div class="stage" :style="{width: shelf.width}" v-for="book in books">
                 <ul class="books-list">
                     <li v-for="b in book">
                         <img v-if="b.code=='store'" src="../../image/store.png">
@@ -17,19 +17,19 @@
             </div>
         </div>
         <nav class="mui-bar mui-bar-tab">
-            <a class="mui-tab-item" href="#tabbar">
+            <a class="mui-tab-item" @tap.stop="handleTapStore">
                 <span class="mui-icon iconfont icon-shuchengxuanzhong"></span>
                 <span class="mui-tab-label">书城</span>
             </a>
-            <a class="mui-tab-item" href="#tabbar-with-chat">
+            <a class="mui-tab-item" @tap.stop="handleTapSearch">
                 <span class="mui-icon iconfont icon-mp-search"></span>
                 <span class="mui-tab-label">搜索</span>
             </a>
-            <a class="mui-tab-item mui-active" href="#tabbar-with-contact">
+            <a class="mui-tab-item mui-active" @tap.stop="handleTapShelf">
                 <span class="mui-icon iconfont icon-books"></span>
                 <span class="mui-tab-label">书架</span>
             </a>
-            <a class="mui-tab-item" href="#tabbar-with-map">
+            <a class="mui-tab-item" @tap.stop="handleTapMine">
                 <span class="mui-icon iconfont icon-foot04"></span>
                 <span class="mui-tab-label">我的</span>
             </a>
@@ -43,12 +43,19 @@
         data () {
             return {
                 title: '书架',
-                books: []
+                books: [],
+                shelf: {
+                    width: 0
+                }
             }
         },
         methods: {
             handleClickBook(e){
                 let name = e.target.dataset.code;
+                if (name == "store") {
+                    this.handleTapStore();
+                    return;
+                }
                 this.openBook(name);
             },
             openBook(name){    // 打开书籍
@@ -82,6 +89,21 @@
                 //						console.log(d.filename + ":" + status);
                 //					}, false);
                 downloader.start();
+            },
+            handleTapStore(){
+                app.mui.toast('书城建设中...');
+            },
+            handleTapSearch(){
+                app.mui.toast('搜索开发中...');
+            },
+            handleTapShelf(){
+                this.$router.push({path: 'shelf'});
+            },
+            handleTapMine(){
+                app.mui.toast('我的思考中...');
+            },
+            handleTapTidy(){
+                app.mui.toast('整理啥，凑合着看吧...');
             }
         },
         created(){
@@ -90,10 +112,14 @@
 //                this.$router.push({name: 'welcome'});
 //                return;
 //            }
+
+            // 宽度
+            this.shelf.width = app.config.device.screenWidth + 'px';
+
             // 获取可展示的书籍： 仅展示8本 + 去书城
             // todo getStorage
             let bookArr = [{
-                code: 'dmbj.txt',
+                code: 'rmdmy.txt',
                 name: '盗墓笔记',
                 author: '南派三叔',
                 img: 'http://jjckb.xinhuanet.com/2016-05/20/135374404_14637120163591n.jpg'
@@ -163,16 +189,17 @@
     }
 
     .mui-content .stage {
-        margin: 26px -30px;
+        text-align: center;
     }
 
     .mui-content ul {
         list-style: none;
+        padding: initial;
     }
 
     .mui-content .books-list li {
         display: inline-block;
-        margin: 0px 10px;
+        margin: 0px 15px;
     }
 
     .mui-content .books-list li img {

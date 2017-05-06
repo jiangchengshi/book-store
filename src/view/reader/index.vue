@@ -54,31 +54,6 @@
                     <a href="javascript:void(0);" class="mui-icon iconfont icon-tubiao mui-pull-right"
                        @tap.stop="handleNavBarReward"></a>
                 </header>
-                <!-- 正文显示 -->
-                <div class="mui-content"
-                     :style="{height:setting.height+'px', color:setting.color, 'background-color':setting.backgroundColor, opacity: setting.opacity}">
-                    <div class="chapter-title">
-                        {{chapter.title}}
-                    </div>
-                    <div class="chapter-scroll" ref="chapterScroll" @tap="handleTapContent">
-                        <div class="chapter-content" ref="chapterContent"
-                             :style="{height: chapter.contentHeight+'px', width: chapter.contentWidth+'px',
-                             'column-width': chapter.contentColumnWidth+'px', 'column-gap': chapter.contentColumnSpace+'px',
-                             'font-size':setting.fontSize+'px', 'line-height':setting.lineHeight+'px'}">
-                            {{chapter.content}}
-                        </div>
-                    </div>
-                    <div class="chapter-status">
-                        <span class="battery">
-                            <span v-if="chapter.battery>80" class="mui-icon iconfont icon-bf-icon-battery"></span>
-                            <span v-else-if="chapter.battery>50" class="mui-icon iconfont icon-bf-battery3"></span>
-                            <span v-else-if="chapter.battery>20" class="mui-icon iconfont icon-bf-icon-battery4"></span>
-                            <span v-else class="mui-icon iconfont icon-bf-icon-battery_charging"></span>
-                        </span>
-                        <span class="time">{{chapter.time}}</span>
-                        <span class="progress">{{chapter.progress}}</span>
-                    </div>
-                </div>
                 <!-- 底部导航-->
                 <nav class="mui-bar mui-bar-tab" v-show="$store.state.showFooter" ref="tabBar"
                      :style="{color:setting.tabColor, 'background-color':setting.tabBackgroundColor}">
@@ -99,6 +74,33 @@
                         <span class="mui-tab-label">{{dayNight}}</span>
                     </a>
                 </nav>
+                <!-- 正文显示 -->
+                <div class="mui-content" :style="{height:screen.height+'px', width:screen.width+'px',
+                    color:setting.color, 'background-color':setting.backgroundColor, opacity: setting.opacity}">
+                    <div class="chapter-title">
+                        {{chapter.title}}
+                    </div>
+                    <div class="chapter-scroll" ref="chapterScroll" @tap="handleTapContent"
+                         :style="{height: chapter.scroll.height+'px', width: chapter.scroll.width+'px',
+                             'font-size':setting.fontSize+'px', 'line-height':setting.lineHeight+'px',
+                             'line-spacing':setting.lineSpacing+'px'}">
+                        <div class="chapter-body" ref="chapterBody"
+                             :style="{height: chapter.body.height+'px', width: chapter.body.width+'px',
+                             'column-width': chapter.body.width+'px'}">
+                            {{chapter.content}}
+                        </div>
+                    </div>
+                    <div class="chapter-status">
+                        <span class="battery">
+                            <span v-if="chapter.battery>80" class="mui-icon iconfont icon-bf-icon-battery"></span>
+                            <span v-else-if="chapter.battery>50" class="mui-icon iconfont icon-bf-battery3"></span>
+                            <span v-else-if="chapter.battery>20" class="mui-icon iconfont icon-bf-icon-battery4"></span>
+                            <span v-else class="mui-icon iconfont icon-bf-icon-battery_charging"></span>
+                        </span>
+                        <span class="time">{{chapter.time}}</span>
+                        <span class="progress">{{chapter.progress}}</span>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- 顶部弹出菜单：更多 -->
@@ -197,22 +199,32 @@
     let splitTitle = '\r\n\r\n',    // 分割章节目录
         borderWidthArr = [],    // 边界宽度数组
         bookContent = "",   // 书籍内容
-        menuHeight = 44,    // 菜单tab | nav高度
-        spaceGap = 10 + 20; // 页间隙：左间距 + 分栏间隙
+        tabBarHeight = 50 + 44,    // 菜单nav高度 + 底部padding
+        turnTranslateX = 0, // 翻页移动距离
+        turnRotateX = 0,    // 翻页旋转角度
+        turnScaleY = 1; // 翻页缩放距离
     export default {
         name: 'reader',
         data () {
             return {
+                screen: {
+                    height: 0,  // 屏幕显示高度
+                    width: 0    // 屏幕显示宽度
+                },
                 chapter: {
                     title: '',
                     content: '',
                     progress: '0 %',
                     battery: 100,
                     time: '',
-                    contentHeight: 0,   // 正文可显示高度（单屏）
-                    contentWidth: 0, // 正文可显示宽度（单屏）
-                    contentColumnWidth: 0,   // 正文分栏宽度
-                    contentColumnSpace: 20  // 正文分栏间隙宽度
+                    scroll: {
+                        height: 0,   // 滚动可显示高度（单屏）
+                        width: 0    // 滚动可显示宽度（单屏）
+                    },
+                    body: {
+                        height: 0,   // 正文可显示高度（单屏）
+                        width: 0    // 正文可显示宽度（单屏）
+                    }
                 },
                 menu: {
                     chapterArr: [],    // 菜单 章节 数组， [第*章 ******, 第*+1章 ******, ...]
@@ -220,11 +232,9 @@
                     noteArr: []    // 菜单 笔记 数组
                 },
                 pos: {
-                    scrollX: 0   // 滚动的x坐标
+                    scrollX: 0   // 已滚动的x距离
                 },
                 setting: {
-                    height: 641,  // 屏幕显示高度
-                    width: 375, // 屏幕显示宽度
                     fontSize: 14,   // 字体大小
                     color: '#1F1F1F',  // 字体颜色
                     navColor: ' #162636',   // 字体颜色：顶部nav
@@ -248,22 +258,6 @@
             }
         },
         methods: {
-            handleTapContent (e){
-                let tapX = e.detail.touches[0].pageX;
-                // 中间区域：点击显示 navbar
-                if (tapX > borderWidthArr[0] && tapX < borderWidthArr[1]) {
-                    this.$store.commit('updateNavbarStatus');
-                } else {
-                    // 上一页
-                    if (tapX <= borderWidthArr[0]) {
-                        this.processPage('prev');
-                    } else
-                    // 下一页
-                    if (tapX >= borderWidthArr[1]) {
-                        this.processPage('next');
-                    }
-                }
-            },
             openBook(){
                 let _this = this;
                 let localFile = _this.$store.state.localPath + _this.$route.query.name;
@@ -292,6 +286,12 @@
                         "这些api又很麻烦。我们有一项突破性的技术来解决上述烦恼—Native.js，一种把40w原生API映射为JS API的技术。" +
                         "如果说node.js把js的战火烧到了服务器端，那么Native.js把js战火烧到了原生应用战场。但我们可以使用js直接" +
                         "调原生API，语法是js语法，API命名是原生命名。比如var然后obj.xxx，这个xxx属性就完全是原生对象的属性命名。" +
+                        "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
+                        "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
+                        "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
+                        "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
+                        "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
+                        "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
                         "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
                         "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
                         "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
@@ -334,68 +334,84 @@
                 this.chapter.content = chapterContent;
                 this.chapter.progress = Number(this.chapterCur / this.chapterMax * 100).toFixed(2) + ' %';
 
-                // 章节变换
-                let translateX = undefined;
-                if (direction == 'prev') {  // 上一章：需要到最后一页
-                    translateX = this.$refs.chapterScroll.scrollWidth - this.chapter.contentWidth - this.chapter.contentColumnSpace;
-                } else if (direction == 'next') {   // 下一章：需要到第一页
-                    translateX = 0;
+                // 切换章节：等dom渲染后
+                app.vue.$nextTick(() => {
+                    if (direction == 'prev') {
+                        turnTranslateX = this.$refs.chapterBody.scrollWidth - this.screen.width + 40;
+                    } else if (direction == 'next') {
+                        turnTranslateX = 0;
+                    }
+                    // 记录已滚动的距离
+                    this.pos.scrollX = turnTranslateX;
+                    // 翻页滚动
+                    this.processTurn();
+                });
+            },
+            handleTapContent (e){
+                let tapX = e.detail.touches[0].pageX;
+                // 中间区域：点击显示 navbar
+                if (tapX > borderWidthArr[0] && tapX < borderWidthArr[1]) {
+                    this.$store.commit('updateNavbarStatus');
+                } else {
+                    // 翻页：上一页
+                    if (tapX <= borderWidthArr[0]) {
+                        this.processPage('prev');
+                    } else
+                    // 翻页：下一页
+                    if (tapX >= borderWidthArr[1]) {
+                        this.processPage('next');
+                    }
                 }
-                // 翻页滚动
-                this.processTurn(translateX);
             },
             processPage(direction) {
-                let translateX = undefined;
                 if (direction == 'prev') {
-                    if (this.pos.scrollX <= 0) {
+                    turnTranslateX = this.pos.scrollX - this.screen.width;
+                    if (turnTranslateX < 0) {
                         if (this.chapterCur <= this.chapterMin) {
                             app.mui.toast('已经到最前面了');
-                            return;
+                        } else {
+                            this.showChapter(direction);
                         }
-                        this.showChapter(direction);
-                    } else {
-                        translateX = this.pos.scrollX - this.chapter.contentWidth - this.chapter.contentColumnSpace;
+                        return;
                     }
                 } else if (direction == 'next') {
-                    if (this.$refs.chapterScroll.scrollWidth <= (this.chapter.contentWidth + spaceGap)) {
+                    turnTranslateX = this.pos.scrollX + this.screen.width;
+                    if (turnTranslateX >= this.$refs.chapterBody.scrollWidth) {
                         if (this.chapterCur >= this.chapterMax) {
                             app.mui.toast('已经到最后面了');
-                            return;
+                        } else {
+                            this.showChapter(direction);
                         }
-                        this.showChapter(direction);
-                    } else {
-                        translateX = this.pos.scrollX + this.chapter.contentWidth + this.chapter.contentColumnSpace;
+                        return;
                     }
                 }
-                // 记录滚动距离
-                this.pos.scrollX = translateX;
-                // 翻页滚动
-                this.processTurn(translateX);
-            },
-            processTurn(translateX){
-                if (translateX != undefined) {
-                    let chapterContent = this.$refs.chapterContent;
-                    let rotateX = 0;
-                    if (this.setting.turnEffect == 2) {
-                        rotateX = rotateX == 0 ? 360 : 0;
-                    }
-                    console.log(rotateX);
-                    let scaleY = 1;
-                    if (this.setting.turnEffect == 3) {
-                        scaleY = 2;
-                    }
-                    let transform = 'translateX(-' + translateX + 'px) rotateX(' + rotateX + 'deg) scaleY(' + scaleY + ')';
-                    chapterContent.style['-webkit-transform'] = transform;   // Webkit内核浏览器：Safari and Chrome
-                    chapterContent.style['transform'] = transform;  // W3C标准
 
-                    if (this.setting.turnEffect == 3) {
-                        setTimeout(function () {
-                            transform = 'translateX(-' + translateX + 'px) rotateX(' + rotateX + 'deg) scaleY(1)';
-                            chapterContent.style['-webkit-transform'] = transform;   // Webkit内核浏览器：Safari and Chrome
-                            chapterContent.style['transform'] = transform;  // W3C标准
-                        }, 500);
-                    }
+                // 记录已滚动的距离
+                this.pos.scrollX = turnTranslateX;
+                // 翻页滚动
+                this.processTurn();
+            },
+            processTurn(){
+                if (this.setting.turnEffect == 1) {
+                    turnScaleY = 1;
+                } else if (this.setting.turnEffect == 2) {
+                    turnRotateX = 360 - turnRotateX;
+                } else if (this.setting.turnEffect == 3) {
+                    turnScaleY = 2;
                 }
+                this.processTransForm();
+
+                if (this.setting.turnEffect == 3) {
+                    setTimeout(() => {
+                        turnScaleY = 1;
+                        this.processTransForm();
+                    }, 500);
+                }
+            },
+            processTransForm(){
+                let transform = 'translateX(-' + turnTranslateX + 'px) rotateX(' + turnRotateX + 'deg) scaleY(' + turnScaleY + ')';
+                this.$refs.chapterBody.style['-webkit-transform'] = transform;   // Webkit内核浏览器：Safari and Chrome
+                this.$refs.chapterBody.style['transform'] = transform;  // W3C标准
             },
             showTimeNow() {
                 this.chapter.time = app.util.dateFormat(new Date(), 'hh:mm');
@@ -488,24 +504,24 @@
             }
         },
         created() {
-            let barHeight = 0;
+            // 全屏显示
             if (app.config.isApp) {
-                barHeight = plus.navigator.getStatusbarHeight();
-                // 全屏显示
                 plus.navigator.setFullscreen(true);
             }
 
-            // 屏幕高度
-            this.setting.height = app.config.device.displayHeight + barHeight;
-            this.setting.width = app.config.device.displayWidth;
+            // 屏幕高度&宽度
+            this.screen.height = app.config.device.screenHeight;   // 全屏高度
+            this.screen.width = app.config.device.screenWidth; // 全屏宽度
 
+            // 书籍滚动 高度/宽度
+            this.chapter.scroll.height = this.screen.height - tabBarHeight; // 减掉 底部tab菜单高度
+            this.chapter.scroll.width = this.screen.width;
             // 书籍正文 高度/宽度
-            this.chapter.contentHeight = this.setting.height - menuHeight * 2;
-            this.chapter.contentWidth = this.setting.width - spaceGap;
-            this.chapter.contentColumnWidth = this.setting.width - spaceGap;
+            this.chapter.body.height = this.chapter.scroll.height;
+            this.chapter.body.width = this.screen.width - 40;
 
             // 边界点击区域
-            borderWidthArr = [this.setting.height * 0.2, this.setting.width * 0.8];
+            borderWidthArr = [this.screen.width * 0.2, this.screen.width * 0.8];
 
             // 当前系统时间
             this.showTimeNow();
@@ -549,19 +565,18 @@
         position: absolute;
         top: 0px;
         width: 100%;
-        padding: 0px 10px;
+        padding: 0px 20px;
     }
 
     .chapter-scroll {
         overflow: hidden;
-        width: 100%;
+        padding-left: 20px;
     }
 
-    .chapter-scroll .chapter-content {
-        font-size: 16px;
-        text-indent: 40px;
-        letter-spacing: 4px;
-        margin-left: 20px;
+    .chapter-scroll .chapter-body {
+        text-indent: 30px;
+        -webkit-column-gap: 40px;
+        column-gap: 40px;
         -webkit-transition: transform 1s;
         transition: transform 1s;
     }
@@ -573,7 +588,7 @@
         bottom: 0px;
         line-height: 44px;
         width: 100%;
-        padding: 0px 10px;
+        padding: 0px 20px;
     }
 
     .chapter-status .battery {

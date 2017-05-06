@@ -51,6 +51,7 @@ module.exports = {
         ]
     },
     plugins: [
+        // need: npm i jquery@1.11.3
         // new webpack.ProvidePlugin({
         //     jQuery: "jquery",
         //     $: "jquery"

@@ -32,12 +32,8 @@
     "Accelerometer": {
       "description": "访问加速度感应器"
     },
-    "Audio": {
-      "description": "访问麦克风"
-    },
-    "Messaging": {
-      "description": "短彩邮件插件"
-    },
+    
+    
     "Cache": {
       "description": "管理应用缓存"
     },
@@ -47,9 +43,7 @@
     "Console": {
       "description": "跟踪调试输出日志"
     },
-    "Contacts": {
-      "description": "访问系统联系人信息"
-    },
+    
     "Device": {
       "description": "访问设备信息"
     },
@@ -95,12 +89,8 @@
     "Barcode": {
       "description": "管理二维码扫描插件"
     },
-    "Maps": {
-      "description": "管理地图插件"
-    },
-    "Speech": {
-      "description": "管理语音识别插件"
-    },
+    
+    
     "Webview": {
       "description": "窗口管理"
     },
@@ -152,30 +142,7 @@
         /*Android应用打包使用密钥库中证书的密码*/
         "aliasname": "",
         /*Android应用打包使用密钥库中证书的别名*/
-        "permissions": [
-          "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
-          "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
-          "<uses-permission android:name=\"android.permission.READ_CONTACTS\"/>",
-          "<uses-permission android:name=\"android.permission.VIBRATE\"/>",
-          "<uses-permission android:name=\"android.permission.READ_LOGS\"/>",
-          "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
-          "<uses-feature android:name=\"android.hardware.camera.autofocus\"/>",
-          "<uses-permission android:name=\"android.permission.WRITE_CONTACTS\"/>",
-          "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
-          "<uses-permission android:name=\"android.permission.CAMERA\"/>",
-          "<uses-permission android:name=\"android.permission.RECORD_AUDIO\"/>",
-          "<uses-permission android:name=\"android.permission.GET_ACCOUNTS\"/>",
-          "<uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>",
-          "<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>",
-          "<uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>",
-          "<uses-permission android:name=\"android.permission.WAKE_LOCK\"/>",
-          "<uses-permission android:name=\"android.permission.CALL_PHONE\"/>",
-          "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
-          "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>",
-          "<uses-feature android:name=\"android.hardware.camera\"/>",
-          "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
-          "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
-        ]
+        "permissions": ["<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>","<uses-permission android:name=\"android.permission.VIBRATE\"/>","<uses-permission android:name=\"android.permission.WAKE_LOCK\"/>","<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>","<uses-permission android:name=\"android.permission.CALL_PHONE\"/>","<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>","<uses-feature android:name=\"android.hardware.camera.autofocus\"/>","<uses-feature android:name=\"android.hardware.camera\"/>","<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>","<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>","<uses-permission android:name=\"android.permission.CAMERA\"/>"]
         /*使用Native.js调用原生安卓API需要使用到的系统权限*/
       },
       "orientation": [
@@ -300,73 +267,7 @@
 		"pages": {
 			"index.html": {
 				"resources": [
-					"build/font/iconfont.a47a2f6.ttf",
-					"build/app.7f45d07fd32a7c53921f.js",
-					"build/store.png",
-					"build/app.7df48980f8a35622edf4.js",
-					"build/app.244823bb4f2915abb798.js",
-					"build/app.86a19fd0368e24096cdd.js",
-					"build/app.475340876945d9dbab8d.js",
-					"build/app.adfce0532646cae0a924.js",
-					"build/app.777cbff6e5108d530f06.js",
-					"build/app.01de3c7c00adea1f4458.js",
-					"build/app.5f46811b20a3258aea7e.js",
-					"build/app.7ad162cef68e6ed9395d.js",
-					"build/app.34a4b0ad7ad1375be07f.js",
-					"build/app.449a180aace28e5aa92e.js",
-					"build/app.1fc96a01b808173a4f56.js",
-					"build/app.b318c564bfa47222d92c.js",
-					"build/app.f7f9cd685302436dda3d.js",
-					"build/app.827862d8bfb8cdb9df8c.js",
-					"build/app.279de9d5951dd8ac9e0f.js",
-					"build/app.0d4c6a5c2f2fb1439310.js",
-					"build/app.e4030a9e1357871728cc.js",
-					"build/app.a839904996feaba68636.js",
-					"build/app.42f1f7035fb7e1b765ae.js",
-					"build/app.137699cb3f9133999455.js",
-					"build/app.8c8eb40fe481a493e135.js",
-					"build/app.df3c41e857e990270489.js",
-					"build/app.996f7a361046371fe268.js",
-					"build/app.b49b24cc141b3f5f8132.js",
-					"build/app.6f9d6127b71bc539eead.js",
-					"build/app.0754789440b6d6f663c0.js",
-					"build/app.15c72d0b48c01ddc6679.js",
-					"build/app.bdc7bfa6ae4cbc02abdf.js",
-					"build/app.58f4b777be0ce9cc378e.js",
-					"build/app.cd951d064812850c146a.js",
-					"build/app.caeed04db2416f587865.js",
-					"build/app.3b0dc7c373bf0429bfd3.js",
-					"build/app.5c1621e6139eace38279.js",
-					"build/app.d34489b109f6fff62d8f.js",
-					"build/app.433638955f1b74471757.js",
-					"build/app.51f330d94340536e5257.js",
-					"build/app.d09fdec4845c6e1d26fa.js",
-					"build/app.02972c2f3a1706eca815.js",
-					"build/app.9b514c3a42bf1e84c276.js",
-					"build/app.07085bd00ebfe2574a12.js",
-					"build/app.205b2e8291770fe917e3.js",
-					"build/app.8901c7cbdba69e9a92ff.js",
-					"build/app.e589cb320b98a616df9c.js",
-					"build/app.03e59f5c4ef789867801.js",
-					"build/app.abc9e7bc0f1c4c5e78fa.js",
-					"build/app.21194b757553490888f0.js",
-					"build/app.543b13fb4c777e2c869b.js",
-					"build/app.e2464f42b18dd5e47fee.js",
-					"build/app.049a985ccb9d71e436ed.js",
-					"build/app.e44dcc21b1b214652fbb.js",
-					"build/app.a27d493c033a9c479f74.js",
-					"build/app.30370f965e5363df5e75.js",
-					"build/app.92b10b95d8b08fc8a744.js",
-					"build/app.35feddeda0b53c4937df.js",
-					"build/app.f5ec552c4a641ee661e5.js",
-					"build/app.c318abc7395c9548b4c2.js",
-					"build/app.79263cdbe74a832a2e43.js",
-					"build/app.150201211edf491cf4f1.js",
-					"build/app.e2df36ee830322ceb81e.js",
-					"build/app.5fcce39d93abbcd10f32.js",
-					"build/app.dbdf2478f1bdf626d8a7.js",
-					"build/app.8a7ad1b56e2a10ca419f.js",
-					"build/app.241f8f450f6a91cca625.js"
+					"build/app.bdfb37fe26da18ff41e4.js"
 				],
 				"refer": [],
 				"priority": 0
@@ -8431,5 +8332,10 @@
 				"node_modules/lodash/_createHybrid.js"
 			]
 		}
-	}
+	},
+	"unpackage":[
+	  "README.md",
+	  "package.json",
+	  "webpack.config.js"
+	]
 }
