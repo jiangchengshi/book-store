@@ -262,6 +262,7 @@
                 let _this = this;
                 let localFile = _this.$store.state.localPath + _this.$route.query.name;
                 if (app.config.isApp) {
+                    plus.nativeUI.showWaiting('努力加载中...');
                     plus.io.resolveLocalFileSystemURL(localFile, function (fe) {
                         fe.file(function (file) {
                             let fileReader = new plus.io.FileReader();
@@ -272,6 +273,8 @@
                                 _this.processBook();
                                 // 展示当前章节内容
                                 _this.showChapter();
+
+                                plus.nativeUI.closeWaiting();
                             }
                         }, function (e) {
                             app.mui.toast("read book exception: " + e.message);
