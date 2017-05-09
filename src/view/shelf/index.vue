@@ -108,10 +108,10 @@
         },
         created(){
             // 欢迎界面
-//            if (!app.common.getStartFlag()) {
-//                this.$router.push({name: 'welcome'});
-//                return;
-//            }
+            if (!app.service.getStartFlag()) {
+                this.$router.push({name: 'welcome'});
+                return;
+            }
 
             // 宽度
             this.shelf.width = app.config.device.screenWidth + 'px';

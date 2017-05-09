@@ -3,16 +3,17 @@ import router from "./router";
 import store from "./store";
 
 import config from "./config";
-import mui from "./lib/mui";
+import mui from "./lib/mui.min";
+import "./lib/velocity.min";
 
-import common from "./util/service";
+import service from "./util/service";
 import ajax from "./util/ajax";
 import log from "./util/log";
 import util from "./util/util";
 
 import app from "../view/app.vue";
 
-window.app = Object.assign({}, {config, mui, common, ajax, log, util});
+window.app = Object.assign({}, {config, mui, service, ajax, log, util});
 
 const initVue = function () {
     // Object.keys(directive).forEach((key) => {
@@ -27,7 +28,9 @@ const initVue = function () {
 
 mui.init({
     gestureConfig: {
-        tap: true
+        tap: true,
+        swipe: true,
+        drag: true
     },
     swipeBack: false, //关闭右滑关闭功能（默认就是false）
     keyEventBind: {

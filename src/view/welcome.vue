@@ -1,81 +1,128 @@
 <template>
-    <div class="main">
-        <div class="mui-slider mui-fullscreen" style="background-color: black;">
-            <div class="mui-slider-group">
-                <!-- 第一张 -->
-                <div class="mui-slider-item">
-                    <div class="item-logo" style="background-color: #D74B28">
-                        <a href="#">
-                            MUI
-                        </a>
-                        <div class="animate guide-show">
-                            <h2 class="animated bounceInDown">小巧高能</h2>
-                            <li class="animated bounceInLeft">几十K的JS和CSS</li>
-                            <li class="animated bounceInRight">上百种控件样式和模板</li>
-                        </div>
+    <div id="welcome">
+        <slider :width="width+'px'" :height="height+'px'" :auto="false" :control-btn="true" animation="fade"
+                :speed="500">
+            <slider-item>
+                <div class="item-logo" style="background-color: #02C1ED;">
+                    <a href="#">BOOK</a>
+                    <div id="slider-1" class="animate">
+                        <h2>小巧高能</h2>
+                        <li>几十K的JS和CSS</li>
+                        <li>上百种控件样式和模板</li>
                     </div>
                 </div>
-                <!-- 第二张 -->
-                <div class="mui-slider-item">
-                    <div class="item-logo" style="background-color: #02C1ED;">
-                        <a href="#">
-                            MUI
-                        </a>
-                        <div id="tips-2" class="animate mui-hidden">
-                            <h2 class="animated bounceInDown">原生UI</h2>
-                            <li class="animated bounceInLeft">以iOS原生UI为基础</li>
-                            <li class="animated bounceInRight">补充Android特有样式</li>
-                        </div>
+            </slider-item>
+            <slider-item>
+                <div class="item-logo" style="background-color: #67C962;">
+                    <a href="#">BOOK</a>
+                    <div id="slider-2" class="animate">
+                        <h2>流畅体验</h2>
+                        <li>下拉刷新、转场动画</li>
+                        <li>整个世界都流畅了</li>
                     </div>
                 </div>
-                <!-- 第三张 -->
-                <div class="mui-slider-item">
-                    <div class="item-logo" style="background-color: #67C962;">
-                        <a href="#">
-                            MUI
-                        </a>
-                        <div id="tips-3" class="animate mui-hidden">
-                            <h2 class="animated bounceInDown">流畅体验</h2>
-                            <li class="animated bounceInLeft">下拉刷新、转场动画</li>
-                            <li class="animated bounceInRight">整个世界都流畅了</li>
-                        </div>
+            </slider-item>
+            <slider-item>
+                <div class="item-logo" style="background-color: #FCD208;">
+                    <a href="#">BOOK</a>
+                    <div class="animate">
+                        <button class="mui-btn mui-btn-warning mui-btn-outlined" @tap.stop="handleTapExpr">立即体验</button>
                     </div>
                 </div>
-                <!-- 第四张 -->
-                <div class="mui-slider-item">
-                    <div class="item-logo" style="background-color: #FCD208;">
-                        <a href="#">
-                            MUI
-                        </a>
-                        <div class="animate">
-                            <button id='close' class="mui-btn mui-btn-warning mui-btn-outlined">立即体验</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="mui-slider-indicator">
-                <div class="mui-indicator mui-active"></div>
-                <div class="mui-indicator"></div>
-                <div class="mui-indicator"></div>
-                <div class="mui-indicator"></div>
-            </div>
-        </div>
+            </slider-item>
+        </slider>
     </div>
 </template>
 
 <script>
+    import {Slider, SliderItem} from 'vue-easy-slider';
+
     export default {
         data () {
             return {
-                msg: 'Welcome to Your Vue.js App'
+                msg: 'Welcome to Your Vue.js App',
+                width: 0,
+                height: 0
             }
+        },
+        components: {
+            Slider,
+            SliderItem
+        },
+        methods: {
+            handleTapExpr(e){
+                // 设置 started
+                app.service.setStartFlag();
+
+                this.$router.push({path: 'shelf'});
+            }
+        },
+        created(){
+            this.width = app.config.device.screenWidth;
+            this.height = app.config.device.screenHeight;
         }
     }
 </script>
 
 <style scoped>
-    .main {
-        margin: 0;
-        padding: 0;
+    .item-logo {
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+
+    .item-logo a {
+        width: 200px;
+        height: 200px;
+        display: block;
+        border: 1px solid #FFFFFF;
+        text-align: center;
+        line-height: 200px;
+        border-radius: 50%;
+        font-size: 40px;
+        color: #fff;
+        position: absolute;
+        top: 15%;
+        left: 50%;
+        margin-left: -100px;
+    }
+
+    .animate {
+        position: absolute;
+        left: 0;
+        bottom: 15%;
+        width: 100%;
+        color: #fff;
+        display: -moz-box;
+    }
+
+    .animate h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .animate li {
+        width: 50%;
+        height: 30px;
+        line-height: 30px;
+        list-style: none;
+        font-size: 16px;
+        text-align: right;
+    }
+
+    .animate li:nth-child(3) {
+        text-align: left;
+        float: right;
+    }
+
+    .animate button {
+        position: absolute;
+        width: 160px;
+        left: 50%;
+        margin-left: -80px;
+        bottom: 15%;
+        padding: 10px;
+        color: #fff;
+        border-color: #fff;
     }
 </style>

@@ -6,14 +6,17 @@ export default {
         return false;
     },
     getStartFlag(){
-        //如果不是app始终返回true
-        if (!app.config.isApp) {
+        if (!app.config.isApp) {    // 如果不是app始终返回true
             return true;
         }
-        const startFlag = app.util.localStorage('startFlag');
-        if (startFlag) {
+        const start = app.util.localStorage('start');
+        console.log(start);
+        if (start) {
             return true;
         }
         return false;
+    },
+    setStartFlag(){
+        app.util.localStorage('start', {version: app.config.version});
     }
 }

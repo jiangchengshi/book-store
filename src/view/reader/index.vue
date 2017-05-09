@@ -2,7 +2,7 @@
     <div ref="reader" class="reader">
         <!-- 侧滑导航根容器 -->
         <div class="mui-off-canvas-wrap mui-draggable" style="z-index:initial;">
-            <div class="mui-inner-wrap">
+            <div class="mui-inner-wrap" ref="muiInnerWrap">
                 <!-- 侧滑菜单 -->
                 <aside class="mui-off-canvas-left" style="background: #FFFFFF;color: #162636; font-size: 12px;">
                     <div style="padding: 10px 10px;">
@@ -18,7 +18,8 @@
                     <div class="content">
                         <div id="menuChapter" class="mui-control-content mui-active">
                             <ul class="mui-table-view" v-if="menu.chapterArr.length>0">
-                                <li class="mui-table-view-cell" v-for="chapter in menu.chapterArr">
+                                <li class="mui-table-view-cell" :data-index="index"
+                                    v-for="(chapter, index) in menu.chapterArr" @tap.stop="handleTapMenuChapter">
                                     {{chapter}}
                                 </li>
                             </ul>
@@ -26,7 +27,7 @@
                         </div>
                         <div id="menuMark" class="mui-control-content">
                             <ul class="mui-table-view" v-if="menu.markArr.length>0">
-                                <li class="mui-table-view-cell" v-for="chapter in menu.markArr">
+                                <li class="mui-table-view-cell" v-for="(mark, index) in menu.markArr">
                                     {{mark}}
                                 </li>
                             </ul>
@@ -34,7 +35,7 @@
                         </div>
                         <div id="menuNote" class="mui-control-content">
                             <ul class="mui-table-view" v-if="menu.noteArr.length>0">
-                                <li class="mui-table-view-cell" v-for="chapter in menu.noteArr">
+                                <li class="mui-table-view-cell" v-for="(note, index) in menu.noteArr">
                                     {{note}}
                                 </li>
                             </ul>
@@ -77,20 +78,20 @@
                 <!-- 正文显示 -->
                 <div class="mui-content" :style="{height:screen.height+'px', width:screen.width+'px',
                     color:setting.color, 'background-color':setting.backgroundColor, opacity: setting.opacity}">
-                    <div class="chapter-title">
+                    <div class="chapter-title" :style="{color: setting.color}">
                         {{chapter.title}}
                     </div>
                     <div class="chapter-scroll" ref="chapterScroll" @tap="handleTapContent"
                          :style="{height: chapter.scroll.height+'px', width: chapter.scroll.width+'px',
-                             'font-size':setting.fontSize+'px', 'line-height':setting.lineHeight+'px',
-                             'line-spacing':setting.lineSpacing+'px'}">
-                        <div class="chapter-body" ref="chapterBody"
-                             :style="{height: chapter.body.height+'px', width: chapter.body.width+'px',
-                             'column-width': chapter.body.width+'px'}">
-                            {{chapter.content}}
-                        </div>
+                             'font-size':setting.fontSize+'px', 'line-height':setting.lineHeight+'px', 'line-spacing':setting.lineSpacing+'px'}">
+                        <transition @before-enter="beforeEnter" @enter="enter" @leave="leave" :css="false">
+                            <div class="chapter-body" ref="chapterBody" v-if="turnFlag"
+                                 :style="{height: chapter.body.height+'px', width: chapter.body.width+'px', 'column-width': chapter.body.width+'px'}">
+                                {{chapter.content}}
+                            </div>
+                        </transition>
                     </div>
-                    <div class="chapter-status">
+                    <div class="chapter-status" :style="{color: setting.color}">
                         <span class="battery">
                             <span v-if="chapter.battery>80" class="mui-icon iconfont icon-bf-icon-battery"></span>
                             <span v-else-if="chapter.battery>50" class="mui-icon iconfont icon-bf-battery3"></span>
@@ -100,6 +101,8 @@
                         <span class="time">{{chapter.time}}</span>
                         <span class="progress">{{chapter.progress}}</span>
                     </div>
+                    <!-- off-canvas backdrop -->
+                    <div class="mui-off-canvas-backdrop"></div>
                 </div>
             </div>
         </div>
@@ -144,7 +147,7 @@
             </div>
             <div class="mui-input-row mui-input-range" style="padding-right:0px;color:#35B4EB;">
                 <label style="padding: 15px 10px; width: 20%" @tap.stop="handleTapPopPrevChapter">上一章</label>
-                <input type="range" min="chapterMin" :max="chapterMax" :value="chapterCur"
+                <input type="range" :min="chapterMin" :max="chapterMax" :value="chapterCur"
                        @change="handleChangePopProgress">
                 <label style="padding: 15px 10px; width: 20%" @tap.stop="handleTapPopNextChapter">下一章</label>
             </div>
@@ -155,21 +158,20 @@
             <div class="mui-input-row mui-input-range bright" style="padding-right: 0px;">
                 <label>亮度</label>
                 <span class="mui-icon iconfont icon-rijian" style="font-size: 16px"></span>
-                <input type="range" min="1" :max="100" @change="handleChangePopBright">
+                <input type="range" min="1" max="100" @change="handleChangePopBright">
                 <span class="mui-icon iconfont icon-rijian" style="font-size: 26px;"></span>
             </div>
             <div class="mui-input-row mui-input-range font" style="padding-right: 0px;">
                 <label>字体</label>
-                <span class="simpleTradition btn">繁</span>
+                <span class="simpleTradition btn" data-oper="convert" @tap.stop="handleTapPopFont">{{setting.fontFamily}}</span>
                 <span class="minus btn" data-oper="minus" @tap.stop="handleTapPopFont">A-</span>
                 <span class="size">{{setting.fontSize}}</span>
                 <span class="plus btn" data-oper="plus" @tap.stop="handleTapPopFont">A+</span>
             </div>
             <div class="mui-input-row mui-input-range turn" style="padding-right: 0px;">
                 <label>翻页</label>
-                <span class="btn" data-effect="1" @tap.stop="handleTapPopTurn">左右</span>
-                <span class="btn" data-effect="2" @tap.stop="handleTapPopTurn">旋转</span>
-                <span class="btn" data-effect="3" @tap.stop="handleTapPopTurn">缩放</span>
+                <span class="btn" data-effect="1" @tap.stop="handleTapPopTurn">滑动</span>
+                <span class="btn" data-effect="2" @tap.stop="handleTapPopTurn">覆盖</span>
             </div>
             <div class="mui-input-row mui-input-range compose" style="padding-right: 0px;">
                 <label>排版</label>
@@ -200,9 +202,7 @@
         borderWidthArr = [],    // 边界宽度数组
         bookContent = "",   // 书籍内容
         tabBarHeight = 50 + 44,    // 菜单nav高度 + 底部padding
-        turnTranslateX = 0, // 翻页移动距离
-        turnRotateX = 0,    // 翻页旋转角度
-        turnScaleY = 1; // 翻页缩放距离
+        turnTranslateX = 0; // 翻页移动距离
     export default {
         name: 'reader',
         data () {
@@ -235,6 +235,8 @@
                     scrollX: 0   // 已滚动的x距离
                 },
                 setting: {
+                    brightness: 0,   // 亮度
+                    fontFamily: '繁',   // 简体/繁体
                     fontSize: 14,   // 字体大小
                     color: '#1F1F1F',  // 字体颜色
                     navColor: ' #162636',   // 字体颜色：顶部nav
@@ -243,18 +245,18 @@
                     navBackgroundColor: '#FFFFFF',  // 背景颜色：顶部nav
                     tabBackgroundColor: '#FFFFFF',  // 背景颜色：底部tab
                     opacity: 1, // 不透明级别
-                    turnEffect: 1,  // 翻页效果：1-左右；2-翻转；3-缩放
+                    turnEffect: 1,  // 翻页效果：1-滑动；2-覆盖
                     lineHeight: 30, // 行间高
-                    lineSpacing: 4, // 行间隔
-                    brightness: 0   // 亮度
+                    lineSpacing: 4  // 行间隔
                 },
                 chapterTitle: {},    // 章节title对象， {第*章: 第*章 ******}
                 chapterTitleKeyArr: [],    // 章节title key数组， 第*章
                 chapterCur: 0, // 当前章节： title key数组的下标
-                chapterMin: 0,  // 最小章节： 默认0
-                chapterMax: 0,  // 最大章节： title key数组的长度-1
+                chapterMin: 0, // 最小章节： 默认0
+                chapterMax: 0, // 最大章节： title key数组的长度-1
                 dayNight: '夜间',
-                dayNightIcon: 'icon-yejian1'
+                dayNightIcon: 'icon-yejian1',
+                turnFlag: true  // 翻页效果标识
             }
         },
         methods: {
@@ -288,17 +290,8 @@
                         "比如ios的game center api。太多的API封装到HTML5plus里，会过多增加runtime的体积，但若有需求要使用" +
                         "这些api又很麻烦。我们有一项突破性的技术来解决上述烦恼—Native.js，一种把40w原生API映射为JS API的技术。" +
                         "如果说node.js把js的战火烧到了服务器端，那么Native.js把js战火烧到了原生应用战场。但我们可以使用js直接" +
-                        "调原生API，语法是js语法，API命名是原生命名。比如var然后obj.xxx，这个xxx属性就完全是原生对象的属性命名。" +
-                        "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
-                        "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
-                        "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
-                        "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
-                        "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
-                        "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
-                        "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
-                        "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
-                        "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。" +
-                        "对于JSer，他一下就有40w API可以用，瞬间感觉无所不能，大声神器，大家肯定是看i欸看到 流口水开始宽度开始。";
+                        "调原生API，语法是js语法，API命名是原生命名。比如var然后obj.xxx，这个xxx属性就完全是原生对象的属性命名。";
+                    this.menu.chapterArr.push('第54章 急急急看看');
                     app.mui.toast('please read via app');
                 }
             },
@@ -343,6 +336,8 @@
                         turnTranslateX = this.$refs.chapterBody.scrollWidth - this.screen.width + 40;
                     } else if (direction == 'next') {
                         turnTranslateX = 0;
+                    } else {
+                        turnTranslateX = 0;
                     }
                     // 记录已滚动的距离
                     this.pos.scrollX = turnTranslateX;
@@ -364,6 +359,16 @@
                     if (tapX >= borderWidthArr[1]) {
                         this.processPage('next');
                     }
+                }
+            },
+            handleSwipeLeft(e){
+                if (e.target.className == 'chapter-body') {
+                    this.processPage('next');
+                }
+            },
+            handleSwipeRight(e){
+                if (e.target.className == 'chapter-body') {
+                    this.processPage('prev');
                 }
             },
             processPage(direction) {
@@ -395,29 +400,7 @@
                 this.processTurn();
             },
             processTurn(){
-                if (this.setting.turnEffect == 1) {
-                    turnScaleY = 1;
-                } else if (this.setting.turnEffect == 2) {
-                    turnRotateX = 360 - turnRotateX;
-                } else if (this.setting.turnEffect == 3) {
-                    turnScaleY = 2;
-                }
-                this.processTransForm();
-
-                if (this.setting.turnEffect == 3) {
-                    setTimeout(() => {
-                        turnScaleY = 1;
-                        this.processTransForm();
-                    }, 500);
-                }
-            },
-            processTransForm(){
-                let transform = 'translateX(-' + turnTranslateX + 'px) rotateX(' + turnRotateX + 'deg) scaleY(' + turnScaleY + ')';
-                this.$refs.chapterBody.style['-webkit-transform'] = transform;   // Webkit内核浏览器：Safari and Chrome
-                this.$refs.chapterBody.style['transform'] = transform;  // W3C标准
-            },
-            showTimeNow() {
-                this.chapter.time = app.util.dateFormat(new Date(), 'hh:mm');
+                this.turnFlag = false;
             },
             handleNavBarMark(){
                 app.mui.alert('别点了，还没有书签...');
@@ -475,12 +458,15 @@
             },
             handleTapPopFont(e){
                 let oper = e.detail.target.dataset.oper;
-                if (oper == "minus") {
+                if (oper == 'convert') {
+                    this.setting.fontFamily = this.setting.fontFamily == '繁' ? '简' : '繁';
+                    app.mui.toast('切换? 稍等');
+                } else if (oper == "minus") {
                     this.setting.fontSize--;
                 } else if (oper == "plus") {
                     this.setting.fontSize++;
                 }
-                let eleFontArr = app.mui('.popover-sz .font span');
+                let eleFontArr = app.mui('.popover-sz .font span.btn');
                 this.handleActiveElement(eleFontArr, e.target);
             },
             handleTapPopTurn(e){
@@ -499,11 +485,52 @@
                 this.setting.backgroundColor = color;
                 this.setting.color = '#1F1F1F';
             },
+            handleTapMenuChapter(e){
+                this.chapterCur = Number(e.target.dataset.index);
+                this.showChapter();
+            },
             handleActiveElement(eleArr, target){
                 for (let i = 0; i < eleArr.length; i++) {
                     eleArr[i].style.backgroundColor = '#FFFFFF';
                 }
                 target.style.backgroundColor = '#D8D8D8';
+            },
+            beforeEnter: function (el) {
+                if (this.setting.turnEffect == 1) {
+                    Velocity(el, {opacity: 0.5, translateX: '-' + turnTranslateX + 'px'}, {
+                        easing: "ease-in-out",
+                        duration: 500
+                    });
+                }
+                if (this.setting.turnEffect == 2) {
+                    Velocity(el, {translateX: '-' + turnTranslateX + 'px'}, {
+                        easing: "ease-in-out",
+                        duration: 1
+                    });
+                }
+            },
+            enter: function (el, done) {
+                Velocity(el, {opacity: 1}, {
+                    duration: 300,
+                    complete: done
+                });
+            },
+            leave: function (el, done) {
+                if (this.setting.turnEffect == 1) {
+                    this.turnFlag = true;
+                    done();
+                } else if (this.setting.turnEffect == 2) {
+                    Velocity(el, {opacity: 0}, {
+                        easing: "ease-in-out",
+                        duration: 1,
+                        complete: () => {
+                            this.turnFlag = true;
+                        }
+                    });
+                }
+            },
+            showTimeNow() {
+                this.chapter.time = app.util.dateFormat(new Date(), 'hh:mm');
             }
         },
         created() {
@@ -526,6 +553,10 @@
             // 边界点击区域
             borderWidthArr = [this.screen.width * 0.2, this.screen.width * 0.8];
 
+            // 监听手势滑动
+            window.addEventListener('swipeleft', this.handleSwipeLeft);
+            window.addEventListener('swiperight', this.handleSwipeRight);
+
             // 当前系统时间
             this.showTimeNow();
             setInterval(this.showTimeNow, 60000);
@@ -533,6 +564,12 @@
         mounted() {
             // 打开书籍
             this.openBook();
+
+            // 侧滑菜单：禁用手势侧滑
+            this.$refs.muiInnerWrap.addEventListener('drag', function (e) {
+                console.log(e);
+                e.stopPropagation();
+            });
 
             // 默认设置参数
             // 1. 翻页
@@ -562,6 +599,7 @@
     }
 
     .chapter-title {
+        opacity: 0.56;
         font-size: 10px;
         letter-spacing: 0;
         line-height: 44px;
@@ -580,11 +618,10 @@
         text-indent: 30px;
         -webkit-column-gap: 40px;
         column-gap: 40px;
-        -webkit-transition: transform 1s;
-        transition: transform 1s;
     }
 
     .chapter-status {
+        opacity: 0.56;
         font-size: 10px;
         letter-spacing: 0;
         position: absolute;
@@ -674,7 +711,8 @@
     }
 
     .mui-popover.popover-sz .turn span {
-        padding: 6px 15px;
+        padding: 6px 30px;
+        margin-right: 10px;
     }
 
     .mui-popover.popover-sz .compose span {

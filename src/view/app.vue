@@ -7,7 +7,7 @@
 </template>
 
 <script>
-    import '../css/mui.css';
+    import '../css/mui.min.css';
     import '../css/iconfont.css';
     export default {
         data () {
