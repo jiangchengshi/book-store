@@ -290,7 +290,14 @@
                         "比如ios的game center api。太多的API封装到HTML5plus里，会过多增加runtime的体积，但若有需求要使用" +
                         "这些api又很麻烦。我们有一项突破性的技术来解决上述烦恼—Native.js，一种把40w原生API映射为JS API的技术。" +
                         "如果说node.js把js的战火烧到了服务器端，那么Native.js把js战火烧到了原生应用战场。但我们可以使用js直接" +
-                        "调原生API，语法是js语法，API命名是原生命名。比如var然后obj.xxx，这个xxx属性就完全是原生对象的属性命名。";
+                        "调原生API，语法是js语法，API命名是原生命名。比如var然后obj.xxx，这个xxx属性就完全是原生对象的属性命名。" +
+                        "看到就发生口角的楼房喀什觉得垃圾收到了卡就是懒得空间阿里山的空间阿隆索多久啦可是记得啦就是了大家阿拉山口" +
+                        "所看见的联发科时间到了卡就是懒得阿拉山口的垃圾收到了看见法律思考的flask多久啦空间的算了咯技术的离开房间啊" +
+                        "圣诞节分厘卡三季稻浪费卡死了大家阿拉山口的拉升阶段flak时间到了开发进度顺利开机撒 是打开房间阿里山扩大风落" +
+                        "的撒立刻解放螺丝扣搭街坊拉克丝就立刻垃圾上单放假啊手里的空间法律思考的经费卢卡斯就螺丝钉解放了啊上级领导的" +
+                        "设定拉开附件是打开解放拉萨扩大解放啦空手道垃圾啊独立开发阿隆索多久啦可是觉得 尽量靠近当时风落谁家的拉开说的" +
+                        "时间对抗疗法就是懒得看垃圾堆了放假啊手里的空间拉萨看得见垃圾的啦收到了军阀势力的会计法律思考的 是打开房间阿" +
+                        "电视剧啊来反抗集散地立刻反击撒立刻搭街坊到了卡就是独立开发建设力度空间flask的即将拉升的就flak但是四道口附近。";
                     this.menu.chapterArr.push('第54章 急急急看看');
                     app.mui.toast('please read via app');
                 }
@@ -497,9 +504,9 @@
             },
             beforeEnter: function (el) {
                 if (this.setting.turnEffect == 1) {
-                    Velocity(el, {opacity: 0.5, translateX: '-' + turnTranslateX + 'px'}, {
+                    Velocity(el, {translateX: '-' + turnTranslateX + 'px'}, {
                         easing: "ease-in-out",
-                        duration: 500
+                        duration: 800
                     });
                 }
                 if (this.setting.turnEffect == 2) {
@@ -510,10 +517,12 @@
                 }
             },
             enter: function (el, done) {
-                Velocity(el, {opacity: 1}, {
-                    duration: 300,
-                    complete: done
-                });
+                if (this.setting.turnEffect == 2) {
+                    Velocity(el, {opacity: 1}, {
+                        duration: 1,
+                        complete: done
+                    });
+                }
             },
             leave: function (el, done) {
                 if (this.setting.turnEffect == 1) {
@@ -553,10 +562,6 @@
             // 边界点击区域
             borderWidthArr = [this.screen.width * 0.2, this.screen.width * 0.8];
 
-            // 监听手势滑动
-            window.addEventListener('swipeleft', this.handleSwipeLeft);
-            window.addEventListener('swiperight', this.handleSwipeRight);
-
             // 当前系统时间
             this.showTimeNow();
             setInterval(this.showTimeNow, 60000);
@@ -567,9 +572,12 @@
 
             // 侧滑菜单：禁用手势侧滑
             this.$refs.muiInnerWrap.addEventListener('drag', function (e) {
-                console.log(e);
                 e.stopPropagation();
             });
+
+            // 监听手势滑动
+            this.$refs.chapterScroll.addEventListener('swipeleft', this.handleSwipeLeft);
+            this.$refs.chapterScroll.addEventListener('swiperight', this.handleSwipeRight);
 
             // 默认设置参数
             // 1. 翻页
