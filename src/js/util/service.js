@@ -5,17 +5,23 @@ export default {
     isLogin(){
         return false;
     },
-    getStartFlag(){
+    isWelcome(){
         if (!app.config.isApp) {    // 如果不是app始终返回true
             return true;
         }
-        const start = app.util.localStorage('start');
-        if (start) {
-            return true;
+        const welcome = app.util.localStorage('welcome');
+        if (welcome) {
+            const obj = JSON.parse(welcome);
+            if (obj.version && obj.version == app.config.version) {
+                return true;
+            }
         }
         return false;
     },
-    setStartFlag(){
-        app.util.localStorage('start', {version: app.config.version});
+    setWelcome(){
+        app.util.localStorage('welcome', {version: app.config.version});
+    },
+    remWelcome(){
+        app.util.localStorage('welcome', null);
     }
 }

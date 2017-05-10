@@ -107,8 +107,8 @@
             }
         },
         created(){
-            // 欢迎界面
-            if (!app.service.getStartFlag()) {
+            // 欢迎 界面
+            if (!app.service.isWelcome()) {
                 this.$router.push({name: 'welcome'});
                 return;
             }
@@ -169,6 +169,28 @@
                     this.books.push(_books);
                 }
             });
+        },
+        mounted(){
+            // 返回键处理：1秒内，连续两次按返回键，则退出应用
+            let first = null;
+            plus.key.addEventListener('backbutton', function () {
+                //首次按键，提示‘再按一次退出应用’
+                if (!first) {
+                    first = new Date().getTime();
+                    mui.toast('再按一次退出应用');
+                    setTimeout(function () {
+                        first = null;
+                    }, 1000);
+                } else {
+                    if (new Date().getTime() - first < 1000) {
+                        // 清空 欢迎标识
+                        app.service.remWelcome();
+
+                        // 退出
+                        plus.runtime.quit();
+                    }
+                }
+            }, false);
         }
     }
 </script>

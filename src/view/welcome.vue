@@ -51,8 +51,8 @@
         },
         methods: {
             handleTapExpr(e){
-                // 设置 started
-                app.service.setStartFlag();
+                // 设置 欢迎 标识
+                app.service.setWelcome();
 
                 this.$router.push({path: 'shelf'});
             },
