@@ -77,12 +77,12 @@
                 </nav>
                 <!-- 正文显示 -->
                 <div class="mui-content" :style="{height:screen.height+'px', width:screen.width+'px',
-                    color:setting.color, 'background-color':setting.backgroundColor, opacity: setting.opacity}">
+                    color:setting.color, 'background-color':setting.backgroundColor}">
                     <div class="chapter-title" :style="{color: setting.color}">
                         {{chapter.title}}
                     </div>
                     <div class="chapter-scroll" ref="chapterScroll" @tap="handleTapContent"
-                         :style="{height: chapter.scroll.height+'px', width: chapter.scroll.width+'px',
+                         :style="{height: chapter.scroll.height+'px', width: chapter.scroll.width+'px', opacity: setting.opacity,
                              'font-size':setting.fontSize+'px', 'line-height':setting.lineHeight+'px', 'line-spacing':setting.lineSpacing+'px'}">
                         <transition @enter="enter" @leave="leave" :css="false">
                             <div class="chapter-body" ref="chapterBody" v-show="tranFlag"
@@ -185,11 +185,13 @@
             </div>
             <div class="mui-input-row mui-input-range background" style="padding-right: 0px;">
                 <label>背景</label>
-                <span class="btn" style="background-color: #FFFFFF" data-color="#FFFFFF"
+                <span class="btn" style="background-color: #F7F7F7" data-bg-color="#F7F7F7" data-color="#1F1F1F"
                       @tap.stop="handleTapPopBackground"></span>
-                <span class="btn" style="background-color: #EFDBBC" data-color="#EFDBBC"
+                <span class="btn" style="background-color: #EFDBBC" data-bg-color="#EFDBBC" data-color="#1F1F1F"
                       @tap.stop="handleTapPopBackground"></span>
-                <span class="btn" style="background-color: #D6E8C8" data-color="#D6E8C8"
+                <span class="btn" style="background-color: #D6E8C8" data-bg-color="#D6E8C8" data-color="#1F1F1F"
+                      @tap.stop="handleTapPopBackground"></span>
+                <span class="btn" style="background-color: #FCE2E2" data-bg-color="#FCE2E2" data-color="#162636"
                       @tap.stop="handleTapPopBackground"></span>
                 <span class="mui-icon mui-icon-plusempty btn"></span>
             </div>
@@ -241,7 +243,7 @@
                     color: '#1F1F1F',  // 字体颜色
                     navColor: ' #162636',   // 字体颜色：顶部nav
                     tabColor: ' #162636',   // 字体颜色：底部tab
-                    backgroundColor: '#efeff4', // 背景颜色
+                    backgroundColor: '#F7F7F7', // 背景颜色
                     navBackgroundColor: '#FFFFFF',  // 背景颜色：顶部nav
                     tabBackgroundColor: '#FFFFFF',  // 背景颜色：底部tab
                     opacity: 1, // 不透明级别
@@ -450,12 +452,12 @@
                 this.dayNight = go2Night ? '日间' : '夜间';
                 this.dayNightIcon = go2Night ? 'icon-rijian1' : 'icon-yejian1';
                 this.setting.color = go2Night ? '#FFFFFF' : '#1F1F1F';
-                this.setting.navColor = go2Night ? '#FFFFFF' : '#162636';
-                this.setting.tabColor = go2Night ? '#FFFFFF' : '#162636';
-                this.setting.backgroundColor = go2Night ? '#222224' : '#efeff4';
+                this.setting.navColor = go2Night ? '#BDBDBD' : '#162636';
+                this.setting.tabColor = go2Night ? '#BDBDBD' : '#162636';
+                this.setting.backgroundColor = go2Night ? '#222224' : '#F7F7F7';
                 this.setting.navBackgroundColor = go2Night ? '#2C3136' : '#FFFFFF';
                 this.setting.tabBackgroundColor = go2Night ? '#2D3136' : '#FFFFFF';
-                this.setting.opacity = go2Night ? 0.56 : 1;
+                this.setting.opacity = go2Night ? 0.26 : 1;
             },
             handleChangePopBright(e){
                 plus.screen.setBrightness(Number(e.target.value / 100).toFixed(1));
@@ -485,9 +487,9 @@
                 this.handleActiveElement(eleComposeArr, e.target);
             },
             handleTapPopBackground(e){
-                let color = e.detail.target.dataset.color;
-                this.setting.backgroundColor = color;
-                this.setting.color = '#1F1F1F';
+                console.log(e.detail.target.dataset);
+                this.setting.backgroundColor = e.detail.target.dataset.bgColor;
+                this.setting.color = e.detail.target.dataset.color;
             },
             handleTapMenuChapter(e){
                 this.chapterCur = Number(e.target.dataset.index);
@@ -616,6 +618,7 @@
 
     .chapter-scroll .chapter-body {
         text-indent: 30px;
+        letter-spacing: 2px;
         -webkit-column-gap: 40px;
         column-gap: 40px;
     }
@@ -723,7 +726,7 @@
     }
 
     .mui-popover.popover-sz .background span {
-        width: 44px;
+        width: 34px;
         height: 32px;
         float: left;
         margin-top: 6px;
