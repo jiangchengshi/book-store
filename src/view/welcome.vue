@@ -57,13 +57,18 @@
                 this.$router.push({path: 'shelf'});
             },
             handleSwipeLeft(e){
-                console.log(this.$refs.slider.next());
+                this.$refs.slider.next();
             },
             handleSwipeRight(e){
-                console.log(this.$refs.slider.prev());
+                this.$refs.slider.prev();
             }
         },
         created(){
+            // 全屏显示
+            if (app.config.isApp) {
+                plus.navigator.setFullscreen(true);
+            }
+
             this.width = app.config.device.screenWidth;
             this.height = app.config.device.screenHeight;
         },

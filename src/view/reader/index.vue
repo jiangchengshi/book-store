@@ -435,10 +435,16 @@
                 app.mui('.mui-popover.popover-jd').popover('toggle', this.$refs.tabBar);
             },
             handleTapPopPrevChapter(){
-                this.showChapter('prev');
+                if (this.chapterCur > this.chapterMin) {
+                    this.chapterCur--;
+                    this.showChapter();
+                }
             },
             handleTapPopNextChapter(){
-                this.showChapter('next');
+                if (this.chapterCur < this.chapterMax) {
+                    this.chapterCur++;
+                    this.showChapter();
+                }
             },
             handleChangePopProgress(e){
                 this.chapterCur = Number(e.target.value);
