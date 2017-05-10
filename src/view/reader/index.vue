@@ -84,8 +84,8 @@
                     <div class="chapter-scroll" ref="chapterScroll" @tap="handleTapContent"
                          :style="{height: chapter.scroll.height+'px', width: chapter.scroll.width+'px',
                              'font-size':setting.fontSize+'px', 'line-height':setting.lineHeight+'px', 'line-spacing':setting.lineSpacing+'px'}">
-                        <transition @before-enter="beforeEnter" @enter="enter" @leave="leave" :css="false">
-                            <div class="chapter-body" ref="chapterBody" v-if="turnFlag"
+                        <transition @enter="enter" @leave="leave" :css="false">
+                            <div class="chapter-body" ref="chapterBody" v-show="turnFlag"
                                  :style="{height: chapter.body.height+'px', width: chapter.body.width+'px', 'column-width': chapter.body.width+'px'}">
                                 {{chapter.content}}
                             </div>
@@ -369,14 +369,10 @@
                 }
             },
             handleSwipeLeft(e){
-                if (e.target.className == 'chapter-body') {
-                    this.processPage('next');
-                }
+                this.processPage('next');
             },
             handleSwipeRight(e){
-                if (e.target.className == 'chapter-body') {
-                    this.processPage('prev');
-                }
+                this.processPage('prev');
             },
             processPage(direction) {
                 if (direction == 'prev') {
@@ -444,6 +440,7 @@
             },
             handleChangePopProgress(e){
                 this.chapterCur = Number(e.target.value);
+                this.showChapter();
             },
             handleTapTabBarSZ(e){
                 app.mui('.mui-popover.popover-sz').popover('toggle', this.$refs.tabBar);
@@ -502,23 +499,17 @@
                 }
                 target.style.backgroundColor = '#D8D8D8';
             },
-            beforeEnter: function (el) {
+            enter: function (el, done) {
                 if (this.setting.turnEffect == 1) {
                     Velocity(el, {translateX: '-' + turnTranslateX + 'px'}, {
                         easing: "ease-in-out",
-                        duration: 800
+                        duration: 800,
+                        complete: done
                     });
                 }
                 if (this.setting.turnEffect == 2) {
-                    Velocity(el, {translateX: '-' + turnTranslateX + 'px'}, {
+                    Velocity(el, {opacity: 1, translateX: '-' + turnTranslateX + 'px'}, {
                         easing: "ease-in-out",
-                        duration: 1
-                    });
-                }
-            },
-            enter: function (el, done) {
-                if (this.setting.turnEffect == 2) {
-                    Velocity(el, {opacity: 1}, {
                         duration: 1,
                         complete: done
                     });
@@ -534,6 +525,7 @@
                         duration: 1,
                         complete: () => {
                             this.turnFlag = true;
+                            done();
                         }
                     });
                 }
