@@ -85,7 +85,7 @@
                          :style="{height: chapter.scroll.height+'px', width: chapter.scroll.width+'px',
                              'font-size':setting.fontSize+'px', 'line-height':setting.lineHeight+'px', 'line-spacing':setting.lineSpacing+'px'}">
                         <transition @enter="enter" @leave="leave" :css="false">
-                            <div class="chapter-body" ref="chapterBody" v-show="turnFlag"
+                            <div class="chapter-body" ref="chapterBody" v-show="tranFlag"
                                  :style="{height: chapter.body.height+'px', width: chapter.body.width+'px', 'column-width': chapter.body.width+'px'}">
                                 {{chapter.content}}
                             </div>
@@ -256,7 +256,7 @@
                 chapterMax: 0, // 最大章节： title key数组的长度-1
                 dayNight: '夜间',
                 dayNightIcon: 'icon-yejian1',
-                turnFlag: true  // 翻页效果标识
+                tranFlag: true  // 翻页效果 切换标识
             }
         },
         methods: {
@@ -403,7 +403,7 @@
                 this.processTurn();
             },
             processTurn(){
-                this.turnFlag = false;
+                this.tranFlag = false;
             },
             handleNavBarMark(){
                 app.mui.alert('别点了，还没有书签...');
@@ -499,7 +499,7 @@
                 }
                 target.style.backgroundColor = '#D8D8D8';
             },
-            enter: function (el, done) {
+            enter (el, done) {
                 if (this.setting.turnEffect == 1) {
                     Velocity(el, {translateX: '-' + turnTranslateX + 'px'}, {
                         easing: "ease-in-out",
@@ -515,16 +515,16 @@
                     });
                 }
             },
-            leave: function (el, done) {
+            leave (el, done) {
                 if (this.setting.turnEffect == 1) {
-                    this.turnFlag = true;
+                    this.tranFlag = true;
                     done();
                 } else if (this.setting.turnEffect == 2) {
                     Velocity(el, {opacity: 0}, {
                         easing: "ease-in-out",
                         duration: 1,
                         complete: () => {
-                            this.turnFlag = true;
+                            this.tranFlag = true;
                             done();
                         }
                     });

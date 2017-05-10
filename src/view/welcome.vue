@@ -1,7 +1,7 @@
 <template>
-    <div id="welcome">
-        <slider :width="width+'px'" :height="height+'px'" :auto="false" :control-btn="true" animation="fade"
-                :speed="500">
+    <div ref="welcome">
+        <slider ref="slider" :width="width+'px'" :height="height+'px'" :interval="3000" :speed="600" :auto="true"
+                :control-btn="false" animation="fade">
             <slider-item>
                 <div class="item-logo" style="background-color: #02C1ED;">
                     <a href="#">BOOK</a>
@@ -26,7 +26,8 @@
                 <div class="item-logo" style="background-color: #FCD208;">
                     <a href="#">BOOK</a>
                     <div class="animate">
-                        <button class="mui-btn mui-btn-warning mui-btn-outlined" @tap.stop="handleTapExpr">立即体验</button>
+                        <button class="mui-btn mui-btn-warning mui-btn-outlined" @tap.stop="handleTapExpr">立即体验
+                        </button>
                     </div>
                 </div>
             </slider-item>
@@ -40,7 +41,6 @@
     export default {
         data () {
             return {
-                msg: 'Welcome to Your Vue.js App',
                 width: 0,
                 height: 0
             }
@@ -55,11 +55,22 @@
                 app.service.setStartFlag();
 
                 this.$router.push({path: 'shelf'});
+            },
+            handleSwipeLeft(e){
+                console.log(this.$refs.slider.next());
+            },
+            handleSwipeRight(e){
+                console.log(this.$refs.slider.prev());
             }
         },
         created(){
             this.width = app.config.device.screenWidth;
             this.height = app.config.device.screenHeight;
+        },
+        mounted(){
+            // 监听手势滑动
+            this.$refs.welcome.addEventListener('swipeleft', this.handleSwipeLeft);
+            this.$refs.welcome.addEventListener('swiperight', this.handleSwipeRight);
         }
     }
 </script>

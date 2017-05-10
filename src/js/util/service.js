@@ -10,7 +10,6 @@ export default {
             return true;
         }
         const start = app.util.localStorage('start');
-        console.log(start);
         if (start) {
             return true;
         }
