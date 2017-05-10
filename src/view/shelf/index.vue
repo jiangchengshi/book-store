@@ -109,7 +109,7 @@
         created(){
             // 欢迎 界面
             if (!app.service.isWelcome()) {
-                this.$router.push({name: 'welcome'});
+                this.$router.replace({name: 'welcome'});
                 return;
             }
 
