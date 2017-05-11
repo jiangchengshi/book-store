@@ -1,126 +1,138 @@
 <template>
     <div ref="reader" class="reader">
-        <!-- 侧滑导航根容器 -->
-        <div class="mui-off-canvas-wrap mui-draggable" style="z-index:initial;">
-            <div class="mui-inner-wrap" ref="muiInnerWrap">
-                <!-- 侧滑菜单 -->
-                <aside class="mui-off-canvas-left" style="background: #FFFFFF;color: #162636; font-size: 12px;">
-                    <div style="padding: 10px 10px;">
-                        <div id="segmentedControl" class="mui-segmented-control">
-                            <a class="mui-control-item mui-active" href="#menuChapter"><span
-                                    class="mui-icon iconfont icon-mulu1"></span></a>
-                            <a class="mui-control-item" href="#menuMark"><span
-                                    class="mui-icon iconfont icon-bookmark"></span></a>
-                            <a class="mui-control-item" href="#menuNote"><span
-                                    class="mui-icon iconfont icon-biji"></span></a>
-                        </div>
-                    </div>
-                    <div class="content">
-                        <div id="menuChapter" class="mui-control-content mui-active">
-                            <ul class="mui-table-view" v-if="menu.chapterArr.length>0">
-                                <li class="mui-table-view-cell" :data-index="index"
-                                    v-for="(chapter, index) in menu.chapterArr" @tap.stop="handleTapMenuChapter">
-                                    {{chapter}}
-                                </li>
-                            </ul>
-                            <ul v-else>没有发现目录哦</ul>
-                        </div>
-                        <div id="menuMark" class="mui-control-content">
-                            <ul class="mui-table-view" v-if="menu.markArr.length>0">
-                                <li class="mui-table-view-cell" v-for="(mark, index) in menu.markArr">
-                                    {{mark}}
-                                </li>
-                            </ul>
-                            <ul v-else>没有发现书签哦</ul>
-                        </div>
-                        <div id="menuNote" class="mui-control-content">
-                            <ul class="mui-table-view" v-if="menu.noteArr.length>0">
-                                <li class="mui-table-view-cell" v-for="(note, index) in menu.noteArr">
-                                    {{note}}
-                                </li>
-                            </ul>
-                            <ul v-else>没有发现笔记哦</ul>
-                        </div>
-                    </div>
-                </aside>
-                <!-- 顶部导航 -->
-                <header class="mui-bar mui-bar-nav" v-show="$store.state.showHeader"
-                        :style="{color:setting.navColor, 'background-color':setting.navBackgroundColor}">
-                    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-                    <a href="#popoverMore" class="mui-icon mui-icon-more mui-pull-right" style="margin-left: 5px;"></a>
-                    <a href="javascript:void(0);" class="mui-icon iconfont icon-shuqian mui-pull-right"
-                       style="margin-left: 5px;" @tap.stop="handleNavBarMark"></a>
-                    <a href="javascript:void(0);" class="mui-icon iconfont icon-xiazai mui-pull-right"
-                       style="margin-left: 5px;" @tap.stop="handleNavBarDownload"></a>
-                    <a href="javascript:void(0);" class="mui-icon iconfont icon-tubiao mui-pull-right"
-                       @tap.stop="handleNavBarReward"></a>
-                </header>
-                <!-- 底部导航-->
-                <nav class="mui-bar mui-bar-tab" v-show="$store.state.showFooter" ref="tabBar"
-                     :style="{color:setting.tabColor, 'background-color':setting.tabBackgroundColor}">
-                    <a class="mui-tab-item" @tap.stop="handleTapTabBarML" href="javascript:void(0);">
-                        <span class="mui-icon iconfont icon-mulu1"></span>
-                        <span class="mui-tab-label">目录</span>
-                    </a>
-                    <a class="mui-tab-item" @tap.stop="handleTapTabBarJD" href="javascript:void(0);">
-                        <span class="mui-icon iconfont icon-diaozhengjindu-copy"></span>
-                        <span class="mui-tab-label">进度</span>
-                    </a>
-                    <a class="mui-tab-item" @tap.stop="handleTapTabBarSZ" href="javascript:void(0);">
-                        <span class="mui-icon iconfont icon-icon-yxj-font"></span>
-                        <span class="mui-tab-label">设置</span>
-                    </a>
-                    <a class="mui-tab-item" @tap.stop="handleTapTabBarRY" href="javascript:void(0);">
-                        <span class="mui-icon iconfont" :class="[dayNightIcon]"></span>
-                        <span class="mui-tab-label">{{dayNight}}</span>
-                    </a>
-                </nav>
-                <!-- 正文显示 -->
-                <div class="mui-content" :style="{height:screen.height+'px', width:screen.width+'px',
-                    color:setting.color, 'background-color':setting.backgroundColor}">
-                    <div class="chapter-title" :style="{color: setting.color}">
-                        {{chapter.title}}
-                    </div>
-                    <div class="chapter-scroll" ref="chapterScroll" @tap="handleTapContent"
-                         :style="{height: chapter.scroll.height+'px', width: chapter.scroll.width+'px', opacity: setting.opacity,
-                             'font-size':setting.fontSize+'px', 'line-height':setting.lineHeight+'px', 'line-spacing':setting.lineSpacing+'px'}">
-                        <transition @enter="enter" @leave="leave" :css="false">
-                            <div class="chapter-body" ref="chapterBody" v-show="tranFlag"
-                                 :style="{height: chapter.body.height+'px', width: chapter.body.width+'px', 'column-width': chapter.body.width+'px'}">
-                                {{chapter.content}}
+        <scroller ref="scroller" :onRefresh="handlePullDown" refreshText="下拉添加书签">
+            <!-- 侧滑导航根容器 -->
+            <div class="mui-off-canvas-wrap mui-draggable" style="z-index:initial;">
+                <div class="mui-inner-wrap" ref="muiInnerWrap">
+                    <!-- 侧滑菜单 -->
+                    <aside class="mui-off-canvas-left" style="background: #FFFFFF;color: #162636; font-size: 12px;">
+                        <div style="padding: 10px 10px;">
+                            <div id="segmentedControl" class="mui-segmented-control">
+                                <a class="mui-control-item mui-active" href="#menuChapter"><span
+                                        class="mui-icon iconfont icon-mulu1"></span></a>
+                                <a class="mui-control-item" href="#menuMark"><span
+                                        class="mui-icon iconfont icon-bookmark"></span></a>
+                                <a class="mui-control-item" href="#menuNote"><span
+                                        class="mui-icon iconfont icon-biji"></span></a>
                             </div>
-                        </transition>
+                        </div>
+                        <div class="content">
+                            <div id="menuChapter" class="mui-control-content mui-active">
+                                <ul class="mui-table-view" v-if="menu.chapterArr.length>0">
+                                    <li class="mui-table-view-cell" :data-index="index"
+                                        v-for="(chapter, index) in menu.chapterArr"
+                                        @tap.stop="handleTapMenuChapter">
+                                        {{chapter}}
+                                    </li>
+                                </ul>
+                                <ul v-else>没有发现目录哦</ul>
+                            </div>
+                            <div id="menuMark" class="mui-control-content">
+                                <ul class="mui-table-view" v-if="menu.markArr.length>0">
+                                    <li class="mui-table-view-cell" :data-index="index"
+                                        v-for="(mark, index) in menu.markArr"
+                                        @tap.stop="handleTapMenuMark">
+                                        {{mark.title}} - {{mark.content}}
+                                    </li>
+                                </ul>
+                                <ul v-else>没有发现书签哦</ul>
+                            </div>
+                            <div id="menuNote" class="mui-control-content">
+                                <ul class="mui-table-view" v-if="menu.noteArr.length>0">
+                                    <li class="mui-table-view-cell" v-for="(note, index) in menu.noteArr">
+                                        {{note}}
+                                    </li>
+                                </ul>
+                                <ul v-else>没有发现笔记哦</ul>
+                            </div>
+                        </div>
+                    </aside>
+                    <!-- 顶部导航 -->
+                    <header class="mui-bar mui-bar-nav" v-show="$store.state.showHeader"
+                            :style="{color:setting.navColor, 'background-color':setting.navBackgroundColor}">
+                        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+                        <a href="#popoverMore" class="mui-icon mui-icon-more mui-pull-right"
+                           style="margin-left: 5px;"></a>
+                        <a href="javascript:void(0);" class="mui-icon iconfont icon-shuqian mui-pull-right"
+                           style="margin-left: 5px;" @tap.stop="handleNavBarMark"></a>
+                        <a href="javascript:void(0);" class="mui-icon iconfont icon-xiazai mui-pull-right"
+                           style="margin-left: 5px;" @tap.stop="handleNavBarDownload"></a>
+                        <a href="javascript:void(0);" class="mui-icon iconfont icon-tubiao mui-pull-right"
+                           @tap.stop="handleNavBarReward"></a>
+                    </header>
+                    <!-- 底部导航 -->
+                    <nav class="mui-bar mui-bar-tab" v-show="$store.state.showFooter" ref="tabBar"
+                         :style="{color:setting.tabColor, 'background-color':setting.tabBackgroundColor}">
+                        <a class="mui-tab-item" @tap.stop="handleTapTabBarML" href="javascript:void(0);">
+                            <span class="mui-icon iconfont icon-mulu1"></span>
+                            <span class="mui-tab-label">目录</span>
+                        </a>
+                        <a class="mui-tab-item" @tap.stop="handleTapTabBarJD" href="javascript:void(0);">
+                            <span class="mui-icon iconfont icon-diaozhengjindu-copy"></span>
+                            <span class="mui-tab-label">进度</span>
+                        </a>
+                        <a class="mui-tab-item" @tap.stop="handleTapTabBarSZ" href="javascript:void(0);">
+                            <span class="mui-icon iconfont icon-icon-yxj-font"></span>
+                            <span class="mui-tab-label">设置</span>
+                        </a>
+                        <a class="mui-tab-item" @tap.stop="handleTapTabBarRY" href="javascript:void(0);">
+                            <span class="mui-icon iconfont" :class="[dayNightIcon]"></span>
+                            <span class="mui-tab-label">{{dayNight}}</span>
+                        </a>
+                    </nav>
+                    <!-- 正文显示 -->
+                    <div class="chapter-content"
+                         :style="{height:screen.height+'px', width:screen.width+'px', color:setting.color, 'background-color':setting.backgroundColor}">
+                        <div class="chapter-title" :style="{color: setting.color}">
+                            {{chapter.title}}
+                        </div>
+                        <div class="chapter-mark" v-show="markFlag">
+                            <i class="mui-icon iconfont icon-bookmark"></i>
+                        </div>
+                        <div class="chapter-scroll" ref="chapterScroll" @tap="handleTapContent"
+                             :style="{height: chapter.scroll.height+'px', width: chapter.scroll.width+'px', opacity: setting.opacity,
+                             'font-size':setting.fontSize+'px', 'line-height':setting.lineHeight+'px', 'line-spacing':setting.lineSpacing+'px'}">
+                            <transition @enter="handleEnter" @leave="handleLeave" :css="false">
+                                <div class="chapter-body" ref="chapterBody" v-show="tranFlag"
+                                     :style="{height: chapter.body.height+'px', width: chapter.body.width+'px', 'column-width': chapter.body.width+'px'}">
+                                    {{chapter.content}}
+                                </div>
+                            </transition>
+                        </div>
+                        <div class="chapter-status" :style="{color: setting.color}">
+                            <span class="battery">
+                                <i v-if="chapter.battery>80" class="mui-icon iconfont icon-bf-icon-battery"></i>
+                                <i v-else-if="chapter.battery>50" class="mui-icon iconfont icon-bf-battery3"></i>
+                                <i v-else-if="chapter.battery>20" class="mui-icon iconfont icon-bf-icon-battery4"></i>
+                                <i v-else class="mui-icon iconfont icon-bf-icon-battery_charging"></i>
+                            </span>
+                            <span class="time">{{chapter.time}}</span>
+                            <span class="progress">{{chapter.progress}}</span>
+                        </div>
+                        <!-- 遮罩层 -->
+                        <div class="mui-off-canvas-backdrop"></div>
                     </div>
-                    <div class="chapter-status" :style="{color: setting.color}">
-                        <span class="battery">
-                            <span v-if="chapter.battery>80" class="mui-icon iconfont icon-bf-icon-battery"></span>
-                            <span v-else-if="chapter.battery>50" class="mui-icon iconfont icon-bf-battery3"></span>
-                            <span v-else-if="chapter.battery>20" class="mui-icon iconfont icon-bf-icon-battery4"></span>
-                            <span v-else class="mui-icon iconfont icon-bf-icon-battery_charging"></span>
-                        </span>
-                        <span class="time">{{chapter.time}}</span>
-                        <span class="progress">{{chapter.progress}}</span>
-                    </div>
-                    <!-- off-canvas backdrop -->
-                    <div class="mui-off-canvas-backdrop"></div>
                 </div>
             </div>
-        </div>
+        </scroller>
         <!-- 顶部弹出菜单：更多 -->
         <div id="popoverMore" class="mui-popover">
             <div class="mui-popover-arrow"></div>
             <ul class="mui-table-view">
                 <li class="mui-table-view-cell" @tap.stop="handleTapPopMark">
-                    <a href="javascript:void(0);"><span class="mui-icon iconfont icon-tianjiashuqian"></span> 添加书签</a>
+                    <a href="javascript:void(0);"><span class="mui-icon iconfont icon-tianjiashuqian"></span>
+                        添加书签</a>
                 </li>
                 <li class="mui-table-view-cell" @tap.stop="handleTapPopSearch">
-                    <a href="javascript:void(0);"><span class="mui-icon iconfont icon-sousuo-sousuo1"></span> 全文搜索</a>
+                    <a href="javascript:void(0);"><span class="mui-icon iconfont icon-sousuo-sousuo1"></span>
+                        全文搜索</a>
                 </li>
                 <li class="mui-table-view-cell">
                     <a href="#popoverBook"><span class="mui-icon iconfont icon-iconset0116"></span> 书籍详情</a>
                 </li>
                 <li class="mui-table-view-cell" @tap.stop="handleTapPopShare">
-                    <a href="javascript:void(0);"><span class="mui-icon iconfont icon-fenxiang3"></span> 分享本书</a>
+                    <a href="javascript:void(0);"><span class="mui-icon iconfont icon-fenxiang3"></span>
+                        分享本书</a>
                 </li>
             </ul>
         </div>
@@ -203,8 +215,7 @@
     let splitTitle = '\r\n\r\n',    // 分割章节目录
         borderWidthArr = [],    // 边界宽度数组
         bookContent = "",   // 书籍内容
-        tabBarHeight = 50 + 44,    // 菜单nav高度 + 底部padding
-        turnTranslateX = 0; // 翻页移动距离
+        tabBarHeight = 50 + 44;    // 菜单nav高度 + 底部padding
     export default {
         name: 'reader',
         data () {
@@ -234,7 +245,8 @@
                     noteArr: []    // 菜单 笔记 数组
                 },
                 pos: {
-                    scrollX: 0   // 已滚动的x距离
+                    translateX: 0,  // X轴移动距离
+                    scrollX: 0   // 已滚动的X距离
                 },
                 setting: {
                     brightness: 0,   // 亮度
@@ -258,7 +270,8 @@
                 chapterMax: 0, // 最大章节： title key数组的长度-1
                 dayNight: '夜间',
                 dayNightIcon: 'icon-yejian1',
-                tranFlag: true  // 翻页效果 切换标识
+                tranFlag: true, // 翻页效果 切换标识
+                markFlag: false // 书签标识
             }
         },
         methods: {
@@ -277,7 +290,7 @@
                                 _this.processBook();
                                 // 展示当前章节内容
                                 _this.showChapter();
-
+                                // 关闭loading
                                 plus.nativeUI.closeWaiting();
                             }
                         }, function (e) {
@@ -287,21 +300,16 @@
                         app.mui.toast("open book exception: " + e.message);
                     });
                 } else {
-                    _this.chapter.title = "第88章 测试章节";
-                    _this.chapter.content = "原生API在iOS和Android上各自有40多万，有些API并不常用，而且不具有跨平台特性，" +
-                        "比如ios的game center api。太多的API封装到HTML5plus里，会过多增加runtime的体积，但若有需求要使用" +
-                        "这些api又很麻烦。我们有一项突破性的技术来解决上述烦恼—Native.js，一种把40w原生API映射为JS API的技术。" +
-                        "如果说node.js把js的战火烧到了服务器端，那么Native.js把js战火烧到了原生应用战场。但我们可以使用js直接" +
-                        "调原生API，语法是js语法，API命名是原生命名。比如var然后obj.xxx，这个xxx属性就完全是原生对象的属性命名。" +
-                        "看到就发生口角的楼房喀什觉得垃圾收到了卡就是懒得空间阿里山的空间阿隆索多久啦可是记得啦就是了大家阿拉山口" +
-                        "所看见的联发科时间到了卡就是懒得阿拉山口的垃圾收到了看见法律思考的flask多久啦空间的算了咯技术的离开房间啊" +
-                        "圣诞节分厘卡三季稻浪费卡死了大家阿拉山口的拉升阶段flak时间到了开发进度顺利开机撒 是打开房间阿里山扩大风落" +
-                        "的撒立刻解放螺丝扣搭街坊拉克丝就立刻垃圾上单放假啊手里的空间法律思考的经费卢卡斯就螺丝钉解放了啊上级领导的" +
-                        "设定拉开附件是打开解放拉萨扩大解放啦空手道垃圾啊独立开发阿隆索多久啦可是觉得 尽量靠近当时风落谁家的拉开说的" +
-                        "时间对抗疗法就是懒得看垃圾堆了放假啊手里的空间拉萨看得见垃圾的啦收到了军阀势力的会计法律思考的 是打开房间阿" +
-                        "电视剧啊来反抗集散地立刻反击撒立刻搭街坊到了卡就是独立开发建设力度空间flask的即将拉升的就flak但是四道口附近。";
-                    this.menu.chapterArr.push('第54章 急急急看看');
-                    app.mui.toast('please read via app');
+                    bookContent = "第46集 - 陆亦可摆脱祁同伟的围追堵截 易学习调任纪委书记监督李达康\r\n\r\n" +
+                        "吕梁希望侯亮平将此事汇报给田国富，侯亮平觉得自己还在审查期间，还是由他去汇报更合适。张宝宝从交警队出来。" +
+                        "第47集 - 田国富来到吕州找易学习，他们俩来到月牙湖\r\n\r\n" +
+                        "与此同时，田国富来到吕州找易学习，他们俩来到月牙湖，湖面碧波荡漾，让人心旷神怡。田国富向易学习传达了。" +
+                        "第48集 - 郑乾突然想明白了，吴心怡之所以让他一起陪同来接人\r\n\r\n" +
+                        "郑乾，吴心怡和林华华等在外面等候，郑乾突然想明白了，吴心怡之所以让他一起陪同来接人，就是为了让他投案自首。";
+                    // 处理书籍内容
+                    _this.processBook();
+                    // 展示当前章节内容
+                    _this.showChapter();
                 }
             },
             processBook() {
@@ -322,10 +330,18 @@
                     this.chapterCur++;
                 }
                 let chapterKey = this.chapterTitleKeyArr[this.chapterCur];
+                if (!chapterKey) {
+                    app.mui.toast('系统发生错误,请退出重新打开. err.key');
+                    return;
+                }
                 let chapterTitle = this.chapterTitle[chapterKey];
+                if (!chapterTitle) {
+                    app.mui.toast('系统发生错误,请退出重新打开. err.title');
+                    return;
+                }
                 let posStart = bookContent.indexOf(chapterTitle);
                 if (posStart == -1) {
-                    app.mui.toast('系统发生错误,请退出重新打开.');
+                    app.mui.toast('系统发生错误,请退出重新打开. err.pos');
                     return;
                 }
                 posStart += chapterTitle.length + splitTitle.length;
@@ -341,15 +357,15 @@
 
                 // 切换章节：等dom渲染后
                 app.vue.$nextTick(() => {
-                    if (direction == 'prev') {
-                        turnTranslateX = this.$refs.chapterBody.scrollWidth - this.screen.width + 40;
-                    } else if (direction == 'next') {
-                        turnTranslateX = 0;
-                    } else {
-                        turnTranslateX = 0;
+                    // 已滚动的距离
+                    if (direction == 'prev') {  // 上一章节
+                        this.pos.scrollX = this.$refs.chapterBody.scrollWidth - this.screen.width + 40;
+                    } else if (direction == 'next') {   // 下一章节
+                        this.pos.scrollX = 0;
+                    } else if (direction != 'shift') {  // 当前章节：shift=>需要移动，其他则为0，不需移动
+                        this.pos.scrollX = 0;
                     }
-                    // 记录已滚动的距离
-                    this.pos.scrollX = turnTranslateX;
+                    this.pos.translateX = this.pos.scrollX;
                     // 翻页滚动
                     this.processTurn();
                 });
@@ -378,8 +394,8 @@
             },
             processPage(direction) {
                 if (direction == 'prev') {
-                    turnTranslateX = this.pos.scrollX - this.screen.width;
-                    if (turnTranslateX < 0) {
+                    this.pos.translateX = this.pos.scrollX - this.screen.width;
+                    if (this.pos.translateX < 0) {
                         if (this.chapterCur <= this.chapterMin) {
                             app.mui.toast('已经到最前面了');
                         } else {
@@ -388,8 +404,8 @@
                         return;
                     }
                 } else if (direction == 'next') {
-                    turnTranslateX = this.pos.scrollX + this.screen.width;
-                    if (turnTranslateX >= this.$refs.chapterBody.scrollWidth) {
+                    this.pos.translateX = this.pos.scrollX + this.screen.width;
+                    if (this.pos.translateX >= this.$refs.chapterBody.scrollWidth) {
                         if (this.chapterCur >= this.chapterMax) {
                             app.mui.toast('已经到最后面了');
                         } else {
@@ -400,12 +416,15 @@
                 }
 
                 // 记录已滚动的距离
-                this.pos.scrollX = turnTranslateX;
+                this.pos.scrollX = this.pos.translateX;
                 // 翻页滚动
                 this.processTurn();
             },
             processTurn(){
                 this.tranFlag = false;
+
+                // mark标记
+                this.markFlag = this.checkMark();
             },
             handleNavBarMark(){
                 app.mui.alert('别点了，还没有书签...');
@@ -493,7 +512,6 @@
                 this.handleActiveElement(eleComposeArr, e.target);
             },
             handleTapPopBackground(e){
-                console.log(e.detail.target.dataset);
                 this.setting.backgroundColor = e.detail.target.dataset.bgColor;
                 this.setting.color = e.detail.target.dataset.color;
             },
@@ -501,29 +519,55 @@
                 this.chapterCur = Number(e.target.dataset.index);
                 this.showChapter();
             },
+            handleTapMenuMark(e){
+                let mark = this.menu.markArr[Number(e.target.dataset.index)];
+                this.chapterCur = Number(mark.chapterCur);
+                this.pos.scrollX = Number(mark.scrollX);
+                this.showChapter('shift');
+            },
             handleActiveElement(eleArr, target){
                 for (let i = 0; i < eleArr.length; i++) {
                     eleArr[i].style.backgroundColor = '#FFFFFF';
                 }
                 target.style.backgroundColor = '#D8D8D8';
             },
-            enter (el, done) {
+            handlePullDown(){
+                // 检查 书签 是否已存在
+                let exists = this.checkMark();
+                if (!exists) {
+                    // 添加 书签
+                    this.menu.markArr.push({
+                        chapterCur: this.chapterCur,
+                        scrollX: this.pos.scrollX,
+                        title: this.chapter.title,
+                        content: this.chapter.content.substring(0, 50)
+                    });
+                    this.markFlag = true;
+                    // 存储
+                    app.util.localStorage('mark', this.menu.markArr);
+                    app.mui.toast('已添加书签');
+                }
+
+                // 结束下拉
+                this.$refs.scroller.finishPullToRefresh();
+            },
+            handleEnter (el, done) {
                 if (this.setting.turnEffect == 1) {
-                    Velocity(el, {translateX: '-' + turnTranslateX + 'px'}, {
+                    Velocity(el, {translateX: '-' + this.pos.translateX + 'px'}, {
                         easing: "ease-in-out",
                         duration: 800,
                         complete: done
                     });
                 }
                 if (this.setting.turnEffect == 2) {
-                    Velocity(el, {opacity: 1, translateX: '-' + turnTranslateX + 'px'}, {
+                    Velocity(el, {opacity: 1, translateX: '-' + this.pos.translateX + 'px'}, {
                         easing: "ease-in-out",
                         duration: 1,
                         complete: done
                     });
                 }
             },
-            leave (el, done) {
+            handleLeave (el, done) {
                 if (this.setting.turnEffect == 1) {
                     this.tranFlag = true;
                     done();
@@ -538,29 +582,94 @@
                     });
                 }
             },
+            handleLongTap(e){
+                console.log(e);
+                console.log(plus.android.runtimeMainActivity().getContentResolver());
+            },
+            initLocalAssign(){
+                // 1. 亮度
+                let brightness = app.util.localStorage('brightness');
+                if (brightness) {
+                    this.setting.brightness = brightness;
+                }
+                // 2. 翻页
+                let turnEffect = app.util.localStorage('turnEffect');
+                if (turnEffect) {
+                    this.setting.turnEffect = turnEffect;
+                }
+                app.mui('.popover-sz .turn span[data-effect="' + this.setting.turnEffect + '"]')[0].style.backgroundColor = '#D8D8D8';
+                // 3. 排版
+                let lineHeight = app.util.localStorage('lineHeight');
+                if (lineHeight) {
+                    this.setting.lineHeight = lineHeight;
+                }
+                app.mui('.popover-sz .compose span[data-height="' + this.setting.lineHeight + '"]')[0].style.backgroundColor = '#D8D8D8';
+                // 4. 背景
+                let backgroundColor = app.util.localStorage('backgroundColor');
+                if (backgroundColor) {
+                    this.setting.backgroundColor = backgroundColor;
+                }
+                // 5. 书签
+                let mark = app.util.localStorage('mark');
+                if (mark && mark.length > 0) {
+                    this.menu.markArr = JSON.parse(mark);
+                }
+                // 6. 笔记
+                let note = app.util.localStorage('note');
+                if (note && note.length > 0) {
+                    this.menu.noteArr = JSON.parse(note);
+                }
+            },
+            initEventListener(){
+                // 监听侧滑菜单：禁用手势侧滑
+                this.$refs.muiInnerWrap.addEventListener('drag', function (e) {
+                    e.stopPropagation();
+                });
+
+                // 监听：手势滑动
+                this.$refs.chapterScroll.addEventListener('swipeleft', this.handleSwipeLeft);
+                this.$refs.chapterScroll.addEventListener('swiperight', this.handleSwipeRight);
+
+                // 监听：长按 选中文字
+                this.$refs.chapterBody.addEventListener('longtap', this.handleLongTap);
+            },
+            initScreenAssign(){
+                // 全屏显示
+                if (app.config.isApp) {
+                    plus.navigator.setFullscreen(true);
+                }
+
+                // 屏幕高度&宽度
+                this.screen.height = app.config.device.screenHeight;   // 全屏高度
+                this.screen.width = app.config.device.screenWidth; // 全屏宽度
+
+                // 书籍滚动 高度/宽度
+                this.chapter.scroll.height = this.screen.height - tabBarHeight; // 减掉 底部tab菜单高度
+                this.chapter.scroll.width = this.screen.width;
+                // 书籍正文 高度/宽度
+                this.chapter.body.height = this.chapter.scroll.height;
+                this.chapter.body.width = this.screen.width - 40;
+
+                // 边界点击区域
+                borderWidthArr = [this.screen.width * 0.2, this.screen.width * 0.8];
+            },
             showTimeNow() {
                 this.chapter.time = app.util.dateFormat(new Date(), 'hh:mm');
+            },
+            checkMark(){
+                if (this.menu.markArr.length > 0) {
+                    for (let mark of this.menu.markArr) {
+                        if (mark.chapterCur == this.chapterCur && mark.scrollX == this.pos.scrollX) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
             }
         },
         created() {
-            // 全屏显示
-            if (app.config.isApp) {
-                plus.navigator.setFullscreen(true);
-            }
-
-            // 屏幕高度&宽度
-            this.screen.height = app.config.device.screenHeight;   // 全屏高度
-            this.screen.width = app.config.device.screenWidth; // 全屏宽度
-
-            // 书籍滚动 高度/宽度
-            this.chapter.scroll.height = this.screen.height - tabBarHeight; // 减掉 底部tab菜单高度
-            this.chapter.scroll.width = this.screen.width;
-            // 书籍正文 高度/宽度
-            this.chapter.body.height = this.chapter.scroll.height;
-            this.chapter.body.width = this.screen.width - 40;
-
-            // 边界点击区域
-            borderWidthArr = [this.screen.width * 0.2, this.screen.width * 0.8];
+            // 初始化
+            this.initScreenAssign();
 
             // 当前系统时间
             this.showTimeNow();
@@ -570,20 +679,11 @@
             // 打开书籍
             this.openBook();
 
-            // 侧滑菜单：禁用手势侧滑
-            this.$refs.muiInnerWrap.addEventListener('drag', function (e) {
-                e.stopPropagation();
-            });
+            // 监听事件
+            this.initEventListener();
 
-            // 监听手势滑动
-            this.$refs.chapterScroll.addEventListener('swipeleft', this.handleSwipeLeft);
-            this.$refs.chapterScroll.addEventListener('swiperight', this.handleSwipeRight);
-
-            // 默认设置参数
-            // 1. 翻页
-            app.mui('.popover-sz .turn span[data-effect="' + this.setting.turnEffect + '"]')[0].style.backgroundColor = '#D8D8D8';
-            // 2. 排版
-            app.mui('.popover-sz .compose span[data-height="' + this.setting.lineHeight + '"]')[0].style.backgroundColor = '#D8D8D8';
+            // 初始化参数赋值
+            this.initLocalAssign();
 
             // 电量
             if (app.config.isApp) {
@@ -602,8 +702,12 @@
         color: #42b983;
     }
 
-    .mui-content {
-        /*padding: 0px 10px;*/
+    .mui-bar-tab ~ .chapter-content {
+        padding-bottom: 50px;
+    }
+
+    .mui-bar-nav ~ .chapter-content {
+        padding-top: 44px;
     }
 
     .chapter-title {
@@ -615,6 +719,17 @@
         top: 0px;
         width: 100%;
         padding: 0px 20px;
+    }
+
+    .chapter-mark {
+        position: absolute;
+        top: 0px;
+        right: 35px;
+        color: #fb9c15;
+    }
+
+    .chapter-mark .iconfont {
+        font-size: 35px;
     }
 
     .chapter-scroll {

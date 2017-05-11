@@ -1,6 +1,7 @@
 import Vue from "vue";
 import router from "./router";
 import store from "./store";
+import scroller from "vue-scroller";
 
 import config from "./config";
 import mui from "./lib/mui.min";
@@ -16,9 +17,8 @@ import app from "../view/app.vue";
 window.app = Object.assign({}, {config, mui, service, ajax, log, util});
 
 const initVue = function () {
-    // Object.keys(directive).forEach((key) => {
-    //     Vue.directive(key, directive[key]);
-    // });
+    Vue.use(scroller);
+
     var vueApp = Vue.extend(app);
     window.app.vue = new vueApp({
         router,
@@ -29,6 +29,7 @@ const initVue = function () {
 mui.init({
     gestureConfig: {
         tap: true,
+        longtap: true,
         swipe: true,
         drag: true
     },

@@ -192,7 +192,7 @@
                                 plus.runtime.quit();
                             }
                         }
-                        return false;
+                        return;
                     }
                 }, false);
             }
