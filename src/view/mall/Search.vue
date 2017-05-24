@@ -1,6 +1,10 @@
 <template>
-    <div class="main">
-        <h1>{{ msg }} - store</h1>
+    <div class="search">
+        <mt-search
+                v-model="value"
+                cancel-text="取消"
+                placeholder="搜索">
+        </mt-search>
     </div>
 </template>
 
@@ -15,7 +19,7 @@
 </script>
 
 <style scoped>
-    .main {
+    .search {
         margin: 0;
         padding: 0;
     }

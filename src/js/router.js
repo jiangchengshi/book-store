@@ -4,32 +4,87 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 // views
-import welcome from "../view/welcome.vue";
-import shelf from "../view/shelf/index.vue";
-import reader from "../view/reader/index.vue";
-import store from "../view/store/index.vue";
+import Welcome from "../view/Welcome.vue";
+import Shelf from "../view/shelf/Index.vue";
+import Reader from "../view/reader/Index.vue";
+import Mall from "../view/mall/Index.vue";
+import Search from "../view/mall/Search.vue";
+import NewBook from "../view/mall/book/New.vue";
+import FreeBook from "../view/mall/book/Free.vue";
+import SpecialBook from "../view/mall/book/Special.vue";
+import Monthly from "../view/mall/monthly/Index.vue";
+import MonthlyDetail from "../view/mall/monthly/Detail.vue";
+import MonthlyPackage from "../view/mall/monthly/Package.vue";
+import Login from "../view/Login.vue";
+
 Vue.use(VueRouter);
 
-const routes = [{
-    path: '/',  // 首页
-    redirect: '/shelf'
-}, {
-    path: '/welcome', // 欢迎页
-    name: "welcome",
-    component: welcome
-}, {
-    path: '/shelf', // 书架
-    name: "shelf",
-    component: shelf
-}, {
-    path: '/reader', // 阅读器
-    name: "reader",
-    component: reader
-}, {
-    path: '/store', // 书城
-    name: "store",
-    component: store
-}];
+const routes = [
+    {
+        path: '/',  // 首页
+        redirect: '/shelf'
+    },
+    {
+        path: '/welcome', // 欢迎页
+        name: "welcome",
+        component: Welcome
+    },
+    {
+        path: '/shelf', // 书架
+        name: "shelf",
+        component: Shelf
+    },
+    {
+        path: '/reader', // 阅读器
+        name: "reader",
+        component: Reader
+    },
+    {
+        path: '/mall', // 书城
+        name: "mall",
+        component: Mall
+    },
+    {
+        path: '/search', // 搜索
+        name: "search",
+        component: Search
+    },
+    {
+        path: '/newBook', // 新书
+        name: "newBook",
+        component: NewBook
+    },
+    {
+        path: '/freeBook', // 免费
+        name: "freeBook",
+        component: FreeBook
+    },
+    {
+        path: '/specialBook', // 特价
+        name: "specialBook",
+        component: SpecialBook
+    },
+    {
+        path: '/monthly', // 包月
+        name: "monthly",
+        component: Monthly
+    },
+    {
+        path: '/monthlyDetail', // 包月详情
+        name: "monthlyDetail",
+        component: MonthlyDetail
+    },
+    {
+        path: '/monthlyPackage', // 包月包
+        name: "monthlyPackage",
+        component: MonthlyPackage
+    },
+    {
+        path: '/login', // 登录
+        name: "login",
+        component: Login
+    }
+];
 
 const router = new VueRouter({
     //路由列表

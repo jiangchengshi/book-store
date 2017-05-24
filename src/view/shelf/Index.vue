@@ -1,39 +1,24 @@
 <template>
     <div class="shelf">
-        <header class="mui-bar mui-bar-nav">
-            <h1 class="mui-title">{{title}}</h1>
-            <a class="mui-pull-right" @tap.stop="handleTapTidy">整理</a>
-        </header>
-        <div class="mui-content">
-            <div class="stage" :style="{width: shelf.width}" v-for="book in books">
+        <mt-header :title="title">
+            <mt-button slot="right" @tap.stop="handleTapTidy" style="color: blue">整理</mt-button>
+        </mt-header>
+        <div class="content" :style="{width: shelf.width+'px', height: shelf.height+'px'}">
+            <div class="stage" v-for="book in books">
                 <ul class="books-list">
                     <li v-for="b in book">
-                        <img v-if="b.code=='store'" src="../../image/store.png">
-                        <img v-else :src="b.img" :data-code="b.code" @tap="handleClickBook">
+                        <img :src="b.image" :data-code="b.code" @tap="handleTapBook">
                         <span class="name" v-html="b.name"></span>
                         <span class="author" v-html="b.author"></span>
+                    </li>
+                    <li v-if="book.length<3">
+                        <img src="../../image/goMall.png" data-code="mall" @tap="handleTapGoMall">
+                        <span class="name">&nbsp;</span>
+                        <span class="author">&nbsp;</span>
                     </li>
                 </ul>
             </div>
         </div>
-        <nav class="mui-bar mui-bar-tab">
-            <a class="mui-tab-item" @tap.stop="handleTapStore">
-                <span class="mui-icon iconfont icon-shuchengxuanzhong"></span>
-                <span class="mui-tab-label">书城</span>
-            </a>
-            <a class="mui-tab-item" @tap.stop="handleTapSearch">
-                <span class="mui-icon iconfont icon-mp-search"></span>
-                <span class="mui-tab-label">搜索</span>
-            </a>
-            <a class="mui-tab-item mui-active" @tap.stop="handleTapShelf">
-                <span class="mui-icon iconfont icon-books"></span>
-                <span class="mui-tab-label">书架</span>
-            </a>
-            <a class="mui-tab-item" @tap.stop="handleTapMine">
-                <span class="mui-icon iconfont icon-foot04"></span>
-                <span class="mui-tab-label">我的</span>
-            </a>
-        </nav>
     </div>
 </template>
 
@@ -45,18 +30,20 @@
                 title: '书架',
                 books: [],
                 shelf: {
-                    width: 0
+                    width: 0,
+                    height: 0
                 }
             }
         },
         methods: {
-            handleClickBook(e){
-                let name = e.target.dataset.code;
-                if (name == "store") {
-                    this.handleTapStore();
-                    return;
-                }
+            handleTapBook(e){
+                // 隐藏书城 tabBar
+                this.$store.commit('updateMallBar', false);
+
                 this.openBook(name);
+            },
+            handleTapGoMall(){
+                this.$router.push({path: 'mall'});
             },
             openBook(name){    // 打开书籍
                 let _this = this;
@@ -75,7 +62,7 @@
             downloadBook(name){ // 下载书籍
                 console.log('download book ' + name);
                 let _this = this;
-                let remoteFile = _this.$store.state.storeUrl + name;
+                let remoteFile = app.config.common.server + name;
                 let downloader = plus.downloader.createDownload(remoteFile, {
                     filename: _this.$store.state.localPath + name
                 }, function (d, status) {
@@ -90,18 +77,6 @@
                 //					}, false);
                 downloader.start();
             },
-            handleTapStore(){
-                app.mui.toast('书城建设中...');
-            },
-            handleTapSearch(){
-                app.mui.toast('搜索开发中...');
-            },
-            handleTapShelf(){
-                this.$router.push({path: 'shelf'});
-            },
-            handleTapMine(){
-                app.mui.toast('我的思考中...');
-            },
             handleTapTidy(){
                 app.mui.toast('整理啥，凑合着看吧...');
             }
@@ -113,8 +88,12 @@
                 return;
             }
 
-            // 宽度
-            this.shelf.width = app.config.device.screenWidth + 'px';
+            // 宽度/高度
+            this.shelf.width = app.config.device.screenWidth;
+            this.shelf.height = app.config.device.screenHeight - app.config.device.headerHeight - app.config.device.tabbarHeight;
+
+            // 显示书城底部导航菜单
+            this.$store.commit('updateMallBar', true);
 
             // 获取可展示的书籍： 仅展示8本 + 去书城
             // todo getStorage
@@ -122,22 +101,22 @@
                 code: 'rmdmy.txt',
                 name: '盗墓笔记',
                 author: '南派三叔',
-                img: 'http://jjckb.xinhuanet.com/2016-05/20/135374404_14637120163591n.jpg'
+                image: app.config.common.image
             }, {
                 code: 'rmdmy.txt',
                 name: '盗墓笔记2',
                 author: '南派三叔2',
-                img: 'http://jjckb.xinhuanet.com/2016-05/20/135374404_14637120163591n.jpg'
+                image: app.config.common.image
             }, {
                 code: 'rmdmy.txt',
                 name: '盗墓笔记3',
                 author: '南派三叔3',
-                img: 'http://jjckb.xinhuanet.com/2016-05/20/135374404_14637120163591n.jpg'
+                image: app.config.common.image
             }, {
                 code: 'rmdmy.txt',
                 name: '盗墓笔记4',
                 author: '南派三叔4',
-                img: 'http://jjckb.xinhuanet.com/2016-05/20/135374404_14637120163591n.jpg'
+                image: app.config.common.image
             }];
             if (bookArr.length <= 0) {
                 app.mui.toast('还没有添加过书籍哦!');
@@ -145,18 +124,11 @@
             } else if (bookArr.length > 8) {
                 app.mui.toast('显示书籍超过最大值[8]');
             }
-            // 最后本书籍信息： 去书城
-            var lastPos = 8;
-            if (bookArr.length < 7) {
-                lastPos = bookArr.length + 1;
-            }
-            bookArr[lastPos] = {
-                code: 'store',
-                name: '&nbsp;',
-                author: '&nbsp;',
-                img: './build/store.png'
-            };
 
+            // 书籍最多展示7本
+            if (bookArr.length >= 8) {
+                bookArr.length = 7;
+            }
             // 书籍分3层
             let _books = [];
             bookArr.forEach((book, i) => {
@@ -202,48 +174,49 @@
 
 <style scoped>
     .shelf {
-        margin: 0;
-        padding: 0;
         font-family: PingFangSC-Regular;
     }
 
-    .mui-pull-right {
-        line-height: 44px;
+    .shelf header {
+        background-color: white;
+        color: #162636
     }
 
-    .mui-content {
+    .content {
         position: relative;
+        background-color: #F8F8F8;
     }
 
-    .mui-content .stage {
+    .content .stage {
         text-align: center;
+        padding-top: 10px;
     }
 
-    .mui-content ul {
+    .content ul {
         list-style: none;
         padding: initial;
     }
 
-    .mui-content .books-list li {
+    .content .books-list li {
         display: inline-block;
         margin: 0px 15px;
     }
 
-    .mui-content .books-list li img {
+    .content .books-list li img {
         width: 85px;
         height: 120px;
     }
 
-    .mui-content .books-list li span {
+    .content .books-list li span {
         display: block;
         line-height: 16px;
     }
 
-    .mui-content .books-list li .name {
+    .content .books-list li .name {
         font-size: 14px;
     }
 
-    .mui-content .books-list li .author {
+    .content .books-list li .author {
         font-size: 12px;
         color: #989A9C;
     }

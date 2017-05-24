@@ -137,7 +137,20 @@
         /*Android应用打包使用密钥库中证书的密码*/
         "aliasname": "",
         /*Android应用打包使用密钥库中证书的别名*/
-        "permissions": ["<uses-feature android:name=\"android.hardware.camera.autofocus\"/>","<uses-feature android:name=\"android.hardware.camera\"/>","<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>","<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>","<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>","<uses-permission android:name=\"android.permission.VIBRATE\"/>","<uses-permission android:name=\"android.permission.WAKE_LOCK\"/>","<uses-permission android:name=\"android.permission.CALL_PHONE\"/>","<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>","<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>","<uses-permission android:name=\"android.permission.CAMERA\"/>"]
+        "permissions": [
+          "<uses-feature android:name=\"android.hardware.camera.autofocus\"/>",
+          "<uses-feature android:name=\"android.hardware.camera\"/>",
+          "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
+          "<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>",
+          "<uses-permission android:name=\"android.permission.VIBRATE\"/>",
+          "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+          "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>",
+          "<uses-permission android:name=\"android.permission.WAKE_LOCK\"/>",
+          "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
+          "<uses-permission android:name=\"android.permission.CALL_PHONE\"/>",
+          "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
+          "<uses-permission android:name=\"android.permission.CAMERA\"/>"
+        ]
         /*使用Native.js调用原生安卓API需要使用到的系统权限*/
       },
       "orientation": [
@@ -204,7 +217,8 @@
           /*高分屏程序图标，分辨率：72x72*/
           "xhdpi": "unpackage/res/icons/96x96.png",
           /*720P高分屏程序图标，分辨率：96x96*/
-          "xxhdpi": "unpackage/res/icons/144x144.png","xxxhdpi":"unpackage/res/icons/192x192.png"
+          "xxhdpi": "unpackage/res/icons/144x144.png",
+          "xxxhdpi": "unpackage/res/icons/192x192.png"
           /*1080P 高分屏程序图标，分辨率：144x144*/
         }
       },
@@ -261,7 +275,26 @@
   "dependencies": {
 		"pages": {
 			"index.html": {
-				"resources": [],
+				"resources": [
+					"build/store.png",
+					"build/app.54336ae44f1b6dc56997.js",
+					"build/font/iconfont.a47a2f6.ttf",
+					"build/app.89a6ec14f9c5b694138f.js",
+					"build/app.996f09a3bd20f7326474.js",
+					"build/app.c3c18c5ce66c8da25649.js",
+					"build/app.e7ab42d729af882ca9e0.js",
+					"build/app.cf12b9826f2daa5142f3.js",
+					"build/app.4c781c3d0d5e7d9e1bd0.js",
+					"build/app.5f1e343ec423ac624542.js",
+					"build/app.6110399cd7f9b7df20f4.js",
+					"build/app.71ef6c8200028284a9a5.js",
+					"build/app.d85a16233e8177b773c9.js",
+					"build/app.b9e1bffedfc8ece65969.js",
+					"build/font/iconfont.a08c2bd.ttf",
+					"build/app.a94e243cc9d49d4c7ac3.js",
+					"build/app.959a8c95ef82dd1ae913.js",
+					"build/goMall.png"
+				],
 				"refer": [],
 				"priority": 0
 			}

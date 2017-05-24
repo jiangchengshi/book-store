@@ -10,6 +10,8 @@
     "build": "cross-env NODE_ENV=PROD webpack --progress --hide-modules"
   },
   "dependencies": {
+    "axios": "^0.16.1",
+    "mint-ui": "^2.2.7",
     "vue": "^2.2.1",
     "vue-easy-slider": "^3.1.0",
     "vue-router": "^2.5.2",

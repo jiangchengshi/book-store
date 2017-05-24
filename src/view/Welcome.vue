@@ -36,7 +36,7 @@
 </template>
 
 <script>
-    import {Slider, SliderItem} from 'vue-easy-slider';
+    import {Slider, SliderItem} from "vue-easy-slider";
 
     export default {
         data () {
@@ -46,8 +46,7 @@
             }
         },
         components: {
-            Slider,
-            SliderItem
+            Slider, SliderItem
         },
         methods: {
             handleTapExpr(e){

@@ -8,33 +8,31 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
-        storeUrl: 'http://123.206.191.175:8081/',   // 书城Url
-        localPath: '_doc/', // 本地路径
-        readerTitle: "阅读器", // 导航页标题
-        showHeader: false, // 是否显示导航栏
-        showFooter: false, // 是否显示foot栏
-        showBtnBack: true, // 是否显示返回按钮
-        showBtnMore: true, // 是否显示更多按钮
+        mall: {
+            tabBar: true
+        },
+        reader: {
+            navBar: false,
+            tabBar: false
+        }
     },
     mutations: {
-        updateTitle (state, title){
-            state.readerTitle = title;
-        },
-        updateNavbarStatus(state, {showHeader, showFooter, showBtnBack = true, showBtnMore = true} = {}){
-            if (showHeader == undefined) {
-                state.showHeader = !state.showHeader;
+        updateMallBar(state, tabBar){
+            if (tabBar == undefined) {
+                state.mall.tabBar = !state.mall.tabBar;
             } else {
-                state.showHeader = showHeader;
+                state.mall.tabBar = tabBar;
             }
-            if (showFooter == undefined) {
-                state.showFooter = !state.showFooter;
-            } else {
-                state.showFooter = showFooter;
-            }
-            state.showBtnBack = showBtnBack;
-            state.showBtnMore = showBtnMore;
         },
-
+        updateReaderBar(state, payload){
+            if (!payload) {
+                state.reader.navBar = !state.reader.navBar;
+                state.reader.tabBar = !state.reader.tabBar;
+            } else {
+                state.reader.navBar = payload.navBar;
+                state.reader.tabBar = payload.tabBar;
+            }
+        }
     }
 });
 

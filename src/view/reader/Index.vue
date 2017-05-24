@@ -48,7 +48,7 @@
                         </div>
                     </aside>
                     <!-- 顶部导航 -->
-                    <header class="mui-bar mui-bar-nav" v-show="$store.state.showHeader"
+                    <header class="mui-bar mui-bar-nav" v-show="$store.state.reader.navBar"
                             :style="{color:setting.navColor, 'background-color':setting.navBackgroundColor}">
                         <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
                         <a href="#popoverMore" class="mui-icon mui-icon-more mui-pull-right"
@@ -61,7 +61,7 @@
                            @tap.stop="handleNavBarReward"></a>
                     </header>
                     <!-- 底部导航 -->
-                    <nav class="mui-bar mui-bar-tab" v-show="$store.state.showFooter" ref="tabBar"
+                    <nav class="mui-bar mui-bar-tab" v-show="$store.state.reader.tabBar" ref="tabBar"
                          :style="{color:setting.tabColor, 'background-color':setting.tabBackgroundColor}">
                         <a class="mui-tab-item" @tap.stop="handleTapTabBarML" href="javascript:void(0);">
                             <span class="mui-icon iconfont icon-mulu1"></span>
@@ -72,7 +72,7 @@
                             <span class="mui-tab-label">进度</span>
                         </a>
                         <a class="mui-tab-item" @tap.stop="handleTapTabBarSZ" href="javascript:void(0);">
-                            <span class="mui-icon iconfont icon-icon-yxj-font"></span>
+                            <span class="mui-icon iconfont icon-aa"></span>
                             <span class="mui-tab-label">设置</span>
                         </a>
                         <a class="mui-tab-item" @tap.stop="handleTapTabBarRY" href="javascript:void(0);">
@@ -87,7 +87,7 @@
                             {{chapter.title}}
                         </div>
                         <div class="chapter-mark" v-show="markFlag">
-                            <i class="mui-icon iconfont icon-bookmark"></i>
+                            <img src="../../image/mark.png"/>
                         </div>
                         <div class="chapter-scroll" ref="chapterScroll" @tap="handleTapContent"
                              :style="{height: chapter.scroll.height+'px', width: chapter.scroll.width+'px', opacity: setting.opacity,
@@ -116,23 +116,32 @@
             </div>
         </scroller>
         <!-- 顶部弹出菜单：更多 -->
-        <div id="popoverMore" class="mui-popover">
+        <div id="popoverMore" class="mui-popover popover-more">
             <div class="mui-popover-arrow"></div>
             <ul class="mui-table-view">
                 <li class="mui-table-view-cell" @tap.stop="handleTapPopMark">
-                    <a href="javascript:void(0);"><span class="mui-icon iconfont icon-tianjiashuqian"></span>
-                        添加书签</a>
+                    <a href="javascript:void(0);">
+                        <span class="mui-icon iconfont icon-tianjiashuqian"></span>
+                        <label>添加书签</label>
+                    </a>
                 </li>
                 <li class="mui-table-view-cell" @tap.stop="handleTapPopSearch">
-                    <a href="javascript:void(0);"><span class="mui-icon iconfont icon-sousuo-sousuo1"></span>
-                        全文搜索</a>
+                    <a href="javascript:void(0);">
+                        <span class="mui-icon iconfont icon-sousuo-sousuo1"></span>
+                        <label>全文搜索</label>
+                    </a>
                 </li>
                 <li class="mui-table-view-cell">
-                    <a href="#popoverBook"><span class="mui-icon iconfont icon-iconset0116"></span> 书籍详情</a>
+                    <a href="#popoverBook">
+                        <span class="mui-icon iconfont icon-iconset0116"></span>
+                        <label>书籍详情</label>
+                    </a>
                 </li>
                 <li class="mui-table-view-cell" @tap.stop="handleTapPopShare">
-                    <a href="javascript:void(0);"><span class="mui-icon iconfont icon-fenxiang3"></span>
-                        分享本书</a>
+                    <a href="javascript:void(0);">
+                        <span class="mui-icon iconfont icon-fenxiang3"></span>
+                        <label>分享本书</label>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -151,8 +160,8 @@
             <button class="mui-btn mui-btn-primary" type="button" @tap.stop="handlePopBuyBook">购买并下载</button>
         </div>
         <!-- 底部弹出菜单：进度 -->
-        <div class="mui-popover mui-popover-bottom popover-jd">
-            <div class="mui-popover-arrow"></div>
+        <div class="mui-popover mui-popover-bottom mui-popover-action popover-jd">
+            <!--<div class="mui-popover-arrow"></div>-->
             <div class="chapter">
                 <span class="title">{{chapterTitle[chapterTitleKeyArr[chapterCur]]}}</span>
                 <span class="process">{{chapter.progress}}</span>
@@ -165,13 +174,13 @@
             </div>
         </div>
         <!-- 底部弹出菜单：设置 -->
-        <div class="mui-popover mui-popover-bottom popover-sz">
-            <div class="mui-popover-arrow"></div>
+        <div class="mui-popover mui-popover-bottom mui-popover-action popover-sz">
+            <!--<div class="mui-popover-arrow"></div>-->
             <div class="mui-input-row mui-input-range bright" style="padding-right: 0px;">
                 <label>亮度</label>
-                <span class="mui-icon iconfont icon-rijian" style="font-size: 16px"></span>
-                <input type="range" min="1" max="100" @change="handleChangePopBright">
-                <span class="mui-icon iconfont icon-rijian" style="font-size: 26px;"></span>
+                <span class="mui-icon iconfont icon-liangdu" style="font-size: 16px"></span>
+                <input type="range" min="0" max="255" :value="setting.brightness">
+                <span class="mui-icon iconfont icon-liangdu" style="font-size: 26px;"></span>
             </div>
             <div class="mui-input-row mui-input-range font" style="padding-right: 0px;">
                 <label>字体</label>
@@ -187,11 +196,11 @@
             </div>
             <div class="mui-input-row mui-input-range compose" style="padding-right: 0px;">
                 <label>排版</label>
-                <span class="mui-icon iconfont icon-jianju1 btn" data-height="20"
+                <span class="mui-icon iconfont icon-2fuben-copy btn" data-height="20"
                       @tap.stop="handleTapPopCompose"></span>
-                <span class="mui-icon iconfont icon-jianju2 btn" data-height="30"
+                <span class="mui-icon iconfont icon-3 btn" data-height="30"
                       @tap.stop="handleTapPopCompose"></span>
-                <span class="mui-icon iconfont icon-jianju btn" data-height="40"
+                <span class="mui-icon iconfont icon-3 btn" data-height="40"
                       @tap.stop="handleTapPopCompose"></span>
                 <span class="mui-icon mui-icon-plusempty btn"></span>
             </div>
@@ -269,7 +278,7 @@
                 chapterMin: 0, // 最小章节： 默认0
                 chapterMax: 0, // 最大章节： title key数组的长度-1
                 dayNight: '夜间',
-                dayNightIcon: 'icon-yejian1',
+                dayNightIcon: 'icon-yejian',
                 tranFlag: true, // 翻页效果 切换标识
                 markFlag: false // 书签标识
             }
@@ -277,7 +286,7 @@
         methods: {
             openBook(){
                 let _this = this;
-                let localFile = _this.$store.state.localPath + _this.$route.query.name;
+                let localFile = app.config.common.localPath + _this.$route.query.name;
                 if (app.config.isApp) {
                     plus.nativeUI.showWaiting('努力加载中...');
                     plus.io.resolveLocalFileSystemURL(localFile, function (fe) {
@@ -356,7 +365,7 @@
                 this.chapter.progress = Number(this.chapterCur / this.chapterMax * 100).toFixed(2) + ' %';
 
                 // 切换章节：等dom渲染后
-                app.vue.$nextTick(() => {
+                this.$nextTick(() => {
                     // 已滚动的距离
                     if (direction == 'prev') {  // 上一章节
                         this.pos.scrollX = this.$refs.chapterBody.scrollWidth - this.screen.width + 40;
@@ -374,7 +383,7 @@
                 let tapX = e.detail.touches[0].pageX;
                 // 中间区域：点击显示 navbar
                 if (tapX > borderWidthArr[0] && tapX < borderWidthArr[1]) {
-                    this.$store.commit('updateNavbarStatus');
+                    this.$store.commit('updateReaderBar');
                 } else {
                     // 翻页：上一页
                     if (tapX <= borderWidthArr[0]) {
@@ -475,7 +484,7 @@
             handleTapTabBarRY(e){
                 let go2Night = this.dayNight === '夜间' ? true : false;
                 this.dayNight = go2Night ? '日间' : '夜间';
-                this.dayNightIcon = go2Night ? 'icon-rijian1' : 'icon-yejian1';
+                this.dayNightIcon = go2Night ? 'icon-rijianmoshi' : 'icon-yejian';
                 this.setting.color = go2Night ? '#FFFFFF' : '#1F1F1F';
                 this.setting.navColor = go2Night ? '#BDBDBD' : '#162636';
                 this.setting.tabColor = go2Night ? '#BDBDBD' : '#162636';
@@ -485,7 +494,10 @@
                 this.setting.opacity = go2Night ? 0.26 : 1;
             },
             handleChangePopBright(e){
-                plus.screen.setBrightness(Number(e.target.value / 100).toFixed(1));
+                let brightness = Number(e.target.value / 255).toFixed(1);
+                if (app.config.isApp) {
+                    plus.screen.setBrightness(brightness);
+                }
             },
             handleTapPopFont(e){
                 let oper = e.detail.target.dataset.oper;
@@ -583,8 +595,8 @@
                 }
             },
             handleLongTap(e){
-                console.log(e);
-                console.log(plus.android.runtimeMainActivity().getContentResolver());
+                let main = plus.android.runtimeMainActivity();
+                console.log(main.getContentResolver());
             },
             initLocalAssign(){
                 // 1. 亮度
@@ -652,6 +664,11 @@
 
                 // 边界点击区域
                 borderWidthArr = [this.screen.width * 0.2, this.screen.width * 0.8];
+
+                // 隐藏书城底部导航菜单
+                this.$store.commit('updateMallBar', false);
+                // 隐藏阅读器底部&顶部导航菜单
+                this.$store.commit('updateReaderBar', {tabBar: false, navBar: false});
             },
             showTimeNow() {
                 this.chapter.time = app.util.dateFormat(new Date(), 'hh:mm');
@@ -693,13 +710,13 @@
     }
 </script>
 
-<style>
+<style scoped>
     .reader {
         font-family: PingFangSC-Regular;
     }
 
     a {
-        color: #42b983;
+        color: #0062cc;
     }
 
     .mui-bar-tab ~ .chapter-content {
@@ -725,11 +742,10 @@
         position: absolute;
         top: 0px;
         right: 35px;
-        color: #fb9c15;
     }
 
-    .chapter-mark .iconfont {
-        font-size: 35px;
+    .chapter-mark img {
+        width: 20px;
     }
 
     .chapter-scroll {
@@ -765,6 +781,10 @@
     .chapter-status .progress {
         float: right;
         margin-right: 10px;
+    }
+
+    .mui-popover.mui-popover-action {
+        background-color: white;
     }
 
     .mui-popover.popover-jd {
@@ -818,7 +838,7 @@
     }
 
     .mui-popover.popover-sz .bright input[type=range] {
-        width: 58%;
+        width: 60%;
         float: initial;
     }
 
@@ -827,7 +847,7 @@
     }
 
     .mui-popover.popover-sz .font .minus, .plus {
-        padding: 6px 20px;
+        padding: 6px 35px;
     }
 
     .mui-popover.popover-sz .font .size {
@@ -835,27 +855,27 @@
     }
 
     .mui-popover.popover-sz .turn span {
-        padding: 6px 30px;
+        padding: 6px 45px;
         margin-right: 10px;
     }
 
     .mui-popover.popover-sz .compose span {
         margin-top: 5px;
         margin-right: 5px;
-        padding: 0px 12px;
+        padding: 0px 20px;
         text-align: center;
     }
 
     .mui-popover.popover-sz .background span {
-        width: 34px;
+        width: 45px;
         height: 32px;
         float: left;
         margin-top: 6px;
-        margin-right: 10px;
+        margin-right: 12px;
         text-align: center;
     }
 
-    .mui-popover#popoverMore {
+    .mui-popover.popover-more {
         position: fixed;
         top: 16px;
         right: 6px;
@@ -863,50 +883,59 @@
         font-size: 15px;
     }
 
-    .mui-popover#popoverMore .mui-popover-arrow {
+    .mui-popover.popover-more .mui-popover-arrow {
         left: auto;
         right: 6px;
     }
 
-    .mui-popover#popoverBook {
-        background: #FFFFFF;
+    .mui-popover.popover-more .mui-popover-arrow:after {
+        background-color: #162636;
     }
 
-    .mui-popover#popoverBook img {
+    .mui-popover.popover-more .mui-table-view {
+        background-color: #162636;
+    }
+
+    .mui-popover.popover-more .mui-table-view span, .mui-popover.popover-more .mui-table-view label {
+        color: #FFFFFF;
+    }
+
+    .mui-popover.popover-book img {
         position: absolute;
-        bottom: 160px;
+        bottom: 170px;
         width: 110px;
         height: 140px;
         margin-left: 15px;
         border-radius: 5px;
     }
 
-    .mui-popover#popoverBook .book-intro {
+    .mui-popover.popover-book .book-intro {
         line-height: 60px;
         border-bottom: dotted 1px;
         padding: 10px 0px 10px 140px;
     }
 
-    .mui-popover#popoverBook .book-intro span {
+    .mui-popover.popover-book .book-intro span {
         display: block;
         line-height: 36px;
     }
 
-    .mui-popover#popoverBook .book-buy {
+    .mui-popover.popover-book .book-buy {
         padding: 10px 20px;
     }
 
-    .mui-popover#popoverBook .book-buy span {
+    .mui-popover.popover-book .book-buy span {
         display: block;
         line-height: 36px;
     }
 
-    .mui-popover#popoverBook .book-buy span label {
+    .mui-popover.popover-book .book-buy span label {
         padding-left: 10px;
     }
 
-    .mui-popover#popoverBook button {
+    .mui-popover.popover-book button {
         width: 95%;
         margin: 10px;
+        height: 42px;
     }
 </style>

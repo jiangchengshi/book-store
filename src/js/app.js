@@ -1,25 +1,32 @@
 import Vue from "vue";
 import router from "./router";
 import store from "./store";
+import mintUI from "mint-ui";
+import "mint-ui/lib/style.css";
 import scroller from "vue-scroller";
 
 import config from "./config";
 import mui from "./lib/mui.min";
 import "./lib/velocity.min";
 
+// import "../css/mui.min.css";
+import "../css/iconfont.css";
+
 import service from "./util/service";
 import ajax from "./util/ajax";
 import log from "./util/log";
 import util from "./util/util";
 
-import app from "../view/app.vue";
+import App from "../view/App.vue";
 
+// 工具配置
 window.app = Object.assign({}, {config, mui, service, ajax, log, util});
 
 const initVue = function () {
-    Vue.use(scroller);
+    Vue.use(mintUI);
+    Vue.use(scroller);   // 下拉滚动
 
-    var vueApp = Vue.extend(app);
+    var vueApp = Vue.extend(App);
     window.app.vue = new vueApp({
         router,
         store
@@ -36,8 +43,7 @@ mui.init({
     swipeBack: false, //关闭右滑关闭功能（默认就是false）
     keyEventBind: {
         backbutton: true  //开启back按键监听（默认就是true）
-    },
-    statusBarBackground: "#1981D8" //设置状态栏颜色,仅iOS可用
+    }
 });
 
 if (mui.os.plus) {    // 返回是否在基座中运行
