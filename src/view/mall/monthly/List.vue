@@ -1,6 +1,6 @@
 <template>
-    <div class="mall-book-new">
-        <c-list-view type="book" :list="dataList"></c-list-view>
+    <div class="mall-monthly-list">
+        <c-list-view type="monthly" :list="dataList"></c-list-view>
     </div>
 </template>
 
@@ -18,24 +18,17 @@
         },
         created(){
             this.$store.commit('updateHeader', {
-                title: '新书',
+                title: '包月',
                 showBack: true,
                 showSearch: true
             });
         },
         mounted(){
-            app.ajax.get(app.config.api.book.new, {}, (resp) => {
+            app.ajax.get(app.config.api.monthly.monthly, {}, (resp) => {
                 if (resp.status == 200) {
                     let data = resp.data.result;
                     if (data) {
-                        this.dataList = data.map((item, index) => ({
-                            src: item.image,
-                            title: item.name,
-                            score: item.score,
-                            desc: item.intro,
-                            author: item.author,
-                            url: item.url
-                        }));
+                        this.dataList = data;
                     }
                 }
             }, (err) => {

@@ -1,17 +1,19 @@
 const path = require('path'),
     webpack = require('webpack'),
     NODE_ENV = process.env.NODE_ENV || 'DEV',  // DEV PROD
-    HtmlWebpackPlugin = require("html-webpack-plugin");
+    HtmlWebpackPlugin = require("html-webpack-plugin"),
+    vuxLoader = require('vux-loader');
 
-module.exports = {
-    entry: ['babel-polyfill', './src/js/app.js'],
+let webpackConfig = {
+    entry: ['babel-polyfill', './src/js/main.js'],
     output: {
         path: NODE_ENV === 'DEV' ? '/' : path.resolve(__dirname, './build'),
         //publicPath路径就是你发布之后的路径，
         // 比如你想发布到你站点的/util/vue/build 目录下, 那么设置publicPath: "/util/vue/build/"
         // 此字段配置如果不正确，发布后资源定位不对，比如：css里面的精灵图路径错误
         publicPath: NODE_ENV === 'DEV' ? '/build/' : './build/',
-        filename: NODE_ENV === 'DEV' ? 'app.js' : 'app.[hash].js'
+        filename: NODE_ENV === 'DEV' ? 'main.js' : 'main.[hash].js',
+        chunkFilename: NODE_ENV ==='DEV'?'[name].[id].js':'[name].[id].[hash].js'
     },
     module: {
         rules: [
@@ -51,11 +53,6 @@ module.exports = {
         ]
     },
     plugins: [
-        // need: npm i jquery@1.11.3
-        // new webpack.ProvidePlugin({
-        //     jQuery: "jquery",
-        //     $: "jquery"
-        // }),
         new HtmlWebpackPlugin({
             filename: "../index.html", //生成的html存放路径，相对于 path
             template: './src/index.html', //html模板路径
@@ -82,7 +79,11 @@ module.exports = {
         hints: false
     },
     devtool: '#eval-source-map'
-};
+}
+
+module.exports = vuxLoader.merge(webpackConfig, {
+    plugins: ['vux-ui', 'progress-bar', 'duplicate-style']
+})
 
 var fileSystem = require('fs');
 //打包状态

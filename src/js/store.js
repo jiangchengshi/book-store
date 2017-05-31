@@ -1,6 +1,3 @@
-/**
- * Created by chengshi on 2017/4/26.
- */
 import Vue from "vue";
 import Vuex from "vuex";
 
@@ -8,28 +5,32 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
-        mall: {
-            tabBar: true
+        loading: false,
+        header: {
+            title: '首页',
+            showBack: false,
+            backText: '',
+            showSearch: false,
+            showClean: false
         },
         reader: {
-            navBar: false,
+            header: false,
             tabBar: false
         }
     },
     mutations: {
-        updateMallBar(state, tabBar){
-            if (tabBar == undefined) {
-                state.mall.tabBar = !state.mall.tabBar;
-            } else {
-                state.mall.tabBar = tabBar;
-            }
+        updateLoading(state, loading){
+            state.loading = loading;
+        },
+        updateHeader(state, payload){
+            Object.assign(state.header, {showBack: false, backText: '', showSearch: false, showClean: false}, payload);
         },
         updateReaderBar(state, payload){
             if (!payload) {
-                state.reader.navBar = !state.reader.navBar;
+                state.reader.header = !state.reader.header;
                 state.reader.tabBar = !state.reader.tabBar;
             } else {
-                state.reader.navBar = payload.navBar;
+                state.reader.header = payload.header;
                 state.reader.tabBar = payload.tabBar;
             }
         }

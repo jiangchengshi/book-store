@@ -55,90 +55,90 @@
     }
 </script>
 
-<style scoped>
+<style>
     .login {
         margin: 0;
         padding: 0;
     }
 
-    header {
+    .login header {
         background-color: white;
     }
 
-    .logo {
+    .login .logo {
         padding: 80px 0px 50px 0px;
         text-align: center;
     }
 
-    .logo img {
+    .login .logo img {
         width: 110px;
         height: 110px;
     }
 
-    .mui-input-group, .mui-input-group:before, .mui-input-group:after {
+    .login .mui-input-group, .mui-input-group:before, .mui-input-group:after {
         background-color: initial;
     }
 
-    .mui-input-group .mui-input-row {
+    .login .mui-input-group .mui-input-row {
         height: 50px;
         line-height: 50px;
     }
 
-    .mui-input-row label {
+    .login .mui-input-row label {
         padding: 4px 20px;
         width: 15%;
     }
 
-    .mui-input-group .mui-input-row label i {
+    .login .mui-input-group .mui-input-row label i {
         font-size: 28px;
     }
 
-    .mui-input-row label ~ input {
+    .login .mui-input-row label ~ input {
         width: 80%;
     }
 
-    .mui-input-group .mui-input-row:after {
+    .login .mui-input-group .mui-input-row:after {
         right: 15px;
         bottom: 10px;
     }
 
-    .mui-input-group .mui-href-row {
+    .login .mui-input-group .mui-href-row {
         height: 40px;
         line-height: 40px;
         margin-bottom: 15px;
     }
 
-    .mui-input-group .mui-href-row span {
+    .login .mui-input-group .mui-href-row span {
         width: 50%;
         font-size: 15px;
         color: #35B4EB;
     }
 
-    .mui-input-group .mui-href-row .logon {
+    .login .mui-input-group .mui-href-row .logon {
         float: left;
         padding-left: 20px;
     }
 
-    .mui-input-group .mui-href-row .forget {
+    .login .mui-input-group .mui-href-row .forget {
         float: right;
         text-align: right;
         padding-right: 20px;
     }
 
-    .mui-input-group button {
+    .login .mui-input-group button {
         display: block;
         line-height: 35px;
         margin: 0px auto;
         width: 90%;
     }
 
-    .otherLogin {
+    .login .otherLogin {
         position: absolute;
         bottom: 10px;
         text-align: center;
     }
 
-    .otherLogin span {
+    .login .otherLogin span {
         display: block;
         padding: 0px 25px;
         color: #A3A5A7;
@@ -146,7 +146,7 @@
         font-size: 14px;
     }
 
-    .otherLogin span:before {
+    .login .otherLogin span:before {
         content: '';
         height: 1px;
         display: block;
@@ -157,7 +157,7 @@
         margin-right: 10px;
     }
 
-    .otherLogin span:after {
+    .login .otherLogin span:after {
         content: '';
         display: block;
         height: 1px;
@@ -168,7 +168,7 @@
         margin-left: 10px;
     }
 
-    .otherLogin i {
+    .login .otherLogin i {
         font-size: 35px;
         margin: 10px 20px;
     }

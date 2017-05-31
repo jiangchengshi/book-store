@@ -1,127 +1,130 @@
 <template>
-    <div class="package">
-        <header class="mui-bar mui-bar-nav">
-            <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-            <h1 class="mui-title">{{title}}</h1>
-        </header>
-        <div class="intro">
-            <ul class="mui-table-view">
-                <li class="mui-table-view-cell mui-media">
-                    <a href="javascript:void(0);" @tap.stop="handleTapView(monthly.id)">
-                        <img class="mui-media-object mui-pull-left" :src="monthly.image">
-                        <div class="mui-media-body">
-                            <span class="name">人民的名义{{monthly.name}}</span>
-                        </div>
-                        <div class="mui-ellipsis">
-                            <span class="desc">最热门的女频小说{{monthly.desc}}</span>
-                            <span style="font-size: 14px;color: #989A9C;line-height: 33px;">原价：
-                                <label style="text-decoration:line-through;">¥134</label>
-                            </span>
-                            <span style="font-size: 16px;line-height: 28px;">现价：
-                                <label style="color: #FF0000;">¥10/月</label>
-                            </span>
-                        </div>
-                    </a>
-                </li>
-                <li v-if="isOrdered" class="mui-table-view-cell">
-                    <label>2016-12-30到期</label>
-                    <button type="button" class="mui-btn mui-btn-primary mui-btn-outlined">续订</button>
-                </li>
-                <li v-if="isOrdered" class="mui-table-view-cell">
-                    <label>到期自动续订</label>
-                    <div class="mui-switch mui-active">
-                        <div class="mui-switch-handle"></div>
-                    </div>
-                </li>
-            </ul>
-            <div v-if="!isOrdered" class="subscribe">
-                <button class="mui-btn mui-btn-primary" type="button">
-                    立即订阅
-                </button>
-            </div>
+    <div class="mall-monthly-package">
+        <div class="weui-panel weui-panel_access">
+            <a class="weui-media-box weui-media-box_appmsg">
+                <div class="weui-media-box__hd">
+                    <img class="weui-media-box__thumb" :src="monthly.image" alt="">
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">{{monthly.name}}
+                        <span style="font-size: 12px;color: #989A9C;">({{monthly.num}}本)</span>
+                    </h4>
+                    <p class="weui-media-box__desc" style="font-size: 14px;color: #989A9C;">{{monthly.desc}}</p>
+                    <p style="font-size: 12px;color: #989A9C;">原价： ￥
+                        <span style="text-decoration: line-through;">1{{monthly.priceOri}}</span>
+                    </p>
+                    <p style="font-size: 14px;color: #162636;">现价： ￥
+                        <span style="color: red;">2{{monthly.priceNow}}</span></p>
+                </div>
+            </a>
         </div>
-        <ListViewBook :url="url" :param="param" @tapView="handleTapView"></ListViewBook>
+        <group style="margin-bottom: 10px;">
+            <x-button v-if="monthly.isvip" type="primary" style="margin: 8px 20px; width: 90%;"
+                      @click.native="handleOrder">立即订阅
+            </x-button>
+            <template v-else>
+                <cell title="2016-12-30到期" style="font-size: 15px;">
+                    <slot>
+                        <x-button type="primary" plain mini @click.native="handleOrder">续订</x-button>
+                    </slot>
+                </cell>
+                <x-switch title="到期自动续订" v-model="show.renew" style="font-size: 15px;"></x-switch>
+            </template>
+        </group>
+        <c-list-view type="book" :list="dataList"></c-list-view>
+        <c-dialog type="monthly" :show="show.dialog" :data="monthly" @confirm="handleConfirm"
+                  @cancel="show.dialog=false"></c-dialog>
     </div>
 </template>
 
 <script>
-    import ListViewBook from '../../components/ListViewBook.vue';
+    import {Group, Cell, XButton, XSwitch} from 'vux';
+    import CListView from '../../components/ListView.vue';
+    import CDialog from '../../components/Dialog.vue';
 
     export default {
         data () {
             return {
-                title: '加载中',
                 monthly: {},
-                url: '',
-                param: {},
-                isOrdered: false
+                dataList: [],
+                show: {
+                    renew: true,
+                    dialog: false
+                }
             }
         },
         components: {
-            ListViewBook
+            Group, Cell, XButton, XSwitch, CListView, CDialog
         },
         methods: {
-            handleTapView(e){
-                console.log('child');
-                console.log(e);
+            getDetailData(){
+                app.ajax.get(app.config.api.monthly.info + this.$route.query.id, {}, (resp) => {
+                    if (resp.status == 200) {
+                        let data = resp.data.result;
+                        if (data) {
+                            this.monthly = data;
+                            this.$store.commit('updateHeader', {
+                                title: data.name,
+                                showBack: true,
+                                showSearch: true
+                            });
+                        }
+                    }
+                }, (err) => {
+                });
+            },
+            getListData(){
+                app.ajax.get(app.config.api.monthly.monthly + this.$route.query.id, {}, (resp) => {
+                    if (resp.status == 200) {
+                        let data = resp.data.result;
+                        if (data) {
+                            this.dataList = data.map((item, index) => ({
+                                src: item.image,
+                                title: item.name,
+                                score: item.score,
+                                desc: item.intro,
+                                author: item.author,
+                                url: item.url
+                            }));
+                        }
+                    }
+                }, (err) => {
+                });
+            },
+            handleOrder(e){
+                this.show.dialog = true;
+            },
+            handleConfirm(){
+                // 订阅 包月包
+
+                this.show.dialog = false;
+                this.$vux.toast.show({
+                    text: '订阅成功!',
+                    isShowMask: true
+                });
             }
+        },
+        created(){
+            this.$store.commit('updateHeader', {
+                title: '加载中...',
+                showBack: true,
+                showSearch: true
+            });
+        },
+        mounted(){
+            this.getDetailData();
+            this.getListData();
         }
     }
 </script>
 
-<style scoped>
-    .package {
-        margin: 0;
-        padding: 0;
+<style>
+    .mall-monthly-package .weui-media-box_appmsg .weui-media-box__hd {
+        height: 75px;
+        line-height: 75px;
     }
 
-    .package header {
-        background-color: white;
-    }
-
-    .package .intro {
-        background-color: white;
-        padding: 60px 10px 0px 10px;
-        margin-bottom: 10px;
-    }
-
-    .package .intro .mui-table-view:before {
-        height: 0px;
-    }
-
-    .package .intro .mui-table-view .mui-table-view-cell.mui-media .mui-media-object {
-        max-width: 86px;
-        height: 120px;
-    }
-
-    .package .intro .mui-table-view .mui-media-body {
-        margin: 10px 0px;
-    }
-
-    .package .intro .mui-table-view .name {
-        color: #162636;
-        font-size: 18px;
-    }
-
-    .package .intro .mui-table-view .mui-ellipsis {
-        margin-bottom: 10px;
-    }
-
-    .package .intro .mui-table-view span {
-        display: block;
-    }
-
-    .package .intro .mui-table-view .desc {
-        color: #989A9C;
-    }
-
-    .package .intro .subscribe {
-        border-top: solid 1px #D9D9D9;
-        padding: 10px 0px;
-    }
-
-    .package .intro button {
-        width: 100%;
-        line-height: 30px;
+    .mall-monthly-package .weui-media-box__bd p {
+        line-height: 20px;
     }
 </style>

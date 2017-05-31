@@ -1,0 +1,46 @@
+* {
+    padding: 0;
+    margin: 0;
+    font-family: PingFangSC-Regular;
+}
+
+.weui-cells {
+    margin: 0px;
+}
+
+.weui-switch {
+    -webkit-appearance: none;
+}
+
+.weui-dialog {
+    text-align: initial;
+}
+
+.weui-btn {
+    display: initial;
+    margin: initial;
+}
+
+a {
+    text-decoration: none;
+}
+
+.iconfont {
+    font-size: 25px;
+}
+
+.vux-header, .weui-tabbar {
+    background-color: white;
+}
+
+.vux-header .vux-header-title, .vux-header h1 {
+    color: #162636;
+}
+
+.weui-cell__ft {
+    font-size: 14px;
+}
+
+.vux-popup-dialog{
+    overflow-y: initial;
+}

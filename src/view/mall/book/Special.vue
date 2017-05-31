@@ -1,44 +1,44 @@
 <template>
-    <div class="special">
-        <header class="mui-bar mui-bar-nav">
-            <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-            <h1 class="mui-title">{{title}}</h1>
-            <a class="mui-pull-right"><i class="mui-icon iconfont icon-sousuo-sousuo1"></i></a>
-        </header>
-        <ListViewBook :url="url" :param="param" @tapView="handleTapView"></ListViewBook>
+    <div class="mall-book-special">
+        <c-list-view type="book" :list="dataList"></c-list-view>
     </div>
 </template>
 
 <script>
-    import ListViewBook from '../../components/ListViewBook.vue';
+    import CListView from '../../components/ListView.vue';
 
     export default {
         data () {
             return {
-                title: '特价',
-                url: app.config.api.book.special + 1,
-                param: {}
+                dataList: []
             }
         },
         components: {
-            ListViewBook
+            CListView
+        }, created(){
+            this.$store.commit('updateHeader', {
+                title: '特价',
+                showBack: true,
+                showSearch: true
+            });
         },
-        methods:{
-            handleTapView(e){
-                console.log('child');
-                console.log(e);
-            }
+        mounted(){
+            app.ajax.get(app.config.api.book.special, {}, (resp) => {
+                if (resp.status == 200) {
+                    let data = resp.data.result;
+                    if (data) {
+                        this.dataList = data.map((item, index) => ({
+                            src: item.image,
+                            title: item.name,
+                            score: item.score,
+                            desc: item.intro,
+                            author: item.author,
+                            url: item.url
+                        }));
+                    }
+                }
+            }, (err) => {
+            });
         }
     }
 </script>
-
-<style scoped>
-    .special {
-        margin: 0;
-        padding: 0;
-    }
-
-    header {
-        background-color: white;
-    }
-</style>
