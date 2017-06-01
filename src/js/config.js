@@ -25,7 +25,9 @@ export default {
         book: {
             new: 'news/',
             free: 'free/',
-            special: 'special/'
+            special: 'special/',
+            detail: 'detail/',
+            review: 'review/'
         },
         monthly: {
             monthly: 'monthly/',

@@ -78,14 +78,7 @@
                     if (resp.status == 200) {
                         let data = resp.data.result;
                         if (data) {
-                            this.dataList = data.map((item, index) => ({
-                                src: item.image,
-                                title: item.name,
-                                score: item.score,
-                                desc: item.intro,
-                                author: item.author,
-                                url: item.url
-                            }));
+                            this.dataList = data;
                         }
                     }
                 }, (err) => {

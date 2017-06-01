@@ -8,9 +8,10 @@ const store = new Vuex.Store({
         loading: false,
         header: {
             title: '首页',
-            showBack: false,
             backText: '',
+            showBack: false,
             showSearch: false,
+            showShare: false,
             showClean: false
         },
         reader: {
@@ -23,7 +24,13 @@ const store = new Vuex.Store({
             state.loading = loading;
         },
         updateHeader(state, payload){
-            Object.assign(state.header, {showBack: false, backText: '', showSearch: false, showClean: false}, payload);
+            Object.assign(state.header, {
+                showBack: false,
+                backText: '',
+                showSearch: false,
+                showShare: false,
+                showClean: false
+            }, payload);
         },
         updateReaderBar(state, payload){
             if (!payload) {

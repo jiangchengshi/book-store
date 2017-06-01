@@ -61,7 +61,7 @@
                         <span slot="title" v-if="chapter.isvip==0">{{chapter.chaptername}}</span>
                         <template v-else>
                             <span slot="title" style="color: #989A9C;">{{chapter.chaptername}}</span>
-                            <span><i class="iconfont icon-lock"></i></span>
+                            <i class="iconfont icon-lock"></i>
                         </template>
                     </cell>
                 </group>
@@ -285,7 +285,7 @@
     }
 
     .reader .popup-catalog .iconfont {
-        font-size: 15px;
+        font-size: 16px;
     }
 
     .reader .popup-progress .weui-cell {

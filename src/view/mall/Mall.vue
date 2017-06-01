@@ -5,6 +5,9 @@
             <router-link to="/search" slot="right">
                 <i v-show="$store.state.header.showSearch" class="iconfont icon-sousuo_sousuo"></i>
             </router-link>
+            <router-link to="/share" slot="right">
+                <i v-show="$store.state.header.showShare" class="iconfont icon-zuihouyibanfenxiang"></i>
+            </router-link>
         </x-header>
         <div style="overflow: scroll" :style="{height: height+'px'}">
             <router-view></router-view>

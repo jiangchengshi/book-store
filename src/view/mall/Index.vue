@@ -5,23 +5,23 @@
         <!-- 栏目导航 -->
         <div class="navigator" v-if="data.navigator.length>=5">
             <a @click="handleNavigator('new')">
-                <i class="mui-icon iconfont icon-shuji01" style="background-color: #F9B248;"></i>
+                <i class="iconfont icon-shuji01" style="background-color: #F9B248;"></i>
                 <div class="label">{{data.navigator[0]}}</div>
             </a>
             <a @click="handleNavigator('free')">
-                <i class="mui-icon iconfont icon-free-font" style="background-color: #72D66D;"></i>
+                <i class="iconfont icon-free-font" style="background-color: #72D66D;"></i>
                 <div class="label">{{data.navigator[1]}}</div>
             </a>
             <a @click="handleNavigator('special')">
-                <i class="mui-icon iconfont icon-tejia" style="background-color: #FA7B7B;"></i>
+                <i class="iconfont icon-tejia" style="background-color: #FA7B7B;"></i>
                 <div class="label">{{data.navigator[2]}}</div>
             </a>
             <a @click="handleNavigator('monthly/list')">
-                <i class="mui-icon iconfont icon-baoyue1" style="background-color: #5FAFF8;"></i>
+                <i class="iconfont icon-baoyue1" style="background-color: #5FAFF8;"></i>
                 <div class="label">{{data.navigator[3]}}</div>
             </a>
             <a @click="handleNavigator('classify/index')">
-                <i class="mui-icon iconfont icon-fenlei" style="background-color: #D572F0;"></i>
+                <i class="iconfont icon-fenlei" style="background-color: #D572F0;"></i>
                 <div class="label">{{data.navigator[4]}}</div>
             </a>
         </div>
@@ -117,14 +117,7 @@
                         if (data && data.length > 1) {
                             this.data.recommend.length = data.length;
                             this.data.recommend.card = data.pop();
-                            this.data.recommend.list = data.map((item, index) => ({
-                                src: item.image,
-                                title: item.name,
-                                score: item.score,
-                                desc: item.intro,
-                                author: item.author,
-                                url: item.url
-                            }));
+                            this.data.recommend.list = data;
                         }
                     }
                 }, (err) => {

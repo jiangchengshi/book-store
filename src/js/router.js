@@ -9,6 +9,7 @@ const MallIndex = resolve => require(['../view/mall/Index.vue'], resolve);
 const MallBookNew = resolve => require(['../view/mall/book/New.vue'], resolve);
 const MallBookFree = resolve => require(['../view/mall/book/Free.vue'], resolve);
 const MallBookSpecial = resolve => require(['../view/mall/book/Special.vue'], resolve);
+const MallBookDetail = resolve => require(['../view/mall/book/Detail'], resolve);
 const MallMonthlyList = resolve => require(['../view/mall/monthly/List.vue'], resolve);
 const MallMonthlyDetail = resolve => require(['../view/mall/monthly/Detail.vue'], resolve);
 const MallMonthlyPackage = resolve => require(['../view/mall/monthly/Package.vue'], resolve);
@@ -43,6 +44,10 @@ const routes = [
             {
                 path: 'special',
                 component: MallBookSpecial
+            },
+            {
+                path: 'detail',
+                component: MallBookDetail
             },
             {
                 path: 'monthly/list',

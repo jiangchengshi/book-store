@@ -80,8 +80,7 @@
     .weui-media-box__bd p {
         line-height: 20px;
     }
-</style>
-<style>
+
     .weui-cell.weui-check_label .weui-cell__bd {
         color: #989A9C;
         font-size: 14px;
