@@ -1,6 +1,6 @@
 <template>
     <div class="mall-classify-list">
-        <template v-for="(data,index) in dataList">
+        <template v-for="(data, index) in dataList">
         <group-title>{{data.caption}}</group-title>
         <grid :rows="2">
             <grid-item :link="'/mall/classify/detail?id='+child.id+'&name='+child.name" v-for="(child, index) in data.children" :key="index">

@@ -43,7 +43,7 @@
                         <p class="weui-media-box__score">
                             <i class="iconfont icon-star" style="font-size: 12px; color: yellow;"
                                v-for="s in item.score"></i>
-                            <i class="iconfont icon-star" style="font-size: 12px;" v-for="s in (5-item.score)"></i>
+                            <i class="iconfont icon-star" style="font-size: 12px;" v-for="s in (8-item.score)"></i>
                         </p>
                         <p class="weui-media-box__desc">{{item.content}}</p>
                         <div>
@@ -75,7 +75,7 @@
         },
         methods: {
             handleClickBook(id){
-                this.$router.push({path: 'detail', query: {id: id}});
+                this.$router.push({path: '/mall/book/detail', query: {id: id}});
             }
         }
     }

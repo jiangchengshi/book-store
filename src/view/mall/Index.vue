@@ -4,15 +4,15 @@
         <c-swipe :swipe="swipe"></c-swipe>
         <!-- 栏目导航 -->
         <div class="navigator" v-if="data.navigator.length>=5">
-            <a @click="handleNavigator('new')">
+            <a @click="handleNavigator('book/new')">
                 <i class="iconfont icon-shuji01" style="background-color: #F9B248;"></i>
                 <div class="label">{{data.navigator[0]}}</div>
             </a>
-            <a @click="handleNavigator('free')">
+            <a @click="handleNavigator('book/free')">
                 <i class="iconfont icon-free-font" style="background-color: #72D66D;"></i>
                 <div class="label">{{data.navigator[1]}}</div>
             </a>
-            <a @click="handleNavigator('special')">
+            <a @click="handleNavigator('book/special')">
                 <i class="iconfont icon-tejia" style="background-color: #FA7B7B;"></i>
                 <div class="label">{{data.navigator[2]}}</div>
             </a>

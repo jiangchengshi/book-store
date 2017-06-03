@@ -24,8 +24,7 @@
                 app.ajax.get(app.config.api.classify + id, {}, (resp) => {
                     if (resp.status == 200) {
                         let data = resp.data.result;
-                        if (data) {
-                            let count = data.remove(count);
+                        if (data && data.length > 0) {
                             this.dataList = data;
                         }
                     }

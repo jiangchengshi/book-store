@@ -36,19 +36,19 @@ const routes = [
                 component: MallIndex
             },
             {
-                path: 'new',
+                path: 'book/new',
                 component: MallBookNew
             },
             {
-                path: 'free',
+                path: 'book/free',
                 component: MallBookFree
             },
             {
-                path: 'special',
+                path: 'book/special',
                 component: MallBookSpecial
             },
             {
-                path: 'detail',
+                path: 'book/detail',
                 component: MallBookDetail
             },
             {

@@ -49,7 +49,7 @@
             </tabbar-item>
         </tabbar>
 
-        <popup position="left" width="75%" class="popup-catalog">
+        <popup v-model="popup.catalog" position="left" width="75%" class="popup-catalog">
             <div style="background-color: #FFFFFF;height: 46px; line-height: 46px; padding: 0px 10px;">
                 <span>{{data.chapter.articlename}}</span>
                 <span class="iconfont icon-paixu" style="float: right;"></span>
@@ -196,10 +196,10 @@
                     chapters: []
                 },
                 chapterId: {
-                    cur: 6438,
+                    cur: 1,
                     min: 1,
-                    max: 6444,
-                    progress: 20
+                    max: 1,
+                    progress: 0
                 },
                 content: {
                     flag: true,
@@ -215,8 +215,10 @@
                 app.ajax.get(app.config.api.reader.chapters + this.$route.query.id + '/' + page, {}, (resp) => {
                     if (resp.status == 200) {
                         let data = resp.data.result;
-                        if (data && data.length > 1) {
-                            this.data.chapters = data;
+                        if (data) {
+                            this.chapterId.min = data.min_chapterid;
+                            this.chapterId.max = data.max_chapterid;
+                            this.data.chapters = data.result;
                         }
                     }
                 }, (err) => {
@@ -398,9 +400,9 @@
                 el.style.opacity = 1;
             },
             transEnter(el, done){
-                if(this.setting.turnModel==1){  // 滑动
+                if (this.setting.turnModel == 1) {  // 滑动
                     el.style.transition = "all 1s ease";
-                }else if(this.setting.turnModel==2){    // 覆盖
+                } else if (this.setting.turnModel == 2) {    // 覆盖
                     el.style.transition = "all 0s ease";
                 }
                 done();
