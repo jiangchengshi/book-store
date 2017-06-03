@@ -25,6 +25,10 @@ a {
     text-decoration: none;
 }
 
+i{
+    font-style: initial;
+}
+
 .iconfont {
     font-size: 25px;
 }

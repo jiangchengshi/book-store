@@ -8,7 +8,7 @@
 </template>
 
 <script>
-    import {Loading} from 'vux'
+    import {Loading} from 'vux';
 
     export default {
         name: 'app',

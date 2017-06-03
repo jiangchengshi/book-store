@@ -10,9 +10,9 @@
                     <div class="weui-media-box__bd">
                         <h4 class="weui-media-box__title">{{item.name}}</h4>
                         <p class="weui-media-box__score">
-                            <i class="iconfont icon-star" style="font-size: 14px; color: yellow;"
+                            <i class="iconfont icon-star" style="font-size: 14px; color: #ffbe00;"
                                v-for="s in item.score"></i>
-                            <i class="iconfont icon-star" style="font-size: 14px;" v-for="s in (5-item.score)"></i>
+                            <i class="iconfont icon-star" style="font-size: 14px;" v-for="s in (8-item.score)"></i>
                         </p>
                         <p class="weui-media-box__desc">{{item.intro}}</p>
                         <p style="font-size: 15px; color: #828181;">{{item.author}}</p>
@@ -32,7 +32,7 @@
                 </cell>
             </group>
         </template>
-        <template v-if="type=='review'">
+        <template v-else-if="type=='review'">
             <div class="weui-panel weui-panel_access review">
                 <a v-for="item in list" :key="item.id" class="weui-media-box weui-media-box_appmsg">
                     <div class="weui-media-box__hd" v-if="item.avatar">
@@ -64,6 +64,7 @@
 
 <script>
     import {Group, Cell} from 'vux';
+
     export default {
         props: {
             type: String,

@@ -20,7 +20,7 @@
                 <i class="iconfont icon-baoyue1" style="background-color: #5FAFF8;"></i>
                 <div class="label">{{data.navigator[3]}}</div>
             </a>
-            <a @click="handleNavigator('classify/index')">
+            <a @click="handleNavigator('classify/list')">
                 <i class="iconfont icon-fenlei" style="background-color: #D572F0;"></i>
                 <div class="label">{{data.navigator[4]}}</div>
             </a>

@@ -50,11 +50,13 @@ if (window.plus) {    // 返回是否在基座中运行
             isAndroid: plus.os.name === "Android",
             isIOS: plus.os.name === "iOS",
             width: {
-                screen: plus.screen.resolutionWidth
+                screen: plus.screen.resolutionWidth,
+                content: plus.screen.resolutionWidth - 10
             },
             height: {
                 screen: plus.screen.resolutionHeight,
                 main: plus.screen.resolutionHeight - headerHeight - tabbarHeight,
+                content: plus.screen.resolutionHeight - headerHeight - tabbarHeight + 10,
                 search: plus.screen.resolutionHeight - searchHeight
             }
         });
@@ -65,11 +67,13 @@ if (window.plus) {    // 返回是否在基座中运行
 } else {
     Object.assign(config.setting, {
         width: {
-            screen: window.screen.availWidth
+            screen: window.screen.availWidth,
+            content: window.screen.availWidth - 5
         },
         height: {
             screen: window.screen.availHeight,
             main: window.screen.availHeight - headerHeight - tabbarHeight,
+            content: window.screen.availHeight - headerHeight - tabbarHeight + 10,
             search: window.screen.availHeight - searchHeight
         }
     });

@@ -7,11 +7,13 @@ export default {
         isAndroid: false,
         isIOS: false,
         width: {
-            screen: 0
+            screen: 0,
+            content: 0
         },
         height: {
             screen: 0,
             main: 0,
+            content: 0,
             search: 0
         },
         server: 'http://api.lveshu.com/',
@@ -29,6 +31,7 @@ export default {
             detail: 'detail/',
             review: 'review/'
         },
+        classify: 'sort/',
         monthly: {
             monthly: 'monthly/',
             info: 'monthly/info/'
@@ -38,7 +41,8 @@ export default {
             hot: 'search/hot'
         },
         reader: {
-            chapter: 'chapters/'
+            chapters: 'chapters/',
+            chapter: 'chapters/info/'
         }
     }
 }

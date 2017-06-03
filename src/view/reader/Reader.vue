@@ -7,19 +7,23 @@
             <a class="iconfont icon-xiazai" slot="right"></a>
             <a class="iconfont icon-shuqian_bookmark" slot="right"></a>
         </x-header>
-        <div class="main" :style="{height: height+'px', backgroundColor: backgroundColor.main, color: color.main}"
+        <div class="main" :style="{height: height+'px',backgroundColor: backgroundColor.main,color: color.main}"
              style="padding: 0px 10px;">
             <div class="title" style="height: 46px; line-height: 46px;" :style="{opacity:opacity.title}">
-                第1章 蛇精病是啥病？
+                {{data.chapter.articlename}}
             </div>
-            <div class="content"
-                 :style="{height: contentHeight+'px', lineHeight: setting.lineHeight+'px',opacity:opacity.content}"
+            <div class="content" ref="content"
+                 :style="{height: contentHeight+'px',lineHeight: setting.lineHeight+'px',opacity: opacity.content,fontSize: setting.fontSize+'px'}"
                  @click="handleClickContent">
-                “原来刚才是一场梦，我说这么逼真。”石凡这才明白过来刚才是在做梦，他迅速回想了一下，今天是姚珠的生日，她特意举办了场生日Party，邀请了不少同学、好友，被邀请的人中就有石凡。
-                舞会中途，姚珠邀请自己进她的房间参观，结果石凡便看到了正在换衣服的姚珠，那女人一声非礼，结果招来了所有同学，纷纷指责嘲笑石凡。
-                被人指责嘲笑不是最重要的，最重要的众所周知，石大少是天痿、不能人事，这才是最要命的，待众人到齐，姚珠直接一句，“你还敢来偷看老娘，我就是同意，你能跟我上床吗？”
-                一句，就一句话便把石大少整没电了。
-                先被人指责非礼，后被人嘲笑鄙夷，还有众多人围观，石凡急怒攻心之下彻
+                <transition @before-enter="transBeforeEnter"
+                            @enter="transEnter"
+                            @leave="transLeave"
+                            @after-leave="transAfterLeave"
+                            :css="false">
+                    <div v-show="content.flag" :style="{'column-width':contentWidth+'px',height: contentHeight+'px'}">
+                        {{data.chapter.content}}
+                    </div>
+                </transition>
             </div>
             <div class="status" style="height: 56px;line-height: 56px;" :style="{opacity:opacity.status}">
                 16:02
@@ -45,9 +49,9 @@
             </tabbar-item>
         </tabbar>
 
-        <popup v-model="popup.catalog" position="left" width="75%" class="popup-catalog">
+        <popup position="left" width="75%" class="popup-catalog">
             <div style="background-color: #FFFFFF;height: 46px; line-height: 46px; padding: 0px 10px;">
-                <span>《梦回唐朝》</span>
+                <span>{{data.chapter.articlename}}</span>
                 <span class="iconfont icon-paixu" style="float: right;"></span>
             </div>
             <tab>
@@ -57,7 +61,7 @@
             </tab>
             <div v-show="catalogItem==0">
                 <group>
-                    <cell v-for="chapter in data.chapters" :key="chapter.chapterid">
+                    <cell v-for="(chapter, index) in data.chapters" :key="index">
                         <span slot="title" v-if="chapter.isvip==0">{{chapter.chaptername}}</span>
                         <template v-else>
                             <span slot="title" style="color: #989A9C;">{{chapter.chaptername}}</span>
@@ -73,14 +77,14 @@
         <popup v-model="popup.progress" class="popup-progress">
             <group>
                 <cell primary="content">
-                    <range v-model="chapter.cur" minHTML="上一章" maxHTML="下一章" @on-change="changeChapter"></range>
+                    <range :min="1" :max="8000" minHTML="上一章" maxHTML="下一章" @on-change="changeChapter"></range>
                 </cell>
             </group>
         </popup>
         <popup v-model="popup.progress" class="popup-progress-tip" is-transparent>
             <div style="width: 95%;background-color:#fff;border-radius:5px;padding-top:10px; text-align: center;">
                 <span style="color: #162636;letter-spacing: 0;font-size: 14px;display: block;line-height: 20px;">
-                    第三十章  我改变主意了
+                    {{data.chapter.articlename}}
                 </span>
                 <span style="color: #EE4D22;letter-spacing: 0;font-size: 16px;line-height: 40px;">
                     38.45%
@@ -91,37 +95,54 @@
         <popup v-model="popup.setting" class="popup-setting">
             <group>
                 <cell title="亮度" primary="content">
-                    <range v-model="chapter.cur" minHTML="<i style='font-size:16px;' class='iconfont icon-liangdu'></i>"
+                    <range v-model="setting.brightness"
+                           minHTML="<i style='font-size:16px;' class='iconfont icon-liangdu'></i>"
                            maxHTML="<i style='font-size:24px;' class='iconfont icon-liangdu'></i>"
-                           @on-change="changeChapter"></range>
+                           @on-change="changeBrightness"></range>
                 </cell>
                 <cell title="字体" primary="content" class="font">
-                    <i v-if="fontStyle" class="iconfont icon-fanzhuanjian"
-                       style="font-size:18px;padding: 5px;border: solid 1px"></i>
-                    <i v-else class="iconfont icon-jianzhuanfan"
-                       style="font-size:18px;padding: 5px;border: solid 1px"></i>
-                    <i class="iconfont icon-a1" style="font-size:18px;padding: 5px 35px;border: solid 1px"></i>
-                    <span>54</span>
-                    <i class="iconfont icon-a" style="font-size:18px;padding: 5px 35px;border: solid 1px"></i>
-
+                    <i v-if="setting.fontStyle=='F'" class="iconfont icon-fanzhuanjian" data-font-size="F"
+                       @click="changeFontSize"
+                       style="font-size:18px;padding: 5px 8px;border: solid 1px"></i>
+                    <i v-else-if="setting.fontStyle=='J'" class="iconfont icon-jianzhuanfan" data-font-size="J"
+                       @click="changeFontSize"
+                       style="font-size:18px;padding: 5px 8px;border: solid 1px"></i>
+                    <i class="iconfont icon-a1" style="font-size:18px;padding: 5px 35px;border: solid 1px"
+                       data-font-size="-" @click="changeFontSize"></i>
+                    <span>{{setting.fontSize}}</span>
+                    <i class="iconfont icon-a" style="font-size:18px;padding: 5px 35px;border: solid 1px"
+                       data-font-size="+" @click="changeFontSize"></i>
                 </cell>
                 <cell title="翻页" primary="content" class="turn">
-                    <span>滑动</span>
-                    <span>覆盖</span>
+                    <i :class="{'setting-active': setting.turnModel==1}" data-turn-model="1"
+                       @click="changeTurnModel">滑动</i>
+                    <i :class="{'setting-active': setting.turnModel==2}" data-turn-model="2"
+                       @click="changeTurnModel">覆盖</i>
                 </cell>
                 <cell title="排版" primary="content" class="compose">
-                    <i class="iconfont icon-2fuben-copy" style="font-size:18px;padding: 5px 12px;border: solid 1px"></i>
-                    <i class="iconfont icon-2" style="font-size:18px;padding: 5px 12px;border: solid 1px"></i>
-                    <i class="iconfont icon-3" style="font-size:18px;padding: 5px 12px;border: solid 1px"></i>
-                    <i style="font-size:16px;font-style:initial;padding: 5px 8px;border: solid 1px">无</i>
-                    <i class="iconfont icon-add" style="font-size:18px;padding: 5px 8px;border: solid 1px"></i>
+                    <i :class="{'setting-active': setting.lineHeight==25}" class="iconfont icon-2fuben-copy"
+                       data-line-height="25" @click="changeLineHeight"></i>
+                    <i :class="{'setting-active': setting.lineHeight==35}" class="iconfont icon-2" data-line-height="35"
+                       @click="changeLineHeight"></i>
+                    <i :class="{'setting-active': setting.lineHeight==45}" class="iconfont icon-3" data-line-height="45"
+                       @click="changeLineHeight"></i>
+                    <i :class="{'setting-active': setting.lineHeight==30}" data-line-height="30"
+                       style="font-size:16px;padding: 5px 12px;" @click="changeLineHeight">无</i>
+                    <i class="iconfont icon-add" data-line-height="0"
+                       style="width: initial;height:initial;font-size:16px;padding: 6px 12px;"
+                       @click="changeLineHeight"></i>
                 </cell>
                 <cell title="背景" primary="content" class="background">
-                    <span style="background: #FFFFFF;border: 1px solid #35B4EB;"></span>
-                    <span style="background: #EFDBBC;border: 1px solid #D8D8D8;"></span>
-                    <span style="background: #D6E8C8;border: 1px solid #D8D8D8;"></span>
-                    <span style="background: #FCE2E2;border: 1px solid #D8D8D8;"></span>
-                    <span class="iconfont icon-add" style="border: solid 1px;text-align: center;"></span>
+                    <i style="background: #FFFFFF;border: 1px solid #35B4EB;" data-background-color="#FFFFFF"
+                       @click="changeBackgroundColor"></i>
+                    <i style="background: #EFDBBC;border: 1px solid #D8D8D8;" data-background-color="#EFDBBC"
+                       @click="changeBackgroundColor"></i>
+                    <i style="background: #D6E8C8;border: 1px solid #D8D8D8;" data-background-color="#D6E8C8"
+                       @click="changeBackgroundColor"></i>
+                    <i style="background: #FCE2E2;border: 1px solid #D8D8D8;" data-background-color="#FCE2E2"
+                       @click="changeBackgroundColor"></i>
+                    <i class="iconfont icon-add" data-background-color="0" @click="changeBackgroundColor"
+                       style="width: initial;height:initial;font-size: 16px;padding: 4px 14px;border: solid 1px;"></i>
                 </cell>
             </group>
         </popup>
@@ -135,10 +156,10 @@
         name: 'reader',
         data () {
             return {
-                bookId: this.$route.query.id,
                 width: app.config.setting.width.screen,
                 height: app.config.setting.height.screen,
-                contentHeight: app.config.setting.height.main,
+                contentHeight: app.config.setting.height.content,
+                contentWidth: app.config.setting.width.content,
                 backgroundColor: {
                     header: '#FFFFFF',
                     main: '#F7F7F7',
@@ -160,19 +181,29 @@
                     setting: false
                 },
                 setting: {
+                    chapterId: 1,
+                    brightness: 0,
+                    fontStyle: 'F',
+                    fontSize: 16,
+                    turnModel: 1,
                     lineHeight: 30
                 },
                 catalogItem: 0,
-                fontStyle: true,
                 dayNight: '夜间',
                 dayNightIcon: 'icon-yejian',
                 data: {
+                    chapter: {},
                     chapters: []
                 },
-                chapter: {
-                    cur: 1,
+                chapterId: {
+                    cur: 6438,
                     min: 1,
-                    max: 1
+                    max: 6444,
+                    progress: 20
+                },
+                content: {
+                    flag: true,
+                    translateX: 0
                 }
             }
         },
@@ -180,8 +211,8 @@
             XHeader, Tabbar, TabbarItem, Popup, Tab, TabItem, Group, Cell, Range, Popover
         },
         methods: {
-            getChapterData(page){
-                app.ajax.get(app.config.api.reader.chapter + this.bookId + '/' + page, {}, (resp) => {
+            getChapterCatalogData(page){
+                app.ajax.get(app.config.api.reader.chapters + this.$route.query.id + '/' + page, {}, (resp) => {
                     if (resp.status == 200) {
                         let data = resp.data.result;
                         if (data && data.length > 1) {
@@ -191,9 +222,54 @@
                 }, (err) => {
                 });
             },
+            getChapterData(){
+                app.ajax.get(app.config.api.reader.chapter + this.chapterId.cur, {}, (resp) => {
+                    if (resp.status == 200) {
+                        let data = resp.data.result;
+                        if (data) {
+                            this.data.chapter = data;
+                        }
+                    }
+                }, (err) => {
+                });
+            },
             handleClickContent(e){
                 if (e.x >= this.width * 0.3 && e.x <= this.width * 0.7) {
                     this.$store.commit('updateReaderBar');
+                } else {
+                    if (e.x < this.width * 0.3) {  // 上一页
+                        if (this.content.translateX <= 0) {
+                            if (this.chapterId.cur <= this.chapterId.min) {
+                                this.$vux.toast.show({
+                                    text: '已经到最前面了',
+                                    type: 'text'
+                                });
+                                return;
+                            } else {
+                                this.chapterId.cur--;
+                                this.getChapterData();
+                            }
+                        } else {
+                            this.content.translateX -= this.contentWidth;
+                        }
+                    } else if (e.x > this.width * 0.7) { // 下一页
+                        if (this.$refs.content.scrollWidth <= this.width) {
+                            if (this.chapterId.cur >= this.chapterId.max) {
+                                this.$vux.toast.show({
+                                    text: '已经到最后了',
+                                    type: 'text'
+                                });
+                                return;
+                            } else {
+                                this.chapterId.cur++;
+                                this.content.translateX = 0;
+                                this.getChapterData();
+                            }
+                        } else {
+                            this.content.translateX += this.contentWidth;
+                        }
+                    }
+                    this.content.flag = false;
                 }
             },
             handleClickTabbar(index){
@@ -204,56 +280,169 @@
                 } else if (index == 2) {
                     this.popup.setting = true;
                 } else if (index == 3) {
-                    this.switchRiYe();
+                    let dayModel = this.dayNight === '夜间' ? true : false;
+                    this.dayNight = dayModel ? '日间' : '夜间';
+                    this.dayNightIcon = dayModel ? 'icon-rijianmoshi' : 'icon-yejian';
+                    this.backgroundColor = {
+                        header: dayModel ? '#2C3136' : '#FFFFFF',
+                        main: dayModel ? '#222224' : '#F7F7F7',
+                        tabbar: dayModel ? '#2D3136' : '#FFFFFF'
+                    };
+                    this.color = {
+                        header: dayModel ? '#BDBDBD' : '#162636',
+                        main: dayModel ? '#FFFFFF' : '#1F1F1F',
+                        tabbar: dayModel ? '#BDBDBD' : '#162636'
+                    };
+                    this.opacity = {
+                        content: dayModel ? 0.26 : 1,
+                        title: dayModel ? 0.26 : 0.56,
+                        status: dayModel ? 0.26 : 0.56
+                    }
                 }
             },
             changeTabItem(index){
                 this.catalogItem = index;
             },
-            changeChapter(){
-                console.log(this.chapter.cur);
-            },
-            switchRiYe(){
-                let dayModel = this.dayNight === '夜间' ? true : false;
-                this.dayNight = dayModel ? '日间' : '夜间';
-                this.dayNightIcon = dayModel ? 'icon-rijianmoshi' : 'icon-yejian';
-                this.backgroundColor = {
-                    header: dayModel ? '#2C3136' : '#FFFFFF',
-                    main: dayModel ? '#222224' : '#F7F7F7',
-                    tabbar: dayModel ? '#2D3136' : '#FFFFFF'
-                };
-                this.color = {
-                    header: dayModel ? '#BDBDBD' : '#162636',
-                    main: dayModel ? '#FFFFFF' : '#1F1F1F',
-                    tabbar: dayModel ? '#BDBDBD' : '#162636'
-                };
-                this.opacity = {
-                    content: dayModel ? 0.26 : 1,
-                    title: dayModel ? 0.26 : 0.56,
-                    status: dayModel ? 0.26 : 0.56
+            changeChapter(value){
+                console.log(value);
+                if (value < this.chapterId.min) {
+                    this.$vux.toast.show({
+                        text: '没有前面章节了',
+                        type: 'text'
+                    });
+                    this.setting.chapterId = this.chapterId.min;
+                    return;
                 }
+                if (value > this.chapterId.max) {
+                    this.$vux.toast.show({
+                        text: '没有后面章节了',
+                        type: 'text'
+                    });
+                    this.setting.chapterId = this.chapterId.max;
+                    return;
+                }
+                this.chapterId.cur = this.setting.chapterId;
+                this.getChapterData();
+            },
+            changeBrightness(){
+                if (app.config.isApp) {
+                    plus.screen.setBrightness(this.setting.brightness);
+                } else {
+                    this.$vux.toast.show({
+                        text: '请使用移动端设备',
+                        type: 'warn'
+                    })
+                }
+            },
+            changeFontSize(e){
+                if (e.target.dataset.fontSize == 'F') {
+                    this.setting.fontStyle = 'J';
+                    console.log('fan ti');
+                } else if (e.target.dataset.fontSize == 'J') {
+                    this.setting.fontStyle = 'F';
+                    console.log('jian ti');
+                } else if (e.target.dataset.fontSize == '+') {
+                    this.setting.fontSize++;
+                } else if (e.target.dataset.fontSize == '-') {
+                    this.setting.fontSize--;
+                }
+            },
+            changeTurnModel(e){
+                this.setting.turnModel = Number(e.target.dataset.turnModel);
+            },
+            changeLineHeight(e){
+                if (e.target.dataset.lineHeight == 0) {
+                    console.log('more');
+                } else {
+                    this.setting.lineHeight = Number(e.target.dataset.lineHeight);
+                }
+            },
+            changeBackgroundColor(e){
+                if (e.target.dataset.backgroundColor == 0) {
+                    console.log('more');
+                } else {
+                    this.backgroundColor.main = e.target.dataset.backgroundColor;
+                }
+            },
+            showBattery(){
+                if (app.config.setting.isApp) {
+                    if (app.config.setting.isAndroid) {
+                        var main = plus.android.runtimeMainActivity();
+                        var Intent = plus.android.importClass('android.content.Intent');
+                        var recevier = plus.android.implements('io.dcloud.feature.internal.reflect.BroadcastReceiver', {
+                            onReceive: function (context, intent) {
+                                var action = intent.getAction();
+                                if (action == Intent.ACTION_BATTERY_CHANGED) {
+                                    var level = intent.getIntExtra("level", 0); //电量
+                                    var voltage = intent.getIntExtra("voltage", 0); //电池电压
+                                    var temperature = intent.getIntExtra("temperature", 0); //电池温度
+                                    //如需获取别的，在这里继续写，此代码只提供获取电量
+                                    console.log(level)
+                                }
+                            }
+                        });
+                        var IntentFilter = plus.android.importClass('android.content.IntentFilter');
+                        var filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+                        main.registerReceiver(recevier, filter);
+                    } else if (app.config.setting.isIOS) {
+                        var UIDevice = plus.ios.import("UIDevice");
+                        var dev = UIDevice.currentDevice();
+                        if (!dev.isBatteryMonitoringEnabled()) {
+                            dev.setBatteryMonitoringEnabled(true);
+                        }
+                        var level = dev.batteryLevel();
+                    }
+                }
+            },
+            transBeforeEnter(el){
+                el.style.opacity = 1;
+            },
+            transEnter(el, done){
+                if(this.setting.turnModel==1){  // 滑动
+                    el.style.transition = "all 1s ease";
+                }else if(this.setting.turnModel==2){    // 覆盖
+                    el.style.transition = "all 0s ease";
+                }
+                done();
+            },
+            transLeave(el, done){
+                el.style.opacity = 0;
+                el.style.transform = "translateX(-" + this.content.translateX + "px)";
+                done();
+            },
+            transAfterLeave(el){
+                this.content.flag = true;
             }
         },
         created(){
             // 全屏显示
             if (app.config.isApp) {
-
+                plus.navigator.setFullscreen(true);
             }
             // 隐藏阅读器底部&顶部导航菜单
             this.$store.commit('updateReaderBar', {header: false, tabBar: false});
 
-            this.getChapterData(1);
+
+            // 初始化 界面 参数数据
+            this.setting.chapterId = 6438;
+        },
+        mounted(){
+            this.getChapterCatalogData(1);
+//            this.getChapterData();    // range组件初始化change会加载数据
+            this.showBattery();
         }
     }
 </script>
 
 <style>
+    @import '../../css/reset.css';
+
     .reader {
         font-family: PingFangSC-Regular;
     }
 
     .reader .vux-header {
-        width: 360px;
+        width: 100%;
         position: absolute;
         background: #FFFFFF;
         z-index: 500;
@@ -274,10 +463,21 @@
     .reader .main .title, .reader .main .status {
         letter-spacing: 0;
         font-size: 13px;
+        position: fixed;
+    }
+
+    .reader .main .title {
+        top: 0px;
+    }
+
+    .reader .main .status {
+        bottom: 0px;
     }
 
     .reader .main .content {
-        letter-spacing: 4px;
+        padding-top: 46px;
+        text-indent: 2em;
+        letter-spacing: 1px;
     }
 
     .reader .popup-catalog .weui-cell .vux-label {
@@ -319,12 +519,7 @@
         margin: 0px 5px;
     }
 
-    .reader .popup-setting .compose i {
-        border-radius: 5px;
-        margin: 0px 5px;
-    }
-
-    .reader .popup-setting .turn .vux-cell-primary span {
+    .reader .popup-setting .turn i {
         display: inline-flex;
         border-radius: 5px;
         border: solid 1px;
@@ -332,11 +527,30 @@
         margin: 0px 6px;
     }
 
-    .reader .popup-setting .background .vux-cell-primary span {
-        display: inline-grid;
+    .reader .popup-setting .compose i {
+        font-size: 18px;
+        padding: 5px 10px;
+        border: solid 1px;
+        border-radius: 5px;
+        margin: 0px 5px;
+        vertical-align: middle;
+    }
+
+    .reader .popup-setting .background i {
+        display: inline-flex;
         border-radius: 4px;
-        width: 42px;
-        height: 28px;
-        margin: 0px 3px;
+        width: 44px;
+        height: 30px;
+        margin: 0px 2px;
+        vertical-align: middle;
+    }
+
+    .reader .popup-setting i:active {
+        background: #D8D8D8;
+        box-shadow: 3px 3px 3px #c7c7c7;
+    }
+
+    .setting-active {
+        background-color: #D8D8D8;
     }
 </style>

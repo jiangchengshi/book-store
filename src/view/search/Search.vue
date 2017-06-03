@@ -61,25 +61,28 @@
             },
             handleSubmit(){
                 this.showResult = true;
-                app.ajax.post(app.config.api.search.search + '?keyword', this.keyword, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data && data.length > 1) {
-                            this.result = 'match';
-                            this.data.result = data.map((item, index) => ({
-                                src: item.image,
-                                title: item.name,
-                                score: item.score,
-                                desc: item.intro,
-                                author: item.author,
-                                url: item.url
-                            }));
-                        } else {
-                            this.result = 'unMatch';
+                app.ajax.post(app.config.api.search.search,
+                    {
+                        'keyword': this.keyword
+                    }, (resp) => {
+                        if (resp.status == 200) {
+                            let data = resp.data.result;
+                            if (data && data.length > 1) {
+                                this.result = 'match';
+                                this.data.result = data.map((item, index) => ({
+                                    src: item.image,
+                                    title: item.name,
+                                    score: item.score,
+                                    desc: item.intro,
+                                    author: item.author,
+                                    url: item.url
+                                }));
+                            } else {
+                                this.result = 'unMatch';
+                            }
                         }
-                    }
-                }, (err) => {
-                });
+                    }, (err) => {
+                    });
             },
             handleFocus(){
                 this.showResult = false;

@@ -5,17 +5,17 @@
                  position:relative;top: -10px;left: 10px;border-radius: 5px;box-shadow: 0 3px 3px #c7c7c7;">
             <span class="title"
                   style="font-family: PingFangSC-Medium;font-size: 16px;color: #162636;margin-top: -130px;">
-                微微一笑很倾城
+                {{detail.articlename}}
             </span>
             <span class="score">
                 <i class="iconfont icon-star" style="font-size: 14px; color: yellow;" v-for="s in detail.score"></i>
                 <i class="iconfont icon-star" style="font-size: 14px;" v-for="s in (5-detail.score)"></i>
-                <label style="font-family: PingFangSC-Medium;font-size: 14px;color: #989A9C;line-height: 24px;">8.2</label>
+                <label style="font-family: PingFangSC-Medium;font-size: 14px;color: #989A9C;line-height: 24px;">{{detail.score}}</label>
                 <label style="font-family: PingFangSC-Regular;font-size: 12px;color: #989A9C;line-height: 24px;">（{{detail.pinfen}}人评分）</label>
             </span>
             <div class="intro"
                  style="opacity: 0.26;font-family: PingFangSC-Regular;font-size: 12px;color: #162636;padding: 8px 0px;">
-                <span>作者：今何在</span>
+                <span>作者：{{detail.author}}</span>
                 <span>分类：{{detail.category}}</span>
                 <span>
                     价格：<label style="color: #EE4D22;">{{detail.price}}阅币</label>/千字 | {{detail.size}}万字
@@ -24,12 +24,12 @@
             </div>
         </div>
         <div style="position:relative; padding-bottom: 10px;text-align: center;background: #FFFFFF;">
-            <x-button @click.native="handleConfirm"
-                      style="width: 45%;border-radius: 10px; background: #35B4EB;color: #FFFFFF;">
+            <x-button @click.native="handlePreview()"
+                      style="width: 40%;border-radius: 5px; background: #35B4EB;color: #FFFFFF;margin-right: 20px;">
                 免费试读
             </x-button>
-            <x-button @click.native="handleCancel" plain
-                      style="width: 45%;border-radius: 10px;color: #989A9C;">
+            <x-button @click.native="handleBuy" plain
+                      style="width: 40%;border-radius: 5px;color: #989A9C;">
                 购买并下载
             </x-button>
         </div>
@@ -60,6 +60,9 @@
         <group>
             <cell :title="'评论(' + detail.pinfen + ')'" value="全部评论" is-link></cell>
             <c-list-view type="review" :list="review"></c-list-view>
+            <cell style="text-align: center;">
+                <a slot="inline-desc">立即评论</a>
+            </cell>
         </group>
     </div>
 </template>
@@ -107,6 +110,12 @@
                     }
                 }, (err) => {
                 });
+            },
+            handlePreview(){
+                this.$router.push({path: '/reader', query: {id: this.$route.query.id}});
+            },
+            handleBuy(){
+
             }
         },
         created(){

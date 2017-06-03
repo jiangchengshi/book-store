@@ -59,13 +59,4 @@
     .mall {
         background: #F8F8F8;
     }
-
-    .fade-enter-active, .fade-leave-active {
-        -webkit-transition: opacity .5s;
-        transition: opacity .5s;
-    }
-
-    .fade-enter, .fade-leave-active {
-        opacity: 0;
-    }
 </style>

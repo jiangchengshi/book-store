@@ -13,6 +13,8 @@ const MallBookDetail = resolve => require(['../view/mall/book/Detail'], resolve)
 const MallMonthlyList = resolve => require(['../view/mall/monthly/List.vue'], resolve);
 const MallMonthlyDetail = resolve => require(['../view/mall/monthly/Detail.vue'], resolve);
 const MallMonthlyPackage = resolve => require(['../view/mall/monthly/Package.vue'], resolve);
+const MallClassifyList = resolve => require(['../view/mall/classify/List.vue'], resolve);
+const MallClassifyDetail = resolve => require(['../view/mall/classify/Detail.vue'], resolve);
 const Shelf = resolve => require(['../view/shelf/Shelf.vue'], resolve);
 const ShelfIndex = resolve => require(['../view/shelf/Index.vue'], resolve);
 const Reader = resolve => require(['../view/reader/Reader.vue'], resolve);
@@ -60,6 +62,14 @@ const routes = [
             {
                 path: 'monthly/package',
                 component: MallMonthlyPackage
+            },
+            {
+                path: 'classify/list',
+                component: MallClassifyList
+            },
+            {
+                path: 'classify/detail',
+                component: MallClassifyDetail
             }
         ]
     },
