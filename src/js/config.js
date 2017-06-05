@@ -31,11 +31,12 @@ export default {
             detail: 'detail/',
             review: 'review/'
         },
-        classify: 'sort/',
         monthly: {
             monthly: 'monthly/',
             info: 'monthly/info/'
         },
+        classify: 'sort/',
+        topic: 'topic/',
         search: {
             search: 'search',
             hot: 'search/hot'

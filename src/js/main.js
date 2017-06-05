@@ -7,6 +7,8 @@ import router from "./router";
 import store from "./store";
 // 引入Config
 import config from "./config";
+// 引入 plusReady
+import plusready from "./plus/ready";
 // 引入Ajax
 import ajax from "./util/ajax";
 // 引入Util
@@ -43,9 +45,25 @@ const initVue = function () {
 };
 
 let headerHeight = 46, tabbarHeight = 56, searchHeight = 44;
-if (window.plus) {    // 返回是否在基座中运行
-    window.addEventListener('plusready', function () {
-        Object.assign(config.device, {
+if (navigator.userAgent.indexOf("Html5Plus") < 0) { //不支持5+ API
+    Object.assign(config.setting, {
+        width: {
+            screen: window.screen.availWidth,
+            content: window.screen.availWidth - 5
+        },
+        height: {
+            screen: window.screen.availHeight,
+            main: window.screen.availHeight - headerHeight - tabbarHeight,
+            content: window.screen.availHeight - headerHeight - tabbarHeight + 10,
+            search: window.screen.availHeight - searchHeight
+        }
+    });
+
+    // 初始化Vue
+    initVue();
+} else { //支持5+ API
+    plusready(() => {
+        Object.assign(config.setting, {
             isApp: true,
             isAndroid: plus.os.name === "Android",
             isIOS: plus.os.name === "iOS",
@@ -63,21 +81,5 @@ if (window.plus) {    // 返回是否在基座中运行
 
         // 初始化Vue
         initVue();
-    });
-} else {
-    Object.assign(config.setting, {
-        width: {
-            screen: window.screen.availWidth,
-            content: window.screen.availWidth - 5
-        },
-        height: {
-            screen: window.screen.availHeight,
-            main: window.screen.availHeight - headerHeight - tabbarHeight,
-            content: window.screen.availHeight - headerHeight - tabbarHeight + 10,
-            search: window.screen.availHeight - searchHeight
-        }
-    });
-
-    // 初始化Vue
-    initVue();
+    })
 }

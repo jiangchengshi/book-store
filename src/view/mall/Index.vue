@@ -48,12 +48,12 @@
         <!-- 推荐列表 -->
         <div class="recommend" v-if="data.recommend.length>0">
             <c-list-view type="book" :list="data.recommend.list" style="margin: 10px 0px;"></c-list-view>
-            <card style="padding: 5px">
-                <div slot="content" class="card-padding">
+            <card style="padding: 5px;">
+                <div slot="content" style="padding-left: 5px;" @click="handleClickTopic">
                     <p style="font-size: 14px;line-height: 20px;">{{data.recommend.card.name}}</p>
                     <p style="font-size: 12px;color:#828181;">{{data.recommend.card.desc}}</p>
                 </div>
-                <img slot="footer" :src="data.recommend.card.cover"
+                <img slot="footer" :src="data.recommend.card.cover" @click="handleClickTopic"
                      style="display:block;width: 98%;margin: 5px auto 0px;">
             </card>
         </div>
@@ -125,6 +125,9 @@
             },
             handleNavigator(path){
                 this.$router.push({path: path});
+            },
+            handleClickTopic(){
+                this.$router.push({path: '/mall/topic/detail', query: {id: this.data.recommend.card.id}});
             }
         },
         created(){

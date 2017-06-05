@@ -449,7 +449,7 @@
                 this.getChapterData();
             },
             changeBrightness(){
-                if (app.config.isApp) {
+                if (app.config.setting.isApp) {
                     plus.screen.setBrightness(this.setting.brightness);
                 } else {
                     this.$vux.toast.show({
@@ -554,7 +554,7 @@
         },
         created(){
             // 全屏显示
-            if (app.config.isApp) {
+            if (app.config.setting.isApp) {
                 plus.navigator.setFullscreen(true);
             }
             // 隐藏阅读器底部&顶部导航菜单
