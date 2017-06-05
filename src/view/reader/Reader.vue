@@ -1,11 +1,11 @@
 <template>
-    <div class="reader">
+    <div class="reader" @touchstart="touchStart" @touchend="touchEnd">
         <x-header v-show="$store.state.reader.header" title="" :left-options="{backText:''}"
-                  :right-options="{showMore: true}"
+                  :right-options="{showMore: true}" @on-click-more="display.more=true"
                   :style="{backgroundColor: backgroundColor.header, color: color.header}">
-            <a class="iconfont icon-dashang2" slot="right"></a>
-            <a class="iconfont icon-xiazai" slot="right"></a>
-            <a class="iconfont icon-shuqian_bookmark" slot="right"></a>
+            <a class="iconfont icon-dashang2" slot="right" @click="display.reward = true"></a>
+            <a class="iconfont icon-xiazai" slot="right" @click="display.download = true"></a>
+            <!--<a class="iconfont icon-shuqian_bookmark" slot="right"></a>-->
         </x-header>
         <div class="main" :style="{height: height+'px',backgroundColor: backgroundColor.main,color: color.main}"
              style="padding: 0px 10px;">
@@ -14,11 +14,9 @@
             </div>
             <div class="content" ref="content"
                  :style="{height: contentHeight+'px',lineHeight: setting.lineHeight+'px',opacity: opacity.content,fontSize: setting.fontSize+'px'}"
-                 @click="handleClickContent">
-                <transition @before-enter="transBeforeEnter"
-                            @enter="transEnter"
-                            @leave="transLeave"
-                            @after-leave="transAfterLeave"
+                 @click="clickContent">
+                <transition @before-enter="transBeforeEnter" @enter="transEnter"
+                            @leave="transLeave" @after-leave="transAfterLeave"
                             :css="false">
                     <div v-show="content.flag" :style="{'column-width':contentWidth+'px',height: contentHeight+'px'}">
                         {{data.chapter.content}}
@@ -31,25 +29,26 @@
         </div>
         <tabbar v-show="$store.state.reader.tabBar"
                 :style="{backgroundColor: backgroundColor.tabbar, color: color.tabbar}">
-            <tabbar-item @on-item-click="handleClickTabbar">
+            <tabbar-item @on-item-click="clickTabbar">
                 <span slot="icon"><i class="iconfont icon-mulu1"></i></span>
                 <span slot="label">目录</span>
             </tabbar-item>
-            <tabbar-item @on-item-click="handleClickTabbar">
+            <tabbar-item @on-item-click="clickTabbar">
                 <span slot="icon"><i class="iconfont icon-diaozhengjindu-copy"></i></span>
                 <span slot="label">进度</span>
             </tabbar-item>
-            <tabbar-item @on-item-click="handleClickTabbar">
+            <tabbar-item @on-item-click="clickTabbar">
                 <span slot="icon"><i class="iconfont icon-aa"></i></span>
                 <span slot="label">设置</span>
             </tabbar-item>
-            <tabbar-item @on-item-click="handleClickTabbar">
+            <tabbar-item @on-item-click="clickTabbar">
                 <span slot="icon"><i class="iconfont" :class="[dayNightIcon]"></i></span>
                 <span slot="label">{{dayNight}}</span>
             </tabbar-item>
         </tabbar>
 
-        <popup v-model="popup.catalog" position="left" width="75%" class="popup-catalog">
+        <!-- 目录：侧滑菜单 -->
+        <popup v-model="display.catalog" position="left" width="75%" class="popup-catalog">
             <div style="background-color: #FFFFFF;height: 46px; line-height: 46px; padding: 0px 10px;">
                 <span>{{data.chapter.articlename}}</span>
                 <span class="iconfont icon-paixu" style="float: right;"></span>
@@ -74,25 +73,29 @@
             <div v-show="catalogItem==2">Container2</div>
         </popup>
 
-        <popup v-model="popup.progress" class="popup-progress">
+        <!-- 进度：滑块条 -->
+        <popup v-model="display.progress" class="popup-progress">
             <group>
                 <cell primary="content">
-                    <range :min="1" :max="8000" minHTML="上一章" maxHTML="下一章" @on-change="changeChapter"></range>
+                    <range :min="chapterId.min" :max="chapterId.max" minHTML="上一章" maxHTML="下一章"
+                           @on-change="changeChapter"></range>
                 </cell>
             </group>
         </popup>
-        <popup v-model="popup.progress" class="popup-progress-tip" is-transparent>
+        <!-- 进度：章节信息 -->
+        <popup v-model="display.progress" class="popup-progress-tip" is-transparent>
             <div style="width: 95%;background-color:#fff;border-radius:5px;padding-top:10px; text-align: center;">
                 <span style="color: #162636;letter-spacing: 0;font-size: 14px;display: block;line-height: 20px;">
                     {{data.chapter.articlename}}
                 </span>
                 <span style="color: #EE4D22;letter-spacing: 0;font-size: 16px;line-height: 40px;">
-                    38.45%
+                    {{data.chapter.progress}} %
                 </span>
             </div>
         </popup>
 
-        <popup v-model="popup.setting" class="popup-setting">
+        <!-- 设置：亮度、字体、翻页、排版、背景色 -->
+        <popup v-model="display.setting" class="popup-setting">
             <group>
                 <cell title="亮度" primary="content">
                     <range v-model="setting.brightness"
@@ -146,11 +149,73 @@
                 </cell>
             </group>
         </popup>
+
+        <!-- 更多：操作菜单 -->
+        <actionsheet v-model="display.more" :menus="data.menuMore" class="actionsheet-more"
+                     @on-click-menu="clickMore"></actionsheet>
+
+        <!-- 下载：书籍购买下载 -->
+        <popup v-model="display.download" class="popup-download">
+            <img :src="data.book.cover"
+                 style="width: 110px; height: 140px; position:absolute;bottom: 140px;left: 10px;border-radius: 5px;box-shadow: 0 3px 3px #c7c7c7;">
+            <div style="padding:20px 0px 20px 140px; height: 80px; border-bottom: dotted 1px #BDBDBD">
+                <span class="title" style="font-family: PingFangSC-Medium;font-size: 19px;color: #162636;">
+                {{data.book.articlename}}
+                </span>
+                <span style="font-family: PingFangSC-Regular;font-size: 15px;color: #989A9C;">{{data.book.author}}张三丰</span>
+                <span style="font-family: PingFangSC-Regular;font-size: 14px;color: #162636;">
+                    价格：{{data.book.price}}
+                </span>
+            </div>
+            <div style="padding: 10px 0px 10px 10px;">
+                <span style="color: #989A9C;">
+                    共计支付：<label style="color: #EE4D22;">{{data.book.price}}</label>
+                </span>
+                <span style="color: #989A9C;">
+                    账户余额：<label style="color:  #162636;">{{data.book.price}}</label>
+                </span>
+            </div>
+            <x-button type="primary" action-type="button" style="background: #35B4EB;border-radius: 7px;"
+                      @click.native="clickBuy">购买并下载
+            </x-button>
+        </popup>
+
+        <!-- 打赏： -->
+        <popup v-model="display.reward" class="popup-reward">
+            <div style="padding: 10px 0px 20px 10px;">
+                <span style="display: block;font-family: PingFangSC-Regular;font-size: 14px;color: #162636;padding-bottom: 10px;">选择打赏金额</span>
+                <label class="coin">100阅币</label>
+                <label class="coin">500阅币</label>
+                <label class="coin">1000阅币</label>
+                <label class="coin">2000阅币</label>
+                <label class="coin">10000阅币</label>
+            </div>
+            <group>
+                <x-input title="其他金额" placeholder="输入具体金额打赏作者(单位：阅币)" v-model="data.reward.coin"></x-input>
+            </group>
+            <x-button type="primary" action-type="button"
+                      style="background: #35B4EB;border-radius: 7px;margin-top: 10px;"
+                      @click.native="clickReward">确定打赏
+            </x-button>
+        </popup>
     </div>
 </template>
 
 <script>
-    import {XHeader, Tabbar, TabbarItem, Popup, Tab, TabItem, Group, Cell, Range, Popover} from 'vux';
+    import {
+        XHeader,
+        Tabbar,
+        TabbarItem,
+        Popup,
+        Tab,
+        TabItem,
+        Group,
+        Cell,
+        XInput,
+        Range,
+        Actionsheet,
+        XButton
+    } from 'vux';
 
     export default {
         name: 'reader',
@@ -175,13 +240,15 @@
                     title: 0.56,
                     status: 0.56
                 },
-                popup: {
+                display: {
+                    more: false,
                     catalog: false,
                     progress: false,
-                    setting: false
+                    setting: false,
+                    download: false,
+                    reward: false
                 },
                 setting: {
-                    chapterId: 1,
                     brightness: 0,
                     fontStyle: 'F',
                     fontSize: 16,
@@ -192,8 +259,25 @@
                 dayNight: '夜间',
                 dayNightIcon: 'icon-yejian',
                 data: {
+                    book: {},
                     chapter: {},
-                    chapters: []
+                    chapters: [],
+                    menuMore: [{
+                        label: "<i class='iconfont icon-bookmark-add'></i> &nbsp;添加书签",
+                        value: 'mark'
+                    }, {
+                        label: "<i class='iconfont icon-sousuo3'></i> &nbsp;全文搜索",
+                        value: 'search'
+                    }, {
+                        label: "<i class='iconfont icon-xiaoyimiji'></i> &nbsp;书籍详情",
+                        value: 'detail'
+                    }, {
+                        label: "<i class='iconfont icon-fenxiang1'></i> &nbsp;分享本书",
+                        value: 'share'
+                    }],
+                    reward: {
+                        coin: 0
+                    }
                 },
                 chapterId: {
                     cur: 1,
@@ -203,12 +287,16 @@
                 },
                 content: {
                     flag: true,
-                    translateX: 0
+                    translateX: 0,
+                    touchX: {
+                        start: 0,
+                        end: 0
+                    }
                 }
             }
         },
         components: {
-            XHeader, Tabbar, TabbarItem, Popup, Tab, TabItem, Group, Cell, Range, Popover
+            XHeader, Tabbar, TabbarItem, Popup, Tab, TabItem, Group, Cell, XInput, Range, Actionsheet, XButton
         },
         methods: {
             getChapterCatalogData(page){
@@ -230,12 +318,24 @@
                         let data = resp.data.result;
                         if (data) {
                             this.data.chapter = data;
+                            this.data.chapter.progress = ((this.chapterId.cur / this.chapterId.max).toFixed(2)) * 100;
                         }
                     }
                 }, (err) => {
                 });
             },
-            handleClickContent(e){
+            getBookData(id){
+                app.ajax.get(app.config.api.book.detail + id, {}, (resp) => {
+                    if (resp.status == 200) {
+                        let data = resp.data.result;
+                        if (data) {
+                            this.data.book = data;
+                        }
+                    }
+                }, (err) => {
+                });
+            },
+            clickContent(e){
                 if (e.x >= this.width * 0.3 && e.x <= this.width * 0.7) {
                     this.$store.commit('updateReaderBar');
                 } else {
@@ -274,13 +374,38 @@
                     this.content.flag = false;
                 }
             },
-            handleClickTabbar(index){
+            clickMore(key){
+                switch (key) {
+                    case 'mark':
+                        break;
+                    case 'search':
+                        break;
+                    case 'detail':
+                        this.$router.push({path: '/mall/book/detail', query: {id: this.$route.query.id}});
+                        break;
+                    case 'share':
+                        break;
+                }
+            },
+            clickBuy(){
+                this.$vux.toast.show({
+                    text: '购买成功',
+                    type: 'info'
+                })
+            },
+            clickReward(){
+                this.$vux.toast.show({
+                    text: '打赏成功',
+                    type: 'info'
+                })
+            },
+            clickTabbar(index){
                 if (index == 0) {
-                    this.popup.catalog = true;
+                    this.display.catalog = true;
                 } else if (index == 1) {
-                    this.popup.progress = true;
+                    this.display.progress = true;
                 } else if (index == 2) {
-                    this.popup.setting = true;
+                    this.display.setting = true;
                 } else if (index == 3) {
                     let dayModel = this.dayNight === '夜间' ? true : false;
                     this.dayNight = dayModel ? '日间' : '夜间';
@@ -306,13 +431,11 @@
                 this.catalogItem = index;
             },
             changeChapter(value){
-                console.log(value);
                 if (value < this.chapterId.min) {
                     this.$vux.toast.show({
                         text: '没有前面章节了',
                         type: 'text'
                     });
-                    this.setting.chapterId = this.chapterId.min;
                     return;
                 }
                 if (value > this.chapterId.max) {
@@ -320,10 +443,9 @@
                         text: '没有后面章节了',
                         type: 'text'
                     });
-                    this.setting.chapterId = this.chapterId.max;
                     return;
                 }
-                this.chapterId.cur = this.setting.chapterId;
+                this.chapterId.cur = value;
                 this.getChapterData();
             },
             changeBrightness(){
@@ -414,6 +536,20 @@
             },
             transAfterLeave(el){
                 this.content.flag = true;
+            },
+            touchStart(e){
+                this.content.touchX.start = e.touches[0].screenX;
+            },
+            touchEnd(e){
+                this.content.touchX.end = e.changedTouches[0].screenX;
+                let diff = Math.abs(this.content.touchX.start - this.content.touchX.end);
+                if (diff > 5) {
+                    if (this.content.touchX.start > this.content.touchX.end) {    // 左滑
+                        this.changeChapter(++this.chapterId.cur);
+                    } else if (this.content.touchX.start < this.content.touchX.end) {  // 右滑
+                        this.changeChapter(--this.chapterId.cur);
+                    }
+                }
             }
         },
         created(){
@@ -424,13 +560,13 @@
             // 隐藏阅读器底部&顶部导航菜单
             this.$store.commit('updateReaderBar', {header: false, tabBar: false});
 
-
             // 初始化 界面 参数数据
-            this.setting.chapterId = 6438;
+            this.setting.chapterId = this.chapterId.min;
         },
         mounted(){
             this.getChapterCatalogData(1);
 //            this.getChapterData();    // range组件初始化change会加载数据
+            this.getBookData(this.$route.query.id);
             this.showBattery();
         }
     }
@@ -554,5 +690,35 @@
 
     .setting-active {
         background-color: #D8D8D8;
+    }
+
+    .reader .actionsheet-more .weui-actionsheet__cell {
+        font-size: 16px;
+    }
+
+    .reader .actionsheet-more .iconfont {
+        font-size: 16px;
+    }
+
+    .reader .popup-download, .reader .popup-reward {
+        background-color: #FFFFFF;
+    }
+
+    .reader .popup-download span {
+        display: block;
+        line-height: 30px;
+    }
+
+    .reader .popup-reward div .coin {
+        display: inline-block;
+        padding: 5px 20px;
+        border: solid 1px #57606A;
+        border-radius: 8px;
+        margin: 8px 10px 8px 0px;
+        font-size: 16px;
+    }
+
+    .reader .popup-reward .vux-x-input {
+        font-size: 14px;
     }
 </style>
