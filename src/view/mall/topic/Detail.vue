@@ -7,7 +7,7 @@
                 <p style="font-size: 13px;line-height:20px;color:#828181;">{{topic.intro}}</p>
             </div>
         </card>
-        <c-list-view type="book" :list="topic.booklist"></c-list-view>
+        <c-list-view type="book" :list="dataList"></c-list-view>
     </div>
 </template>
 
@@ -19,7 +19,8 @@
         data () {
             return {
                 width: app.config.setting.width.screen,
-                topic: {}
+                topic: {},
+                dataList: []
             }
         },
         components: {
@@ -32,6 +33,16 @@
                         let data = resp.data.result;
                         if (data) {
                             this.topic = data;
+                            this.dataList = data.booklist.map((book) => {
+                                return {
+                                    id: book.articleid,
+                                    name: book.articlename,
+                                    author: book.author,
+                                    image: book.image,
+                                    intro: book.intro,
+                                    score: book.score
+                                }
+                            });
                             this.$store.commit('updateHeader', {
                                 title: data.title,
                                 showBack: true,

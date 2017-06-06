@@ -1,34 +1,46 @@
 <template>
-    <div class="reader" @touchstart="touchStart" @touchend="touchEnd">
+    <div class="reader" @touchstart="touchStart" @touchend="touchEnd" @touchmove="touchMove">
         <x-header v-show="$store.state.reader.header" title="" :left-options="{backText:''}"
                   :right-options="{showMore: true}" @on-click-more="display.more=true"
-                  :style="{backgroundColor: backgroundColor.header, color: color.header}">
+                  :style="{backgroundColor: setting.backgroundColor.header, color: setting.color.header}">
             <a class="iconfont icon-dashang2" slot="right" @click="display.reward = true"></a>
             <a class="iconfont icon-xiazai" slot="right" @click="display.download = true"></a>
             <!--<a class="iconfont icon-shuqian_bookmark" slot="right"></a>-->
         </x-header>
-        <div class="main" :style="{height: height+'px',backgroundColor: backgroundColor.main,color: color.main}"
+        <div class="main"
+             :style="{height: height.screen+'px',backgroundColor: setting.backgroundColor.main,color: setting.color.main}"
              style="padding: 0px 10px;">
-            <div class="title" style="height: 46px; line-height: 46px;" :style="{opacity:opacity.title}">
+            <div class="title" style="height: 46px; line-height: 46px;" :style="{opacity:setting.opacity.title}">
                 {{data.chapter.articlename}}
             </div>
             <div class="content" ref="content"
-                 :style="{height: contentHeight+'px',lineHeight: setting.lineHeight+'px',opacity: opacity.content,fontSize: setting.fontSize+'px'}"
+                 :style="{lineHeight: setting.lineHeight+'px',opacity: setting.opacity.content,fontSize: setting.fontSize+'px'}"
                  @click="clickContent">
                 <transition @before-enter="transBeforeEnter" @enter="transEnter"
-                            @leave="transLeave" @after-leave="transAfterLeave"
-                            :css="false">
-                    <div v-show="content.flag" :style="{'column-width':contentWidth+'px',height: contentHeight+'px'}">
+                            @leave="transLeave" @after-leave="transAfterLeave" :css="false">
+                    <div v-show="content.switch"
+                         :style="{'column-width':width.content+'px',height: height.content+'px'}">
                         {{data.chapter.content}}
                     </div>
                 </transition>
             </div>
-            <div class="status" style="height: 56px;line-height: 56px;" :style="{opacity:opacity.status}">
-                16:02
+            <div class="status" style="height: 56px;line-height: 56px;"
+                 :style="{width: (width.content-20)+'px', opacity:setting.opacity.status}">
+                <i v-if="status.battery<10" class="iconfont icon-dianliang1"></i>
+                <i v-else-if="status.battery<30" class="iconfont icon-dianliang2"></i>
+                <i v-else-if="status.battery<60" class="iconfont icon-dianliang3"></i>
+                <i v-else-if="status.battery<90" class="iconfont icon-dianliang4"></i>
+                <i v-else class="iconfont icon-dianliang5"></i>
+                <span style="opacity: 0.56;font-family: PingFangSC-Regular;font-size: 14px;color: #1F1F1F;padding-left: 10px;">
+                    {{status.time}}
+                </span>
+                <span style="float: right;">
+                    {{chapterId.progress}} %
+                </span>
             </div>
         </div>
         <tabbar v-show="$store.state.reader.tabBar"
-                :style="{backgroundColor: backgroundColor.tabbar, color: color.tabbar}">
+                :style="{backgroundColor: setting.backgroundColor.tabbar, color: setting.color.tabbar}">
             <tabbar-item @on-item-click="clickTabbar">
                 <span slot="icon"><i class="iconfont icon-mulu1"></i></span>
                 <span slot="label">目录</span>
@@ -42,8 +54,8 @@
                 <span slot="label">设置</span>
             </tabbar-item>
             <tabbar-item @on-item-click="clickTabbar">
-                <span slot="icon"><i class="iconfont" :class="[dayNightIcon]"></i></span>
-                <span slot="label">{{dayNight}}</span>
+                <span slot="icon"><i class="iconfont" :class="[setting.dayNightIcon]"></i></span>
+                <span slot="label">{{setting.dayNight}}</span>
             </tabbar-item>
         </tabbar>
 
@@ -214,31 +226,21 @@
         XInput,
         Range,
         Actionsheet,
-        XButton
+        XButton,
+        dateFormat
     } from 'vux';
 
     export default {
         name: 'reader',
         data () {
             return {
-                width: app.config.setting.width.screen,
-                height: app.config.setting.height.screen,
-                contentHeight: app.config.setting.height.content,
-                contentWidth: app.config.setting.width.content,
-                backgroundColor: {
-                    header: '#FFFFFF',
-                    main: '#F7F7F7',
-                    tabbar: '#FFFFFF'
+                width: {
+                    screen: app.config.setting.width.screen,
+                    content: app.config.setting.width.content
                 },
-                color: {
-                    header: '#162636',
-                    main: '#1F1F1F',
-                    tabbar: '#162636'
-                },
-                opacity: {
-                    content: 1,
-                    title: 0.56,
-                    status: 0.56
+                height: {
+                    screen: app.config.setting.height.screen,
+                    content: app.config.setting.height.content
                 },
                 display: {
                     more: false,
@@ -253,11 +255,26 @@
                     fontStyle: 'F',
                     fontSize: 16,
                     turnModel: 1,
-                    lineHeight: 30
+                    lineHeight: 30,
+                    dayNight: '夜间',
+                    dayNightIcon: 'icon-yejian',
+                    backgroundColor: {
+                        header: '#FFFFFF',
+                        main: '#F7F7F7',
+                        tabbar: '#FFFFFF'
+                    },
+                    color: {
+                        header: '#162636',
+                        main: '#1F1F1F',
+                        tabbar: '#162636'
+                    },
+                    opacity: {
+                        content: 1,
+                        title: 0.56,
+                        status: 0.56
+                    },
                 },
                 catalogItem: 0,
-                dayNight: '夜间',
-                dayNightIcon: 'icon-yejian',
                 data: {
                     book: {},
                     chapter: {},
@@ -280,18 +297,22 @@
                     }
                 },
                 chapterId: {
-                    cur: 1,
-                    min: 1,
-                    max: 1,
+                    cur: -1,
+                    min: -1,
+                    max: -1,
                     progress: 0
                 },
                 content: {
-                    flag: true,
+                    switch: true,
                     translateX: 0,
                     touchX: {
                         start: 0,
                         end: 0
                     }
+                },
+                status: {
+                    battery: 0,
+                    time: ''
                 }
             }
         },
@@ -313,6 +334,9 @@
                 });
             },
             getChapterData(){
+                if (this.chapterId.cur < 0) {
+                    return;
+                }
                 app.ajax.get(app.config.api.reader.chapter + this.chapterId.cur, {}, (resp) => {
                     if (resp.status == 200) {
                         let data = resp.data.result;
@@ -336,43 +360,50 @@
                 });
             },
             clickContent(e){
-                if (e.x >= this.width * 0.3 && e.x <= this.width * 0.7) {
+                if (e.x >= this.width.screen * 0.3 && e.x <= this.width.screen * 0.7) {
                     this.$store.commit('updateReaderBar');
                 } else {
-                    if (e.x < this.width * 0.3) {  // 上一页
-                        if (this.content.translateX <= 0) {
-                            if (this.chapterId.cur <= this.chapterId.min) {
-                                this.$vux.toast.show({
-                                    text: '已经到最前面了',
-                                    type: 'text'
-                                });
-                                return;
-                            } else {
-                                this.chapterId.cur--;
-                                this.getChapterData();
-                            }
-                        } else {
-                            this.content.translateX -= this.contentWidth;
-                        }
-                    } else if (e.x > this.width * 0.7) { // 下一页
-                        if (this.$refs.content.scrollWidth <= this.width) {
-                            if (this.chapterId.cur >= this.chapterId.max) {
-                                this.$vux.toast.show({
-                                    text: '已经到最后了',
-                                    type: 'text'
-                                });
-                                return;
-                            } else {
-                                this.chapterId.cur++;
-                                this.content.translateX = 0;
-                                this.getChapterData();
-                            }
-                        } else {
-                            this.content.translateX += this.contentWidth;
-                        }
+                    if (e.x < this.width.screen * 0.3) {  // 上一页
+                        this.turnPage('prev');
+                    } else if (e.x > this.width.screen * 0.7) { // 下一页
+                        this.turnPage('next');
                     }
-                    this.content.flag = false;
                 }
+            },
+            turnPage(direction){
+                if (direction == 'prev') {
+                    if (this.content.translateX <= 0) {
+                        if (this.chapterId.cur <= this.chapterId.min) {
+                            this.$vux.toast.show({
+                                text: '已经到最前面了',
+                                type: 'text'
+                            });
+                            return;
+                        } else {
+                            this.chapterId.cur--;
+                            this.getChapterData();
+                        }
+                    } else {
+                        this.content.translateX -= this.width.content;
+                    }
+                } else if (direction == 'next') {
+                    if (this.$refs.content.scrollWidth <= this.width.screen) {
+                        if (this.chapterId.cur >= this.chapterId.max) {
+                            this.$vux.toast.show({
+                                text: '已经到最后了',
+                                type: 'text'
+                            });
+                            return;
+                        } else {
+                            this.chapterId.cur++;
+                            this.content.translateX = 0;
+                            this.getChapterData();
+                        }
+                    } else {
+                        this.content.translateX += this.width.content;
+                    }
+                }
+                this.content.switch = false;
             },
             clickMore(key){
                 switch (key) {
@@ -407,20 +438,20 @@
                 } else if (index == 2) {
                     this.display.setting = true;
                 } else if (index == 3) {
-                    let dayModel = this.dayNight === '夜间' ? true : false;
-                    this.dayNight = dayModel ? '日间' : '夜间';
-                    this.dayNightIcon = dayModel ? 'icon-rijianmoshi' : 'icon-yejian';
-                    this.backgroundColor = {
+                    let dayModel = this.setting.dayNight === '夜间' ? true : false;
+                    this.setting.dayNight = dayModel ? '日间' : '夜间';
+                    this.setting.dayNightIcon = dayModel ? 'icon-rijianmoshi' : 'icon-yejian';
+                    this.setting.backgroundColor = {
                         header: dayModel ? '#2C3136' : '#FFFFFF',
                         main: dayModel ? '#222224' : '#F7F7F7',
                         tabbar: dayModel ? '#2D3136' : '#FFFFFF'
                     };
-                    this.color = {
+                    this.setting.color = {
                         header: dayModel ? '#BDBDBD' : '#162636',
                         main: dayModel ? '#FFFFFF' : '#1F1F1F',
                         tabbar: dayModel ? '#BDBDBD' : '#162636'
                     };
-                    this.opacity = {
+                    this.setting.opacity = {
                         content: dayModel ? 0.26 : 1,
                         title: dayModel ? 0.26 : 0.56,
                         status: dayModel ? 0.26 : 0.56
@@ -431,6 +462,9 @@
                 this.catalogItem = index;
             },
             changeChapter(value){
+                if (value <= 0) {
+                    return;
+                }
                 if (value < this.chapterId.min) {
                     this.$vux.toast.show({
                         text: '没有前面章节了',
@@ -485,7 +519,21 @@
                 if (e.target.dataset.backgroundColor == 0) {
                     console.log('more');
                 } else {
-                    this.backgroundColor.main = e.target.dataset.backgroundColor;
+                    this.setting.backgroundColor = {
+                        header: '#FFFFFF',
+                        main: e.target.dataset.backgroundColor,
+                        tabbar: '#FFFFFF'
+                    };
+                    this.setting.color = {
+                        header: '#1F1F1F',
+                        main: '#1F1F1F',
+                        tabbar: '#1F1F1F'
+                    };
+                    this.setting.opacity = {
+                        content: 1,
+                        title: 0.56,
+                        status: 0.56
+                    }
                 }
             },
             showBattery(){
@@ -497,11 +545,7 @@
                             onReceive: function (context, intent) {
                                 var action = intent.getAction();
                                 if (action == Intent.ACTION_BATTERY_CHANGED) {
-                                    var level = intent.getIntExtra("level", 0); //电量
-                                    var voltage = intent.getIntExtra("voltage", 0); //电池电压
-                                    var temperature = intent.getIntExtra("temperature", 0); //电池温度
-                                    //如需获取别的，在这里继续写，此代码只提供获取电量
-                                    console.log(level)
+                                    this.status.battery = intent.getIntExtra("level", 0); //电量
                                 }
                             }
                         });
@@ -514,9 +558,12 @@
                         if (!dev.isBatteryMonitoringEnabled()) {
                             dev.setBatteryMonitoringEnabled(true);
                         }
-                        var level = dev.batteryLevel();
+                        this.status.battery = dev.batteryLevel();
                     }
                 }
+            },
+            showTime(){
+                this.status.time = dateFormat(new Date(), 'HH:mm')
             },
             transBeforeEnter(el){
                 el.style.opacity = 1;
@@ -535,19 +582,22 @@
                 done();
             },
             transAfterLeave(el){
-                this.content.flag = true;
+                this.content.switch = true;
             },
             touchStart(e){
                 this.content.touchX.start = e.touches[0].screenX;
+            },
+            touchMove(e){
+                e.preventDefault(); //阻止触摸事件的默认行为，即阻止滚屏
             },
             touchEnd(e){
                 this.content.touchX.end = e.changedTouches[0].screenX;
                 let diff = Math.abs(this.content.touchX.start - this.content.touchX.end);
                 if (diff > 5) {
-                    if (this.content.touchX.start > this.content.touchX.end) {    // 左滑
-                        this.changeChapter(++this.chapterId.cur);
-                    } else if (this.content.touchX.start < this.content.touchX.end) {  // 右滑
-                        this.changeChapter(--this.chapterId.cur);
+                    if (this.content.touchX.start > this.content.touchX.end) {    // 左滑：下一页
+                        this.turnPage('next');
+                    } else if (this.content.touchX.start < this.content.touchX.end) {  // 右滑：上一页
+                        this.turnPage('prev');
                     }
                 }
             }
@@ -559,15 +609,23 @@
             }
             // 隐藏阅读器底部&顶部导航菜单
             this.$store.commit('updateReaderBar', {header: false, tabBar: false});
-
-            // 初始化 界面 参数数据
-            this.setting.chapterId = this.chapterId.min;
         },
         mounted(){
+            // 章节目录
             this.getChapterCatalogData(1);
+
+            // 章节信息
 //            this.getChapterData();    // range组件初始化change会加载数据
+
+            // 书籍详情
             this.getBookData(this.$route.query.id);
+
+            // 电量
             this.showBattery();
+
+            // 时间
+            this.showTime();
+            setInterval(this.showTime, 60000);
         }
     }
 </script>
@@ -720,5 +778,11 @@
 
     .reader .popup-reward .vux-x-input {
         font-size: 14px;
+    }
+
+    .reader .status i {
+        font-size: 18px;
+        opacity: 0.56;
+        border-radius: 2px;
     }
 </style>

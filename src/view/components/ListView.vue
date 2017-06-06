@@ -41,7 +41,7 @@
                     <div class="weui-media-box__bd">
                         <p class="weui-media-box__title">{{item.ownername}}</p>
                         <p class="weui-media-box__score">
-                            <i class="iconfont icon-star" style="font-size: 12px; color: yellow;"
+                            <i class="iconfont icon-star" style="font-size: 12px; color: #ffbe00;"
                                v-for="s in item.score"></i>
                             <i class="iconfont icon-star" style="font-size: 12px;" v-for="s in (8-item.score)"></i>
                         </p>
