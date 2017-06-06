@@ -30,7 +30,7 @@
             </x-button>
             <x-button @click.native="handleBuy" plain
                       style="width: 40%;border-radius: 5px;color: #989A9C;">
-                购买并下载
+                购买
             </x-button>
         </div>
         <div style="position:relative; display: flex;justify-content: space-around;background: #FFFFFF;

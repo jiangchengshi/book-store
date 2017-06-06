@@ -1,5 +1,11 @@
 <template>
-    <div class="reader" @touchstart="touchStart" @touchend="touchEnd" @touchmove="touchMove">
+    <div class="reader" @touchstart="touchStart" @touchend="touchEnd" @touchmove="touchMove" ref="reader">
+        <div class="pull-to-refresh-layer">
+            <label style="display: block;line-height: 50px;">
+                继续向下拖动添加书签
+            </label>
+            <img src="../../image/markPull.png" style="width: 40px;">
+        </div>
         <x-header v-show="$store.state.reader.header" title="" :left-options="{backText:''}"
                   :right-options="{showMore: true}" @on-click-more="display.more=true"
                   :style="{backgroundColor: setting.backgroundColor.header, color: setting.color.header}">
@@ -10,8 +16,10 @@
         <div class="main"
              :style="{height: height.screen+'px',backgroundColor: setting.backgroundColor.main,color: setting.color.main}"
              style="padding: 0px 10px;">
-            <div class="title" style="height: 46px; line-height: 46px;" :style="{opacity:setting.opacity.title}">
+            <div class="title" style="height: 46px; line-height: 46px;"
+                 :style="{width: (width.content-20)+'px', opacity:setting.opacity.title}">
                 {{data.chapter.articlename}}
+                <img v-if="content.mark" src="../../image/mark.png" style="width: 20px;float: right;">
             </div>
             <div class="content" ref="content"
                  :style="{lineHeight: setting.lineHeight+'px',opacity: setting.opacity.content,fontSize: setting.fontSize+'px'}"
@@ -303,11 +311,23 @@
                     progress: 0
                 },
                 content: {
+                    mark: true,
                     switch: true,
                     translateX: 0,
-                    touchX: {
-                        start: 0,
-                        end: 0
+                    touch: {
+                        direction: 'x',
+                        start: {
+                            x: 0,
+                            y: 0
+                        },
+                        end: {
+                            x: 0,
+                            y: 0
+                        },
+                        diff: {
+                            x: 0,
+                            y: 0
+                        }
                     }
                 },
                 status: {
@@ -586,19 +606,41 @@
                 this.content.switch = true;
             },
             touchStart(e){
-                this.content.touchX.start = e.touches[0].screenX;
+                this.content.touch.start.x = e.touches[0].screenX;
+                this.content.touch.start.y = e.touches[0].screenY;
             },
             touchMove(e){
-                e.preventDefault(); //阻止触摸事件的默认行为，即阻止滚屏
+                this.content.touch.end.x = e.touches[0].screenX;
+                this.content.touch.end.y = e.touches[0].screenY;
+
+                this.content.touch.diff.x = this.content.touch.start.x - this.content.touch.end.x;
+                this.content.touch.diff.y = this.content.touch.start.y - this.content.touch.end.y;
+                // 滑动方向：x
+                if (Math.abs(this.content.touch.diff.x) >= Math.abs(this.content.touch.diff.y)) {
+                    this.content.touch.direction = 'x';
+                    // 横向滑动：阻止触摸事件的默认行为，即阻止滚屏
+                    e.preventDefault();
+                }
+                // 滑动方向：y
+                else {
+                    if (this.content.touch.diff.y < 0) {  // 下拉
+                        this.content.touch.direction = 'y-down';
+                        this.$refs.reader.style.transform = "translateY(140px)";
+                    }
+                }
             },
             touchEnd(e){
-                this.content.touchX.end = e.changedTouches[0].screenX;
-                let diff = Math.abs(this.content.touchX.start - this.content.touchX.end);
-                if (diff > 5) {
-                    if (this.content.touchX.start > this.content.touchX.end) {    // 左滑：下一页
-                        this.turnPage('next');
-                    } else if (this.content.touchX.start < this.content.touchX.end) {  // 右滑：上一页
-                        this.turnPage('prev');
+                if (Math.abs(this.content.touch.diff.x) > 10 || Math.abs(this.content.touch.diff.y) > 10) {
+                    if (this.content.touch.direction == 'x') {
+                        if (this.content.touch.start.x > this.content.touch.end.x) {    // 左滑：下一页
+                            this.turnPage('next');
+                        } else if (this.content.touch.start.x < this.content.touch.end.x) {  // 右滑：上一页
+                            this.turnPage('prev');
+                        }
+                    } else if (this.content.touch.direction == 'y-down') {
+                        setTimeout(() => {
+                            this.$refs.reader.style.transform = "translateY(0px)";
+                        }, 500);
                     }
                 }
             }
@@ -636,6 +678,7 @@
 
     .reader {
         font-family: PingFangSC-Regular;
+        transition: all 1s ease;
     }
 
     .reader .vux-header {
@@ -661,14 +704,6 @@
         letter-spacing: 0;
         font-size: 13px;
         position: fixed;
-    }
-
-    .reader .main .title {
-        top: 0px;
-    }
-
-    .reader .main .status {
-        bottom: 0px;
     }
 
     .reader .main .content {
@@ -785,5 +820,15 @@
         font-size: 18px;
         opacity: 0.56;
         border-radius: 2px;
+    }
+
+    .pull-to-refresh-layer {
+        width: 100%;
+        height: 140px;
+        margin-top: -140px;
+        text-align: center;
+        font-size: 14px;
+        color: #AAA;
+        background: #D9DCE0;
     }
 </style>
