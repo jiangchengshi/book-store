@@ -275,35 +275,7 @@
   "dependencies": {
 		"pages": {
 			"index.html": {
-				"resources": [
-					"build/store.png",
-					"build/app.54336ae44f1b6dc56997.js",
-					"build/font/iconfont.a47a2f6.ttf",
-					"build/app.89a6ec14f9c5b694138f.js",
-					"build/app.996f09a3bd20f7326474.js",
-					"build/app.c3c18c5ce66c8da25649.js",
-					"build/app.e7ab42d729af882ca9e0.js",
-					"build/app.cf12b9826f2daa5142f3.js",
-					"build/app.4c781c3d0d5e7d9e1bd0.js",
-					"build/app.5f1e343ec423ac624542.js",
-					"build/app.6110399cd7f9b7df20f4.js",
-					"build/app.71ef6c8200028284a9a5.js",
-					"build/app.d85a16233e8177b773c9.js",
-					"build/app.b9e1bffedfc8ece65969.js",
-					"build/font/iconfont.a08c2bd.ttf",
-					"build/app.a94e243cc9d49d4c7ac3.js",
-					"build/app.959a8c95ef82dd1ae913.js",
-					"build/goMall.png",
-					"build/app.203424ec050cd0e8ecb2.js",
-					"build/main.40681c91349d4c27df6e.js",
-					"build/font/iconfont.32643f4.ttf",
-					"build/7.40681c91349d4c27df6e.js",
-					"build/7.2f6fd1cb967630a0f363.js",
-					"build/main.2f6fd1cb967630a0f363.js",
-					"build/0.2f6fd1cb967630a0f363.js",
-					"build/11.2f6fd1cb967630a0f363.js",
-					"build/main.5d4674a9ebbfa3670116.js"
-				],
+				"resources": [],
 				"refer": [],
 				"priority": 0
 			}
