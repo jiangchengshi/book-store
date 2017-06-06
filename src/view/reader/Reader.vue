@@ -18,7 +18,7 @@
                  @click="clickContent">
                 <transition @before-enter="transBeforeEnter" @enter="transEnter"
                             @leave="transLeave" @after-leave="transAfterLeave" :css="false">
-                    <div v-show="content.switch"
+                    <div v-show="content.switch" style="column-gap:20px"
                          :style="{'column-width':width.content+'px',height: height.content+'px'}">
                         {{data.chapter.content}}
                     </div>
@@ -538,6 +538,7 @@
             },
             showBattery(){
                 if (app.config.setting.isApp) {
+                    const _this = this;
                     if (app.config.setting.isAndroid) {
                         var main = plus.android.runtimeMainActivity();
                         var Intent = plus.android.importClass('android.content.Intent');
@@ -545,7 +546,7 @@
                             onReceive: function (context, intent) {
                                 var action = intent.getAction();
                                 if (action == Intent.ACTION_BATTERY_CHANGED) {
-                                    this.status.battery = intent.getIntExtra("level", 0); //电量
+                                    _this.status.battery = intent.getIntExtra("level", 0); //电量
                                 }
                             }
                         });
@@ -558,7 +559,7 @@
                         if (!dev.isBatteryMonitoringEnabled()) {
                             dev.setBatteryMonitoringEnabled(true);
                         }
-                        this.status.battery = dev.batteryLevel();
+                        _this.status.battery = dev.batteryLevel();
                     }
                 }
             },

@@ -17,8 +17,10 @@ import util from "./util/util";
 import log from "./util/log";
 // 引入Iconfont字体
 import "../css/iconfont.css";
-// 引入Vux公共组件引用
+// 引入Vux公共组件
 import {AjaxPlugin, ToastPlugin} from "vux";
+// 引入Vue-Scroller组件
+import VueScroller from "vue-scroller";
 // 主Vue
 import App from "../view/App.vue";
 
@@ -32,6 +34,7 @@ const initVue = function () {
     // Vux Plugin
     Vue.use(AjaxPlugin);
     Vue.use(ToastPlugin);
+    Vue.use(VueScroller);
 
     // Vuex加载Loading
     window.app.store = store;
@@ -49,7 +52,7 @@ if (navigator.userAgent.indexOf("Html5Plus") < 0) { //不支持5+ API
     Object.assign(config.setting, {
         width: {
             screen: window.screen.availWidth,
-            content: window.screen.availWidth - 5
+            content: window.screen.availWidth
         },
         height: {
             screen: window.screen.availHeight,
@@ -69,7 +72,7 @@ if (navigator.userAgent.indexOf("Html5Plus") < 0) { //不支持5+ API
             isIOS: plus.os.name === "iOS",
             width: {
                 screen: plus.screen.resolutionWidth,
-                content: plus.screen.resolutionWidth - 10
+                content: plus.screen.resolutionWidth
             },
             height: {
                 screen: plus.screen.resolutionHeight,
