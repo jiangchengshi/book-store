@@ -10,9 +10,7 @@
                     <div class="weui-media-box__bd">
                         <h4 class="weui-media-box__title">{{item.name}}</h4>
                         <p class="weui-media-box__score">
-                            <i class="iconfont icon-star" style="font-size: 14px; color: #ffbe00;"
-                               v-for="s in item.score"></i>
-                            <i class="iconfont icon-star" style="font-size: 14px;" v-for="s in (8-item.score)"></i>
+                            <rater v-model="item.score" slot="value" disabled :font-size="20"></rater>
                         </p>
                         <p class="weui-media-box__desc">{{item.intro}}</p>
                         <p style="font-size: 15px; color: #828181;">{{item.author}}</p>
@@ -27,7 +25,7 @@
                        style="color: #f9be10;font-size: 15px;margin-right: 10px;"></i>
                 </cell>
                 <cell v-for="item in list" :key="item.id" :title="item.name" :inline-desc="item.desc"
-                      :value="'共'+item.num+'本'" :link="{path: '/mall/monthly/detail', query: {id: item.id}}" is-link>
+                      :value="'共'+item.num+'本'" :link="{path: '/mall/monthly/' + link, query: {id: item.id}}" is-link>
                     <img slot="icon" :src="item.image" style="width: 50px; height: 60px;margin-right: 15px;">
                 </cell>
             </group>
@@ -41,9 +39,7 @@
                     <div class="weui-media-box__bd">
                         <p class="weui-media-box__title">{{item.ownername}}</p>
                         <p class="weui-media-box__score">
-                            <i class="iconfont icon-star" style="font-size: 12px; color: #ffbe00;"
-                               v-for="s in item.score"></i>
-                            <i class="iconfont icon-star" style="font-size: 12px;" v-for="s in (8-item.score)"></i>
+                            <rater v-model="item.score" slot="value" disabled :font-size="20"></rater>
                         </p>
                         <p class="weui-media-box__desc">{{item.content}}</p>
                         <div>
@@ -63,15 +59,16 @@
 </template>
 
 <script>
-    import {Group, Cell} from 'vux';
+    import {Group, Cell, Rater} from 'vux';
 
     export default {
         props: {
             type: String,
+            link: String,
             list: Array
         },
         components: {
-            Group, Cell
+            Group, Cell, Rater
         },
         methods: {
             handleClickBook(id){

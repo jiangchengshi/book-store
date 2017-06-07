@@ -3,18 +3,18 @@
         <div class="weui-panel weui-panel_access">
             <a class="weui-media-box weui-media-box_appmsg">
                 <div class="weui-media-box__hd">
-                    <img class="weui-media-box__thumb" :src="monthly.image" alt="">
+                    <img class="weui-media-box__thumb" :src="monthly.image">
                 </div>
                 <div class="weui-media-box__bd">
                     <h4 class="weui-media-box__title">{{monthly.name}}
-                        <span style="font-size: 12px;color: #989A9C;">({{monthly.num}}本)</span>
+                        <span style="font-size: 12px;color: #989A9C;">({{monthly.book_num}}本)</span>
                     </h4>
                     <p class="weui-media-box__desc" style="font-size: 14px;color: #989A9C;">{{monthly.desc}}</p>
                     <p style="font-size: 12px;color: #989A9C;">原价： ￥
-                        <span style="text-decoration: line-through;">1{{monthly.priceOri}}</span>
+                        <span style="text-decoration: line-through;">{{monthly.old_price}}</span>
                     </p>
                     <p style="font-size: 14px;color: #162636;">现价： ￥
-                        <span style="color: red;">2{{monthly.priceNow}}</span></p>
+                        <span style="color: red;">{{monthly.price}} /月</span></p>
                 </div>
             </a>
         </div>
@@ -57,28 +57,27 @@
             Group, Cell, XButton, XSwitch, CListView, CDialog
         },
         methods: {
-            getDetailData(){
-                app.ajax.get(app.config.api.monthly.info + this.$route.query.id, {}, (resp) => {
+            getData(){
+                app.ajax.get(app.config.api.monthly.monthly + this.$route.query.id, {}, (resp) => {
                     if (resp.status == 200) {
                         let data = resp.data.result;
                         if (data) {
                             this.monthly = data;
+                            this.dataList = data.booklist.map((book) => {
+                                return {
+                                    id: book.articleid,
+                                    name: book.articlename,
+                                    author: book.author,
+                                    image: book.image,
+                                    intro: book.intro,
+                                    score: book.score
+                                }
+                            });
                             this.$store.commit('updateHeader', {
                                 title: data.name,
                                 showBack: true,
                                 showSearch: true
                             });
-                        }
-                    }
-                }, (err) => {
-                });
-            },
-            getListData(){
-                app.ajax.get(app.config.api.monthly.monthly + this.$route.query.id, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.dataList = data;
                         }
                     }
                 }, (err) => {
@@ -105,8 +104,7 @@
             });
         },
         mounted(){
-            this.getDetailData();
-            this.getListData();
+            this.getData();
         }
     }
 </script>

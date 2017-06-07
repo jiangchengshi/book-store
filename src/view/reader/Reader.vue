@@ -178,7 +178,7 @@
         <popup v-model="display.download" class="popup-download">
             <img :src="data.book.cover"
                  style="width: 110px; height: 140px; position:absolute;bottom: 140px;left: 10px;border-radius: 5px;box-shadow: 0 3px 3px #c7c7c7;">
-            <div style="padding:20px 0px 20px 140px; height: 80px; border-bottom: dotted 1px #BDBDBD">
+            <div style="padding:20px 0px 20px 140px; height: 80px; border-bottom: dotted 1px #BDBDBD;">
                 <span class="title" style="font-family: PingFangSC-Medium;font-size: 19px;color: #162636;">
                 {{data.book.articlename}}
                 </span>
@@ -623,7 +623,7 @@
                 }
                 // 滑动方向：y
                 else {
-                    if (this.content.touch.diff.y < 0) {  // 下拉
+                    if (this.content.touch.diff.y < 10) {  // 下拉
                         this.content.touch.direction = 'y-down';
                         this.$refs.reader.style.transform = "translateY(140px)";
                     }

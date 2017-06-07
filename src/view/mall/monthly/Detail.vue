@@ -12,7 +12,7 @@
             </cell>
             <x-switch title="到期自动续订" v-model="renew" style="font-size: 15px;"></x-switch>
         </group>
-        <c-list-view type="monthly" :list="dataList"></c-list-view>
+        <c-list-view type="monthly" link="package" :list="dataList"></c-list-view>
     </div>
 </template>
 

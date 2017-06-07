@@ -1,27 +1,27 @@
 <template>
     <div class="mall-book-detail">
-        <div class="detail" style="margin-top: 20px;background-color: #FFFFFF;">
-            <img :src="detail.cover" style="width: 110px; height: 140px;
-                 position:relative;top: -10px;left: 10px;border-radius: 5px;box-shadow: 0 3px 3px #c7c7c7;">
-            <span class="title"
-                  style="font-family: PingFangSC-Medium;font-size: 16px;color: #162636;margin-top: -130px;">
-                {{detail.articlename}}
-            </span>
-            <span class="score">
-                <i class="iconfont icon-star" style="font-size: 14px; color: yellow;" v-for="s in detail.score"></i>
-                <i class="iconfont icon-star" style="font-size: 14px;" v-for="s in (5-detail.score)"></i>
-                <label style="font-family: PingFangSC-Medium;font-size: 14px;color: #989A9C;line-height: 24px;">{{detail.score}}</label>
-                <label style="font-family: PingFangSC-Regular;font-size: 12px;color: #989A9C;line-height: 24px;">（{{detail.pinfen}}人评分）</label>
-            </span>
-            <div class="intro"
-                 style="opacity: 0.26;font-family: PingFangSC-Regular;font-size: 12px;color: #162636;padding: 8px 0px;">
-                <span>作者：{{detail.author}}</span>
-                <span>分类：{{detail.category}}</span>
-                <span>
+        <div class="detail" style="margin-top: 20px;height: 140px;background-color: #FFFFFF;">
+            <div style="padding: 10px 0px 10px 140px;">
+                <div class="title" style="font-family: PingFangSC-Medium;font-size: 16px;color: #162636;">
+                    {{detail.articlename}}
+                </div>
+                <div class="score">
+                    <rater v-model="score" slot="value" disabled :font-size="20"></rater>
+                    <label style="font-family: PingFangSC-Medium;font-size: 14px;color: #989A9C;line-height: 24px;">{{detail.score}}</label>
+                    <label style="font-family: PingFangSC-Regular;font-size: 12px;color: #989A9C;line-height: 24px;">（{{detail.pinfen}}人评分）</label>
+                </div>
+                <div class="intro"
+                     style="opacity: 0.26;font-family: PingFangSC-Regular;font-size: 12px;color: #162636;padding: 8px 0px;">
+                    <span>作者：{{detail.author}}</span>
+                    <span>分类：{{detail.category}}</span>
+                    <span>
                     价格：<label style="color: #EE4D22;">{{detail.price}}阅币</label>/千字 | {{detail.size}}万字
                 </span>
-                <span>来源：{{detail.source}}</span>
+                    <span>来源：{{detail.source}}</span>
+                </div>
             </div>
+            <img :src="detail.cover" style="width: 110px; height: 140px;
+                 position:relative;top: -160px;left: 15px;border-radius: 5px;box-shadow: 0 3px 3px #c7c7c7;">
         </div>
         <div style="position:relative; padding-bottom: 10px;text-align: center;background: #FFFFFF;">
             <x-button @click.native="handlePreview()"
@@ -53,8 +53,9 @@
                 {{detail.intro}}
             </cell-box>
             <cell title="查看目录" :value="'共 '+detail.chapters+' 章'" is-link></cell>
-            <cell>
-                <label v-for="(key, index) in detail.keywords" :key="index">{{key}}</label>
+            <cell v-if="detail.keywords && detail.keywords.length>0">
+                <label slot="inline-desc" v-for="(key, index) in detail.keywords" :key="index"
+                       style="color: #162636; opacity: 0.26; display: inline-block; padding: 5px 8px;border: 1px solid #C3C7CB; border-radius: 5px;">{{key}}123</label>
             </cell>
         </group>
         <group>
@@ -68,20 +69,19 @@
 </template>
 
 <script>
-    import {Group, Cell, CellBox, XButton} from 'vux';
+    import {Group, Cell, CellBox, XButton, Rater} from 'vux';
     import CListView from '../../components/ListView.vue';
 
     export default {
         data () {
             return {
-                detail: {
-                    score: 0
-                },
+                score: 2,
+                detail: {},
                 review: []
             }
         },
         components: {
-            Group, Cell, CellBox, XButton, CListView
+            Group, Cell, CellBox, XButton, Rater, CListView
         },
         methods: {
             getBookData(id){
@@ -133,8 +133,7 @@
 </script>
 <style>
     .mall-book-detail .detail span {
-        display: list-item;
-        padding-left: 135px;
+        display: block;
     }
 
     .mall-book-detail .vux-cell-box > div {

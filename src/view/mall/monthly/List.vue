@@ -1,6 +1,6 @@
 <template>
     <div class="mall-monthly-list">
-        <c-list-view type="monthly" :list="dataList"></c-list-view>
+        <c-list-view type="monthly" link="detail" :list="dataList"></c-list-view>
     </div>
 </template>
 
