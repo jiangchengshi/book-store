@@ -8,13 +8,13 @@
         </div>
         <x-header v-show="$store.state.reader.header" title="" :left-options="{backText:''}"
                   :right-options="{showMore: true}" @on-click-more="display.more=true"
-                  :style="{backgroundColor: setting.backgroundColor.header, color: setting.color.header}">
+                  :style="{backgroundColor: setting.bgColor.header, color: setting.color.header}">
             <a class="iconfont icon-dashang2" slot="right" @click="display.reward = true"></a>
             <a class="iconfont icon-xiazai" slot="right" @click="display.download = true"></a>
             <!--<a class="iconfont icon-shuqian_bookmark" slot="right"></a>-->
         </x-header>
         <div class="main"
-             :style="{height: height.screen+'px',backgroundColor: setting.backgroundColor.main,color: setting.color.main}"
+             :style="{height: height.screen+'px',backgroundColor: setting.bgColor.main,color: setting.color.main}"
              style="padding: 0px 10px;">
             <div class="title" style="height: 46px; line-height: 46px;"
                  :style="{width: (width.content-20)+'px', opacity:setting.opacity.title}">
@@ -43,12 +43,12 @@
                     {{status.time}}
                 </span>
                 <span style="float: right;">
-                    {{chapterId.progress}} %
+                    {{status.progress}} %
                 </span>
             </div>
         </div>
         <tabbar v-show="$store.state.reader.tabBar"
-                :style="{backgroundColor: setting.backgroundColor.tabbar, color: setting.color.tabbar}">
+                :style="{backgroundColor: setting.bgColor.tabbar, color: setting.color.tabbar}">
             <tabbar-item @on-item-click="clickTabbar">
                 <span slot="icon"><i class="iconfont icon-mulu1"></i></span>
                 <span slot="label">目录</span>
@@ -109,7 +109,7 @@
                     {{data.chapter.articlename}}
                 </span>
                 <span style="color: #EE4D22;letter-spacing: 0;font-size: 16px;line-height: 40px;">
-                    {{data.chapter.progress}} %
+                    {{status.progress}} %
                 </span>
             </div>
         </popup>
@@ -235,7 +235,8 @@
         Range,
         Actionsheet,
         XButton,
-        dateFormat
+        dateFormat,
+        base64
     } from 'vux';
 
     export default {
@@ -266,7 +267,7 @@
                     lineHeight: 30,
                     dayNight: '夜间',
                     dayNightIcon: 'icon-yejian',
-                    backgroundColor: {
+                    bgColor: {
                         header: '#FFFFFF',
                         main: '#F7F7F7',
                         tabbar: '#FFFFFF'
@@ -307,8 +308,7 @@
                 chapterId: {
                     cur: -1,
                     min: -1,
-                    max: -1,
-                    progress: 0
+                    max: -1
                 },
                 content: {
                     mark: true,
@@ -332,7 +332,8 @@
                 },
                 status: {
                     battery: 0,
-                    time: ''
+                    time: '',
+                    progress: 0
                 }
             }
         },
@@ -357,15 +358,39 @@
                 if (this.chapterId.cur < 0) {
                     return;
                 }
-                app.ajax.get(app.config.api.reader.chapter + this.chapterId.cur, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.data.chapter = data;
-                            this.data.chapter.progress = ((this.chapterId.cur / this.chapterId.max).toFixed(2)) * 100;
-                        }
+
+                // 章节进度
+                this.status.progress = ((this.chapterId.cur / this.chapterId.max).toFixed(2)) * 100;
+
+                // 1. 查找本地是否已缓存
+                app.webSql.query(app.config.webSql.chapter, {
+                    id: this.chapterId.cur
+                }, (rows) => {
+                    // 2. 请求服务器
+                    if (rows && rows.length > 0) {
+                        let item = rows.item(0);
+                        this.data.chapter = {
+                            articlename: item.articlename,
+                            content: item.content
+                        };
+                    } else {
+                        app.ajax.get(app.config.api.reader.chapter + this.chapterId.cur, {}, (resp) => {
+                            if (resp.status == 200) {
+                                let data = resp.data.result;
+                                if (data) {
+                                    this.data.chapter = data;
+
+                                    // 章节信息：插入websql
+                                    app.webSql.insert(
+                                        app.config.webSql.chapter,
+                                        ['id', 'articlename', 'content', 'mark'],
+                                        [this.chapterId.cur, data.articlename, data.content, 0]
+                                    )
+                                }
+                            }
+                        }, (err) => {
+                        });
                     }
-                }, (err) => {
                 });
             },
             getBookData(id){
@@ -461,7 +486,7 @@
                     let dayModel = this.setting.dayNight === '夜间' ? true : false;
                     this.setting.dayNight = dayModel ? '日间' : '夜间';
                     this.setting.dayNightIcon = dayModel ? 'icon-rijianmoshi' : 'icon-yejian';
-                    this.setting.backgroundColor = {
+                    this.setting.bgColor = {
                         header: dayModel ? '#2C3136' : '#FFFFFF',
                         main: dayModel ? '#222224' : '#F7F7F7',
                         tabbar: dayModel ? '#2D3136' : '#FFFFFF'
@@ -475,7 +500,16 @@
                         content: dayModel ? 0.26 : 1,
                         title: dayModel ? 0.26 : 0.56,
                         status: dayModel ? 0.26 : 0.56
-                    }
+                    };
+                    // 更新websql：背景颜色
+                    app.webSql.update(app.config.webSql.setting, {value: base64.encode(JSON.stringify(this.setting.bgColor))}, {key: 'bgColor'});
+                    // 更新websql：字体颜色
+                    app.webSql.update(app.config.webSql.setting, {value: base64.encode(JSON.stringify(this.setting.color))}, {key: 'color'});
+                    // 更新websql：透明度
+                    app.webSql.update(app.config.webSql.setting, {value: base64.encode(JSON.stringify(this.setting.opacity))}, {key: 'opacity'});
+                    // 更新websql：日间夜间
+                    app.webSql.update(app.config.webSql.setting, {value: this.setting.dayNight}, {key: 'dayNight'});
+                    app.webSql.update(app.config.webSql.setting, {value: this.setting.dayNightIcon}, {key: 'dayNightIcon'});
                 }
             },
             changeTabItem(index){
@@ -505,6 +539,9 @@
             changeBrightness(){
                 if (app.config.setting.isApp) {
                     plus.screen.setBrightness(this.setting.brightness);
+
+                    // 更新websql：亮度
+                    app.webSql.update(app.config.webSql.setting, {value: this.setting.brightness}, {key: 'brightness'});
                 } else {
                     this.$vux.toast.show({
                         text: '请使用移动端设备',
@@ -524,24 +561,33 @@
                 } else if (e.target.dataset.fontSize == '-') {
                     this.setting.fontSize--;
                 }
+
+                // 更新websql：字体
+                app.webSql.update(app.config.webSql.setting, {value: this.setting.fontSize}, {key: 'fontSize'});
+                // 更新websql：简繁
+                app.webSql.update(app.config.webSql.setting, {value: this.setting.fontStyle}, {key: 'fontStyle'});
             },
             changeTurnModel(e){
                 this.setting.turnModel = Number(e.target.dataset.turnModel);
+                // 更新websql：翻页
+                app.webSql.update(app.config.webSql.setting, {value: this.setting.turnModel}, {key: 'turnModel'});
             },
             changeLineHeight(e){
                 if (e.target.dataset.lineHeight == 0) {
                     console.log('more');
                 } else {
                     this.setting.lineHeight = Number(e.target.dataset.lineHeight);
+                    // 更新websql：行距
+                    app.webSql.update(app.config.webSql.setting, {value: this.setting.lineHeight}, {key: 'lineHeight'});
                 }
             },
             changeBackgroundColor(e){
-                if (e.target.dataset.backgroundColor == 0) {
+                if (e.target.dataset.bgColor == 0) {
                     console.log('more');
                 } else {
-                    this.setting.backgroundColor = {
+                    this.setting.bgColor = {
                         header: '#FFFFFF',
-                        main: e.target.dataset.backgroundColor,
+                        main: e.target.dataset.bgColor,
                         tabbar: '#FFFFFF'
                     };
                     this.setting.color = {
@@ -553,7 +599,14 @@
                         content: 1,
                         title: 0.56,
                         status: 0.56
-                    }
+                    };
+
+                    // 更新websql：背景颜色
+                    app.webSql.update(app.config.webSql.setting, {value: base64.encode(JSON.stringify(this.setting.bgColor))}, {key: 'bgColor'});
+                    // 更新websql：字体颜色
+                    app.webSql.update(app.config.webSql.setting, {value: base64.encode(JSON.stringify(this.setting.color))}, {key: 'color'});
+                    // 更新websql：透明度
+                    app.webSql.update(app.config.webSql.setting, {value: base64.encode(JSON.stringify(this.setting.opacity))}, {key: 'opacity'});
                 }
             },
             showBattery(){
@@ -652,6 +705,33 @@
             }
             // 隐藏阅读器底部&顶部导航菜单
             this.$store.commit('updateReaderBar', {header: false, tabBar: false});
+
+            // 加载websql 设置信息
+            app.webSql.query(app.config.webSql.setting, {}, (rows) => {
+                if (rows && rows.length > 0) {
+                    Object.keys(rows).forEach((i) => {
+                        if (rows[i].type == "integer") {
+                            this.setting[rows[i].key] = Number(rows[i].value);
+                        } else if (rows[i].type == "json") {
+                            this.setting[rows[i].key] = JSON.parse(base64.decode(rows[i].value));
+                        } else {
+                            this.setting[rows[i].key] = rows[i].value;
+                        }
+                    })
+                } else {
+                    // 初始化
+                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['brightness', this.setting.brightness, 'integer']);
+                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['fontSize', this.setting.fontSize, 'integer']);
+                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['fontStyle', this.setting.fontStyle, 'string']);
+                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['turnModel', this.setting.turnModel, 'integer']);
+                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['lineHeight', this.setting.lineHeight, 'integer']);
+                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['dayNight', this.setting.dayNight, 'string']);
+                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['dayNightIcon', this.setting.dayNightIcon, 'string']);
+                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['bgColor', base64.encode(JSON.stringify(this.setting.bgColor)), 'json']);
+                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['color', base64.encode(JSON.stringify(this.setting.color)), 'json']);
+                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['opacity', base64.encode(JSON.stringify(this.setting.opacity)), 'json']);
+                }
+            });
         },
         mounted(){
             // 章节目录

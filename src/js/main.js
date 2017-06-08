@@ -13,6 +13,8 @@ import plusready from "./plus/ready";
 import ajax from "./util/ajax";
 // 引入Util
 import util from "./util/util";
+// 引入WebSql
+import webSql from "./util/websql";
 // 引入Log
 import log from "./util/log";
 // 引入Iconfont字体
@@ -25,7 +27,7 @@ import VueScroller from "vue-scroller";
 import App from "../view/App.vue";
 
 // 工具配置
-window.app = Object.assign({}, {config, ajax, util, log});
+window.app = Object.assign({}, {config, ajax, util, webSql, log});
 
 const initVue = function () {
     // 移除移动端点击延迟
@@ -45,6 +47,22 @@ const initVue = function () {
         store,
         render: h => h(App)
     }).$mount('#app');
+
+    // webSql
+    webSql.open();
+    webSql.create("setting", {
+        // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
+        key: 'TEXT',
+        value: 'TEXT',
+        type: 'TEXT'
+    });
+    webSql.create("chapter",{
+        // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
+        id: 'INTEGER',
+        articlename: 'TEXT',
+        content: 'BLOB',
+        mark: 'INTEGER'   // 0-未添加书签；1-已添加书签
+    })
 };
 
 let headerHeight = 46, tabbarHeight = 56, searchHeight = 44;
@@ -67,9 +85,8 @@ if (navigator.userAgent.indexOf("Html5Plus") < 0) { //不支持5+ API
 } else { //支持5+ API
     plusready(() => {
         Object.assign(config.setting, {
-            isApp: true,
-            isAndroid: plus.os.name === "Android",
-            isIOS: plus.os.name === "iOS",
+            isApp: plus.os.name === "Android" || plus.os.name === "iOS",
+            platform: plus.os.name,
             width: {
                 screen: plus.screen.resolutionWidth,
                 content: plus.screen.resolutionWidth

@@ -27,7 +27,22 @@ const [levels, getLevel] = [
     () => app.config && app.config.debug ? levels.DEBUG : levels.ERROR];
 
 export default {
-    log(level, object) {
+    debug(object){
+        this.print(levels.DEBUG, object);
+    },
+    info(object){
+        this.print(levels.INFO, object);
+    },
+    warn(object){
+        this.print(levels.WARN, object);
+    },
+    error(object){
+        this.print(levels.ERROR, object);
+    },
+    fatal(object){
+        this.print(levels.FATAL, object);
+    },
+    print(level, object) {
         if (!window.console || !window.console.log) {
             return;
         }
@@ -35,25 +50,5 @@ export default {
             return;
         }
         console.log(level.title + object);
-    },
-
-    debug(object){
-        this.log(levels.DEBUG, object);
-    },
-
-    info(object){
-        this.log(levels.INFO, object);
-    },
-
-    warn(object){
-        this.log(levels.WARN, object);
-    },
-
-    error(object){
-        this.log(levels.ERROR, object);
-    },
-
-    fatal(object){
-        this.log(levels.FATAL, object);
     }
 }

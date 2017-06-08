@@ -4,8 +4,7 @@
 export default {
     setting: {
         isApp: false,
-        isAndroid: false,
-        isIOS: false,
+        platform: 'web',
         width: {
             screen: 0,
             content: 0
@@ -18,6 +17,10 @@ export default {
         },
         server: 'http://api.lveshu.com/',
         debug: true
+    },
+    webSql: {
+        chapter: 'chapter',
+        setting: 'setting'
     },
     api: {
         focus: 'index/focus',
