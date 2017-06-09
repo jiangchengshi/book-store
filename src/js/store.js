@@ -6,6 +6,7 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
     state: {
         loading: false,
+        login: false,
         header: {
             title: '首页',
             backText: '',
@@ -22,6 +23,9 @@ const store = new Vuex.Store({
     mutations: {
         updateLoading(state, loading){
             state.loading = loading;
+        },
+        updateLogin(state, login){
+            state.login = login;
         },
         updateHeader(state, payload){
             Object.assign(state.header, {

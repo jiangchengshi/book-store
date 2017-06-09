@@ -365,7 +365,7 @@
                 // 1. 查找本地是否已缓存
                 app.webSql.query(app.config.webSql.chapter, {
                     id: this.chapterId.cur
-                }, (rows) => {
+                }, {}, (rows) => {
                     // 2. 请求服务器
                     if (rows && rows.length > 0) {
                         let item = rows.item(0);

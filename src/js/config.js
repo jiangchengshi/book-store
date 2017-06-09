@@ -19,6 +19,7 @@ export default {
         debug: true
     },
     webSql: {
+        shelf: 'shelf',
         chapter: 'chapter',
         setting: 'setting'
     },

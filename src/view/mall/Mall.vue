@@ -37,7 +37,7 @@
     import {XHeader, Tabbar, TabbarItem} from 'vux';
 
     export default {
-        name: 'app',
+        name: 'mall',
         data(){
             return {
                 width: app.config.setting.width.screen,

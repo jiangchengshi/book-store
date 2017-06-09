@@ -50,6 +50,14 @@ const initVue = function () {
 
     // webSql
     webSql.open();
+    webSql.create("shelf", {
+        // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
+        articleid: 'INTEGER',
+        articlename: 'TEXT',
+        cover: 'TEXT',
+        author: 'TEXT',
+        time: 'TIMESTAMP'
+    });
     webSql.create("setting", {
         // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
         key: 'TEXT',
@@ -74,6 +82,7 @@ if (navigator.userAgent.indexOf("Html5Plus") < 0) { //不支持5+ API
         },
         height: {
             screen: window.screen.availHeight,
+            sign: window.screen.availHeight - headerHeight,
             main: window.screen.availHeight - headerHeight - tabbarHeight,
             content: window.screen.availHeight - headerHeight - tabbarHeight + 10,
             search: window.screen.availHeight - searchHeight
@@ -93,6 +102,7 @@ if (navigator.userAgent.indexOf("Html5Plus") < 0) { //不支持5+ API
             },
             height: {
                 screen: plus.screen.resolutionHeight,
+                sign: plus.screen.resolutionHeight - headerHeight,
                 main: plus.screen.resolutionHeight - headerHeight - tabbarHeight,
                 content: plus.screen.resolutionHeight - headerHeight - tabbarHeight + 10,
                 search: plus.screen.resolutionHeight - searchHeight

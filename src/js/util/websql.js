@@ -37,10 +37,13 @@ export default {
             });
         });
     },
-    query(table, condition, callback){
+    query(table, condition, orderby, callback){
         let sql = "SELECT * FROM " + table + " WHERE 1=1 ";
         Object.keys(condition).forEach(function (con) {
             sql += " AND " + con + " = '" + condition[con] + "'";
+        });
+        Object.keys(orderby).forEach(function (o) {
+            sql += " ORDER BY " + o + " " + orderby[o];
         });
         db.transaction(function (ctx) {
             ctx.executeSql(sql, [], function (ctx, result) {

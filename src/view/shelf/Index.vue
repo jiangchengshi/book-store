@@ -1,13 +1,13 @@
 <template>
     <div class="shelf-index">
         <ul class="books" v-for="book in books">
-            <li class="book" v-for="b in book" @click="handleClickBook(b.id)">
-                <img v-if="b.id!=-1" :src="b.image">
+            <li class="book" v-for="b in book" @click="handleClickBook(b.articleid)">
+                <img v-if="b.articleid!=-1" :src="b.cover">
                 <div v-else>
                     <i class="iconfont icon-add"></i>
                     <span>去书城看看</span>
                 </div>
-                <span class="name" v-html="b.name"></span>
+                <span class="name" v-html="b.articlename"></span>
                 <span class="author" v-html="b.author"></span>
             </li>
         </ul>
@@ -25,54 +25,43 @@
             initLocalBook(){
                 // 获取可展示的书籍： 仅展示8本 + 去书城
                 let bookArr = [];
-                let storage = app.util.localStorage('book');
-                if (storage) {
-                    bookArr = JSON.parse(storage);
-                }
 
-                bookArr = [{
-                    id: 1,
-                    name: '盗墓笔记',
-                    author: '南派三叔',
-                    image: '',
-                    chapter: {
-                        12: {
-                            name: '',
-                            content: ''
-                        }
+                app.webSql.query(app.config.webSql.shelf, {}, {}, (rows) => {
+                    if (rows && rows.length <= 0) {
+                        this.$vux.toast.show({
+                            text: '还没有添加过书籍哦!',
+                            isShowMask: true
+                        });
+                        return;
                     }
-                }];
 
-                if (bookArr.length <= 0) {
-                    this.$vux.toast.show({
-                        text: '还没有添加过书籍哦!',
-                        isShowMask: true
+                    Object.keys(rows).forEach(function (i) {
+                        bookArr.push(rows[i]);
                     });
-                    return;
-                } else if (bookArr.length >= 8) {
-                    bookArr.length = 8;
-                }
 
-                // mall-link
-                bookArr.push({
-                    id: -1,
-                    name: '&nbsp;',
-                    author: '&nbsp;',
-                    image: ''
+                    // mall-link
+                    bookArr.push({
+                        articleid: -1,
+                        articlename: '&nbsp;',
+                        author: '&nbsp;',
+                        cover: ''
+                    });
+
+                    // 书籍分3层
+                    let _books = [];
+                    bookArr.forEach((book, i) => {
+                        if (i > 0 && i % 3 == 0) { // 3, 6
+                            this.books.push(_books);
+                            _books = [];
+                        }
+                        _books.push(book);
+                        if (i == bookArr.length - 1) {
+                            this.books.push(_books);
+                        }
+                    });
                 });
 
-                // 书籍分3层
-                let _books = [];
-                bookArr.forEach((book, i) => {
-                    if (i > 0 && i % 3 == 0) { // 3, 6
-                        this.books.push(_books);
-                        _books = [];
-                    }
-                    _books.push(book);
-                    if (i == bookArr.length - 1) {
-                        this.books.push(_books);
-                    }
-                });
+
             },
             handleClickBook(id){
                 if (id == -1) {
@@ -120,7 +109,10 @@
 
     .shelf-index .books .book span {
         display: block;
+        width: 96px;
+        height: 16px;
         line-height: 16px;
+        overflow: hidden;
     }
 
     .shelf-index .books .book .name {

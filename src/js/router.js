@@ -9,7 +9,8 @@ const MallIndex = resolve => require(['../view/mall/Index.vue'], resolve);
 const MallBookNew = resolve => require(['../view/mall/book/New.vue'], resolve);
 const MallBookFree = resolve => require(['../view/mall/book/Free.vue'], resolve);
 const MallBookSpecial = resolve => require(['../view/mall/book/Special.vue'], resolve);
-const MallBookDetail = resolve => require(['../view/mall/book/Detail'], resolve);
+const MallBookDetail = resolve => require(['../view/mall/book/Detail.vue'], resolve);
+const MallBookCatalog = resolve => require(['../view/mall/book/Catalog.vue'], resolve);
 const MallMonthlyList = resolve => require(['../view/mall/monthly/List.vue'], resolve);
 const MallMonthlyDetail = resolve => require(['../view/mall/monthly/Detail.vue'], resolve);
 const MallMonthlyPackage = resolve => require(['../view/mall/monthly/Package.vue'], resolve);
@@ -21,6 +22,10 @@ const ShelfIndex = resolve => require(['../view/shelf/Index.vue'], resolve);
 const Reader = resolve => require(['../view/reader/Reader.vue'], resolve);
 const Search = resolve => require(['../view/search/Search.vue'], resolve);
 const Mine = resolve => require(['../view/mine/Mine.vue'], resolve);
+const Sign = resolve => require(['../view/sign/Sign.vue'], resolve);
+const SignIn = resolve => require(['../view/sign/In.vue'], resolve);
+const SignUp = resolve => require(['../view/sign/Out.vue'], resolve);
+const SignPass = resolve => require(['../view/sign/Pass.vue'], resolve);
 
 // routes
 const routes = [
@@ -51,6 +56,10 @@ const routes = [
             {
                 path: 'book/detail',
                 component: MallBookDetail
+            },
+            {
+                path: 'book/catalog',
+                component: MallBookCatalog
             },
             {
                 path: 'monthly/list',
@@ -100,7 +109,24 @@ const routes = [
         path: '/mine',
         component: Mine
     },
-
+    {
+        path: '/sign',
+        component: Sign,
+        children: [
+            {
+                path: 'in',
+                component: SignIn
+            },
+            {
+                path: 'up',
+                component: SignUp
+            },
+            {
+                path: 'pass',
+                component: SignPass
+            }
+        ]
+    }
 ];
 
 const vueRouter = new VueRouter({
@@ -118,6 +144,9 @@ vueRouter.beforeEach((to, from, next) => {
             break;
         case '/shelf':
             next('/shelf/index');
+            break;
+        case '/sign':
+            next('/sign/in');
             break;
         default:
             next();
