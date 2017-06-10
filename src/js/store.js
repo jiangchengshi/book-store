@@ -18,6 +18,10 @@ const store = new Vuex.Store({
         reader: {
             header: false,
             tabBar: false
+        },
+        user: {
+            uid: 0,
+            egold: 0
         }
     },
     mutations: {
@@ -43,6 +47,14 @@ const store = new Vuex.Store({
             } else {
                 state.reader.header = payload.header;
                 state.reader.tabBar = payload.tabBar;
+            }
+        },
+        updateUser(state, payload){
+            if (payload && payload.uid > 0) {
+                state.user.uid = payload.uid;
+            }
+            if (payload && payload.egold > 0) {
+                state.user.egold = payload.egold;
             }
         }
     }

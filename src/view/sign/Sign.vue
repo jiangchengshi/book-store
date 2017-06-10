@@ -25,9 +25,3 @@
         }
     }
 </script>
-
-<style>
-    .mall {
-        background: #F8F8F8;
-    }
-</style>

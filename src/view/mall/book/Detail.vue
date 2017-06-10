@@ -52,7 +52,8 @@
             <cell-box>
                 {{detail.intro}}
             </cell-box>
-            <cell title="查看目录" :value="'共 '+detail.chapters+' 章'" is-link :link="'/mall/book/catalog?id='+detail.articleid"></cell>
+            <cell title="查看目录" :value="'共 '+detail.chapters+' 章'" is-link
+                  :link="'/mall/book/catalog?id='+detail.articleid"></cell>
             <cell v-if="detail.keywords && detail.keywords.length>0">
                 <label slot="inline-desc" v-for="(key, index) in detail.keywords" :key="index"
                        style="color: #162636; opacity: 0.26; display: inline-block; padding: 5px 8px;border: 1px solid #C3C7CB; border-radius: 5px;">
@@ -114,25 +115,51 @@
                 });
             },
             handlePreview(){
-                // 更新websql： 书架
-                app.webSql.query(app.config.webSql.shelf, {
-                    articleid: this.$route.query.id
-                }, {}, (rows) => {
-                    if (!rows || rows.length <= 0) {  // 不存在这本书
-                        // 是否已超过8本
-                        app.webSql.query(app.config.webSql.shelf, {}, {time: 'ASC'}, (rows) => {
-                            if (rows && rows.length >= 8) {
-                                // 删除 时间最小的一本
-                                app.webSql.delete(app.config.webSql.shelf, {articleid: rows.item(0).articleid});
-                            }
-                            app.webSql.insert(app.config.webSql.shelf, ['articleid', 'articlename', 'author', 'cover', 'time'], [this.detail.articleid, this.detail.articlename, this.detail.author, this.detail.cover, new Date()]);
-                        });
-                    }
+                this.addShelf(() => {
+                    this.$router.push({path: '/reader', query: {id: this.$route.query.id}});
                 });
-                this.$router.push({path: '/reader', query: {id: this.$route.query.id}});
             },
             handleBuy(){
+                if (this.$store.state.user.uid <= 0) {
+                    this.$router.push({path: '/sign'});
+                    return;
+                }
+                this.$vux.toast.show({
+                    text: '购买成功',
+                    type: 'info'
+                })
+            },
+            addShelf(func){
+                // 1. 本地=> 更新websql： 书架
+//                app.webSql.query(app.config.webSql.shelf, {
+//                    articleid: this.$route.query.id
+//                }, {}, (rows) => {
+//                    if (!rows || rows.length <= 0) {  // 不存在这本书
+//                        // 是否已超过8本
+//                        app.webSql.query(app.config.webSql.shelf, {}, {time: 'ASC'}, (rows) => {
+//                            if (rows && rows.length >= 8) {
+//                                // 删除 时间最小的一本
+//                                app.webSql.delete(app.config.webSql.shelf, {articleid: rows.item(0).articleid});
+//                            }
+//                            app.webSql.insert(app.config.webSql.shelf, ['articleid', 'articlename', 'author', 'cover', 'time'], [this.detail.articleid, this.detail.articlename, this.detail.author, this.detail.cover, new Date()]);
+//                            if(typeof func=="function"){
+//                                func();
+//                            }
+//                        });
+//                    }
+//                });
 
+                // 2. 请求服务=> 添加书架书籍
+                app.ajax.post(app.config.api.shelf.add, {
+                    uid: this.$store.state.user.uid,
+                    articleid: this.$route.query.id
+                }, (resp) => {
+                    if (resp.status == 200) {
+                        app.log.info('shelf add book[' + this.$route.query.id + '] => ' + resp.data.result.result);
+                        func();
+                    }
+                }, (err) => {
+                });
             }
         },
         created(){

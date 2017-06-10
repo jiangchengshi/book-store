@@ -50,14 +50,14 @@ const initVue = function () {
 
     // webSql
     webSql.open();
-    webSql.create("shelf", {
-        // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
-        articleid: 'INTEGER',
-        articlename: 'TEXT',
-        cover: 'TEXT',
-        author: 'TEXT',
-        time: 'TIMESTAMP'
-    });
+    // webSql.create("shelf", {
+    //     // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
+    //     articleid: 'INTEGER',
+    //     articlename: 'TEXT',
+    //     cover: 'TEXT',
+    //     author: 'TEXT',
+    //     time: 'TIMESTAMP'
+    // });
     webSql.create("setting", {
         // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
         key: 'TEXT',

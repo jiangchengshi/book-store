@@ -15,6 +15,7 @@ export default {
             content: 0,
             search: 0
         },
+        codeTime: 120,
         server: 'http://api.lveshu.com/',
         debug: true
     },
@@ -45,9 +46,23 @@ export default {
             search: 'search',
             hot: 'search/hot'
         },
+        shelf:{
+            list: 'bookcase/',
+            add: 'bookcase/add',
+            delete: 'bookcase/delete'
+        },
         reader: {
             chapters: 'chapters/',
             chapter: 'chapters/info/'
+        },
+        sign: {
+            in: 'member/login',
+            up: 'member/register',
+            code: 'sms/'
+        },
+        user:{
+            info: 'member/',
+            base: 'memberinfo/'
         }
     }
 }

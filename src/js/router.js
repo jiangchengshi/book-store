@@ -24,7 +24,7 @@ const Search = resolve => require(['../view/search/Search.vue'], resolve);
 const Mine = resolve => require(['../view/mine/Mine.vue'], resolve);
 const Sign = resolve => require(['../view/sign/Sign.vue'], resolve);
 const SignIn = resolve => require(['../view/sign/In.vue'], resolve);
-const SignUp = resolve => require(['../view/sign/Out.vue'], resolve);
+const SignUp = resolve => require(['../view/sign/Up.vue'], resolve);
 const SignPass = resolve => require(['../view/sign/Pass.vue'], resolve);
 
 // routes

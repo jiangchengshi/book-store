@@ -11,7 +11,7 @@
             </div>
             <div class="result" v-else>
                 <div class="match" v-if="result=='match'">
-                    <span>搜索到 <label style="color: #5FAFF8;">{{data.result.length}}</label> 个结果：</span>
+                    <span class="info">搜索到 <label style="color: #5FAFF8;">{{data.result.length}}</label> 个结果：</span>
                     <c-list-view type="book" :list="data.result"></c-list-view>
                 </div>
                 <div class="unMatch" v-else-if="result=='unMatch'">
@@ -23,11 +23,29 @@
                 </div>
             </div>
         </div>
+        <tabbar>
+            <tabbar-item link="/mall">
+                <span slot="icon"><i class="iconfont icon-shuchengxuanzhong"></i></span>
+                <span slot="label">书城</span>
+            </tabbar-item>
+            <tabbar-item link="/search" selected>
+                <span slot="icon"><i class="iconfont icon-sousuo2"></i></span>
+                <span slot="label">搜索</span>
+            </tabbar-item>
+            <tabbar-item link="/shelf">
+                <span slot="icon"><i class="iconfont icon-bookshelf"></i></span>
+                <span slot="label">书架</span>
+            </tabbar-item>
+            <tabbar-item link="/mine">
+                <span slot="icon"><i class="iconfont icon-wode1"></i></span>
+                <span slot="label">我的</span>
+            </tabbar-item>
+        </tabbar>
     </div>
 </template>
 
 <script>
-    import {Search} from 'vux';
+    import {Search, Tabbar, TabbarItem} from 'vux';
     import CListView from '../components/ListView.vue';
 
     export default {
@@ -45,7 +63,7 @@
             }
         },
         components: {
-            Search, CListView
+            Search, Tabbar, TabbarItem, CListView
         },
         methods: {
             getHotData(page){ // 热门搜索词
@@ -67,16 +85,9 @@
                     }, (resp) => {
                         if (resp.status == 200) {
                             let data = resp.data.result;
-                            if (data && data.length > 1) {
+                            if (data && data.length > 0) {
                                 this.result = 'match';
-                                this.data.result = data.map((item, index) => ({
-                                    src: item.image,
-                                    title: item.name,
-                                    score: item.score,
-                                    desc: item.intro,
-                                    author: item.author,
-                                    url: item.url
-                                }));
+                                this.data.result = data;
                             } else {
                                 this.result = 'unMatch';
                             }
@@ -131,7 +142,7 @@
         margin-right: 10px;
     }
 
-    .search .result .match span {
+    .search .result .match .info {
         font-family: PingFangSC-Light;
         font-size: 15px;
         color: #828181;

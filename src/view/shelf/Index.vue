@@ -1,5 +1,6 @@
 <template>
     <div class="shelf-index">
+        <img src="../../image/sign.png" style="width:50px;height:60px;position: fixed;right: 5px;" @click="handleSign">
         <ul class="books" v-for="book in books">
             <li class="book" v-for="b in book" @click="handleClickBook(b.articleid)">
                 <img v-if="b.articleid!=-1" :src="b.cover">
@@ -23,45 +24,35 @@
         },
         methods: {
             initLocalBook(){
-                // 获取可展示的书籍： 仅展示8本 + 去书城
-                let bookArr = [];
+                // 1. 本地=> 获取书架书籍
+//                app.webSql.query(app.config.webSql.shelf, {}, {}, (rows) => {
+//                    if (rows && rows.length <= 0) {
+//                        this.$vux.toast.show({
+//                            text: '还没有添加过书籍哦!',
+//                            isShowMask: true
+//                        });
+//                        return;
+//                    }
+//
+//                    this.handleShelf(rows);
+//                });
 
-                app.webSql.query(app.config.webSql.shelf, {}, {}, (rows) => {
-                    if (rows && rows.length <= 0) {
-                        this.$vux.toast.show({
-                            text: '还没有添加过书籍哦!',
-                            isShowMask: true
-                        });
-                        return;
+                // 2. 请求服务=> 获取书架书籍
+                app.ajax.get(app.config.api.shelf.list + this.$store.state.user.uid, {}, (resp) => {
+                    if (resp.status == 200) {
+                        let data = resp.data.result;
+                        if (data) {
+                            this.handleShelf(data);
+                        }
                     }
-
-                    Object.keys(rows).forEach(function (i) {
-                        bookArr.push(rows[i]);
-                    });
-
-                    // mall-link
-                    bookArr.push({
-                        articleid: -1,
-                        articlename: '&nbsp;',
-                        author: '&nbsp;',
-                        cover: ''
-                    });
-
-                    // 书籍分3层
-                    let _books = [];
-                    bookArr.forEach((book, i) => {
-                        if (i > 0 && i % 3 == 0) { // 3, 6
-                            this.books.push(_books);
-                            _books = [];
-                        }
-                        _books.push(book);
-                        if (i == bookArr.length - 1) {
-                            this.books.push(_books);
-                        }
-                    });
+                }, (err) => {
                 });
-
-
+            },
+            handleSign(){
+                this.$vux.toast.show({
+                    text: '签到成功',
+                    type: 'info'
+                })
             },
             handleClickBook(id){
                 if (id == -1) {
@@ -69,6 +60,34 @@
                 } else {
                     this.$router.push({path: '/reader', query: {id: id}});
                 }
+            },
+            handleShelf(rows){
+                let bookArr = [];
+
+                Object.keys(rows).forEach(function (i) {
+                    bookArr.push(rows[i]);
+                });
+
+                // mall-link
+                bookArr.push({
+                    articleid: -1,
+                    articlename: '&nbsp;',
+                    author: '&nbsp;',
+                    cover: ''
+                });
+
+                // 书籍分3层
+                let _books = [];
+                bookArr.forEach((book, i) => {
+                    if (i > 0 && i % 3 == 0) { // 3, 6
+                        this.books.push(_books);
+                        _books = [];
+                    }
+                    _books.push(book);
+                    if (i == bookArr.length - 1) {
+                        this.books.push(_books);
+                    }
+                });
             }
         },
         created(){
