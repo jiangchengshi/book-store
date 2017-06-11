@@ -1,6 +1,6 @@
 <template>
-    <scroller :on-infinite="handleInfinite" :height="height+''">
-        <div class="shelf-index">
+    <div class="shelf-index" :style="{height:height+'px'}">
+        <scroller :on-infinite="handleInfinite" :height="height+''">
             <!-- 轮播 -->
             <c-swipe :auto="true" :loop="true" :list="data.swipe"></c-swipe>
             <!-- 栏目导航 -->
@@ -58,8 +58,8 @@
                          style="display:block;width: 98%;margin: 5px auto 0px;">
                 </card>
             </div>
-        </div>
-    </scroller>
+        </scroller>
+    </div>
 </template>
 
 <script>
@@ -70,7 +70,7 @@
     export default {
         data () {
             return {
-                height: app.config.setting.height.main,
+                height: app.config.setting.height.display - app.config.setting.height.header - app.config.setting.height.tabbar,
                 page: 1,
                 data: {
                     swipe: [],
@@ -149,8 +149,8 @@
                     return;
                 }
                 setTimeout(() => {
-                    this.page++;
                     this.getRecommendData();
+                    this.page++;
                     setTimeout(() => {
                         done();
                     })
@@ -164,19 +164,23 @@
             });
         },
         mounted(){
+            // 获取 轮播图片
             this.getSwipeData();
+            // 获取 导航栏目
             this.getNavigatorData();
+            // 获取 推广数据
             this.getExpandData();
-            this.getRecommendData();
+            // 获取 推荐数据：scroller初始化，加载一次数据
+//            this.getRecommendData();
         }
     }
 </script>
 
 <style>
-    .mall ._v-container {
+    .shelf-index ._v-container{
         top: 46px;
+        position: fixed;
     }
-
     /* navigator */
     .shelf-index .navigator {
         display: flex;

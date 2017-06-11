@@ -51,8 +51,8 @@
     export default {
         data () {
             return {
-                width: app.config.setting.width.screen,
-                height: app.config.setting.height.search,
+                width: app.config.setting.width.display,
+                height: app.config.setting.height.display - app.config.setting.height.searchbar,
                 keyword: '',
                 data: {
                     result: [],

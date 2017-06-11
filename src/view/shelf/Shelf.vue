@@ -4,7 +4,7 @@
                   :left-options="{showBack: $store.state.header.showBack, backText: $store.state.header.backText}">
             <span v-show="$store.state.header.showClean" slot="right">整理</span>
         </x-header>
-        <div style="overflow: scroll" :style="{height: height+'px'}">
+        <div style="overflow: scroll;" :style="{height: height+'px'}">
             <router-view></router-view>
         </div>
         <tabbar>
@@ -34,8 +34,8 @@
     export default {
         data () {
             return {
-                width: app.config.setting.width.screen,
-                height: app.config.setting.height.main
+                width: app.config.setting.width.display,
+                height: app.config.setting.height.display - app.config.setting.height.header - app.config.setting.height.tabbar
             }
         },
         components: {

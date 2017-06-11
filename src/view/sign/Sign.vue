@@ -16,8 +16,8 @@
         name: 'sign',
         data(){
             return {
-                width: app.config.setting.width.screen,
-                height: app.config.setting.height.sign
+                width: app.config.setting.width.display,
+                height: app.config.setting.height.display - app.config.setting.height.header
             }
         },
         components: {

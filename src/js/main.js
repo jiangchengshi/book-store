@@ -64,7 +64,7 @@ const initVue = function () {
         value: 'TEXT',
         type: 'TEXT'
     });
-    webSql.create("chapter",{
+    webSql.create("chapter", {
         // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
         id: 'INTEGER',
         articlename: 'TEXT',
@@ -73,24 +73,25 @@ const initVue = function () {
     })
 };
 
-let headerHeight = 46, tabbarHeight = 56, searchHeight = 44;
 if (navigator.userAgent.indexOf("Html5Plus") < 0) { //不支持5+ API
     Object.assign(config.setting, {
         width: {
             screen: window.screen.availWidth,
-            content: window.screen.availWidth
+            display: window.screen.availWidth
         },
         height: {
             screen: window.screen.availHeight,
-            sign: window.screen.availHeight - headerHeight,
-            main: window.screen.availHeight - headerHeight - tabbarHeight,
-            content: window.screen.availHeight - headerHeight - tabbarHeight + 10,
-            search: window.screen.availHeight - searchHeight
+            display: window.screen.availHeight,
+            header: 46,
+            tabbar: 53,
+            searchbar: 44
         }
     });
 
     // 初始化Vue
     initVue();
+
+    console.log(app.config.setting);
 } else { //支持5+ API
     plusready(() => {
         Object.assign(config.setting, {
@@ -98,14 +99,14 @@ if (navigator.userAgent.indexOf("Html5Plus") < 0) { //不支持5+ API
             platform: plus.os.name,
             width: {
                 screen: plus.screen.resolutionWidth,
-                content: plus.screen.resolutionWidth
+                display: plus.display.resolutionWidth,
             },
             height: {
                 screen: plus.screen.resolutionHeight,
-                sign: plus.screen.resolutionHeight - headerHeight,
-                main: plus.screen.resolutionHeight - headerHeight - tabbarHeight,
-                content: plus.screen.resolutionHeight - headerHeight - tabbarHeight + 10,
-                search: plus.screen.resolutionHeight - searchHeight
+                display: plus.display.resolutionHeight,
+                header: 46,
+                tabbar: 53,
+                searchbar: 44
             }
         });
 

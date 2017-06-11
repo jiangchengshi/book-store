@@ -7,13 +7,11 @@ export default {
         platform: 'web',
         width: {
             screen: 0,
-            content: 0
+            display: 0
         },
         height: {
             screen: 0,
-            main: 0,
-            content: 0,
-            search: 0
+            display: 0
         },
         codeTime: 120,
         server: 'http://api.lveshu.com/',

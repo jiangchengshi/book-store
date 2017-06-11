@@ -1,6 +1,6 @@
 <template>
     <div class="mine" style="background: #F8F8F8;" :style="{height: height+'px', width: width+'px'}">
-        <div style="background: #FFFFFF;text-align: center;padding: 55px 0px 35px 0px;">
+        <div style="background: #FFFFFF;text-align: center;padding: 46px 0px 22px 0px;">
             <img :src="info.avatar" style="width: 60px;height: 60px;">
             <a style="color:#35B4EB; display: block;" @click="handleSignIn">{{info.username}}</a>
         </div>
@@ -21,33 +21,35 @@
             </div>
             <x-button action-type="button" :plain="true">充值</x-button>
         </div>
-        <group>
-            <cell title="充值记录" is-link>
-                <i slot="icon" class="iconfont icon-chongzhi" style="color: #9ed18b;"></i>
-            </cell>
-            <cell title="充值记录" is-link>
-                <i slot="icon" class="iconfont icon-xiaofeijilu" style="color: #f5ce8e;"></i>
-            </cell>
-            <cell title="充值记录" is-link>
-                <i slot="icon" class="iconfont icon-dashang1" style="color: #f393af;"></i>
-            </cell>
-        </group>
-        <group>
-            <cell title="我的评论" is-link>
-                <i slot="icon" class="iconfont icon-pinglun" style="color: #66c9f3;"></i>
-            </cell>
-            <cell title="我的消息" is-link>
-                <i slot="icon" class="iconfont icon-icon066" style="color: #f6cf8f;"></i>
-            </cell>
-            <cell title="意见反馈" is-link>
-                <i slot="icon" class="iconfont icon-yijianfankui" style="color: #d9b4fb;"></i>
-            </cell>
-        </group>
-        <group>
-            <cell title="设置" is-link>
-                <i slot="icon" class="iconfont icon-chaozhidijia-01" style="color: #8e9397;"></i>
-            </cell>
-        </group>
+        <div>
+            <group>
+                <cell title="充值记录" is-link>
+                    <i slot="icon" class="iconfont icon-chongzhi" style="color: #9ed18b;"></i>
+                </cell>
+                <cell title="消费记录" is-link>
+                    <i slot="icon" class="iconfont icon-xiaofeijilu" style="color: #f5ce8e;"></i>
+                </cell>
+                <cell title="打赏记录" is-link>
+                    <i slot="icon" class="iconfont icon-dashang1" style="color: #f393af;"></i>
+                </cell>
+            </group>
+            <group>
+                <cell title="我的评论" is-link>
+                    <i slot="icon" class="iconfont icon-pinglun" style="color: #66c9f3;"></i>
+                </cell>
+                <cell title="我的消息" is-link>
+                    <i slot="icon" class="iconfont icon-icon066" style="color: #f6cf8f;"></i>
+                </cell>
+                <cell title="意见反馈" is-link>
+                    <i slot="icon" class="iconfont icon-yijianfankui" style="color: #d9b4fb;"></i>
+                </cell>
+            </group>
+            <group>
+                <cell title="设置" is-link>
+                    <i slot="icon" class="iconfont icon-chaozhidijia-01" style="color: #8e9397;"></i>
+                </cell>
+            </group>
+        </div>
         <tabbar>
             <tabbar-item link="/mall">
                 <span slot="icon"><i class="iconfont icon-shuchengxuanzhong"></i></span>
@@ -75,8 +77,8 @@
     export default {
         data () {
             return {
-                width: app.config.setting.width.screen,
-                height: app.config.setting.height.screen,
+                width: app.config.setting.width.display,
+                height: app.config.setting.height.display - app.config.setting.height.tabbar,
                 info: {
                     username: '登录',
                     avatar: '',
@@ -103,7 +105,9 @@
                 });
             },
             handleSignIn(){
-                this.$router.push({path: '/sign'})
+                if (this.$store.state.user.uid <= 0) {
+                    this.$router.push({path: '/sign'})
+                }
             }
         },
         mounted(){
@@ -151,6 +155,6 @@
     }
 
     .mine .weui-cell.vux-tap-active.weui-cell_access {
-        padding: 5px 15px;
+        padding: 3px 15px;
     }
 </style>

@@ -120,10 +120,10 @@
 <style>
     .in .logo {
         text-align: center;
-        padding: 55px 0px 40px 0px;
+        padding: 25px 0px 30px 0px;
     }
 
-    .in .logo img{
+    .in .logo img {
         /* 更好支持border-radius */
         border-top-left-radius: 999px; /* 左上角 */
         border-top-right-radius: 999px; /* 右上角 */

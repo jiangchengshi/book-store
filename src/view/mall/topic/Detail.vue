@@ -18,7 +18,7 @@
     export default {
         data () {
             return {
-                width: app.config.setting.width.screen,
+                width: app.config.setting.width.display,
                 topic: {},
                 dataList: []
             }

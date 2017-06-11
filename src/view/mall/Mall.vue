@@ -9,7 +9,7 @@
                 <i v-show="$store.state.header.showShare" class="iconfont icon-zuihouyibanfenxiang"></i>
             </router-link>
         </x-header>
-        <div style="overflow: scroll" :style="{height: height+'px', width: width+'px'}">
+        <div style="overflow: scroll;" :style="{height: height+'px', width: width+'px'}">
             <router-view></router-view>
         </div>
         <tabbar>
@@ -40,8 +40,8 @@
         name: 'mall',
         data(){
             return {
-                width: app.config.setting.width.screen,
-                height: app.config.setting.height.main
+                width: app.config.setting.width.display,
+                height: app.config.setting.height.display - app.config.setting.height.header - app.config.setting.height.tabbar
             }
         },
         components: {

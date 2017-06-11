@@ -14,10 +14,10 @@
             <!--<a class="iconfont icon-shuqian_bookmark" slot="right"></a>-->
         </x-header>
         <div class="main"
-             :style="{height: height.screen+'px',backgroundColor: setting.bgColor.main,color: setting.color.main}"
+             :style="{height: screenHeight+'px',backgroundColor: setting.bgColor.main,color: setting.color.main}"
              style="padding: 0px 10px;">
             <div class="title" style="height: 46px; line-height: 46px;"
-                 :style="{width: (width.content-20)+'px', opacity:setting.opacity.title}">
+                 :style="{width: (width-20)+'px', opacity:setting.opacity.title}">
                 {{data.chapter.articlename}}
                 <img v-if="content.mark" src="../../image/mark.png" style="width: 20px;float: right;">
             </div>
@@ -27,13 +27,13 @@
                 <transition @before-enter="transBeforeEnter" @enter="transEnter"
                             @leave="transLeave" @after-leave="transAfterLeave" :css="false">
                     <div v-show="content.switch" style="column-gap:20px"
-                         :style="{'column-width':width.content+'px',height: height.content+'px'}">
+                         :style="{'column-width':width+'px',height: contentHeight+'px'}">
                         {{data.chapter.content}}
                     </div>
                 </transition>
             </div>
             <div class="status" style="height: 56px;line-height: 56px;"
-                 :style="{width: (width.content-20)+'px', opacity:setting.opacity.status}">
+                 :style="{width: (width-20)+'px', opacity:setting.opacity.status}">
                 <i v-if="status.battery<10" class="iconfont icon-dianliang1"></i>
                 <i v-else-if="status.battery<30" class="iconfont icon-dianliang2"></i>
                 <i v-else-if="status.battery<60" class="iconfont icon-dianliang3"></i>
@@ -243,14 +243,9 @@
         name: 'reader',
         data () {
             return {
-                width: {
-                    screen: app.config.setting.width.screen,
-                    content: app.config.setting.width.content
-                },
-                height: {
-                    screen: app.config.setting.height.screen,
-                    content: app.config.setting.height.content
-                },
+                width: app.config.setting.width.screen,
+                screenHeight: app.config.setting.height.screen,
+                contentHeight: app.config.setting.height.screen - app.config.setting.height.header - app.config.setting.height.tabbar,
                 display: {
                     more: false,
                     catalog: false,
@@ -405,12 +400,12 @@
                 });
             },
             clickContent(e){
-                if (e.x >= this.width.screen * 0.3 && e.x <= this.width.screen * 0.7) {
+                if (e.x >= this.width * 0.3 && e.x <= this.width * 0.7) {
                     this.$store.commit('updateReaderBar');
                 } else {
-                    if (e.x < this.width.screen * 0.3) {  // 上一页
+                    if (e.x < this.width * 0.3) {  // 上一页
                         this.turnPage('prev');
-                    } else if (e.x > this.width.screen * 0.7) { // 下一页
+                    } else if (e.x > this.width * 0.7) { // 下一页
                         this.turnPage('next');
                     }
                 }
@@ -429,10 +424,10 @@
                             this.getChapterData();
                         }
                     } else {
-                        this.content.translateX -= this.width.content;
+                        this.content.translateX -= this.width;
                     }
                 } else if (direction == 'next') {
-                    if (this.$refs.content.scrollWidth <= this.width.screen) {
+                    if (this.$refs.content.scrollWidth <= this.width) {
                         if (this.chapterId.cur >= this.chapterId.max) {
                             this.$vux.toast.show({
                                 text: '已经到最后了',
@@ -445,7 +440,7 @@
                             this.getChapterData();
                         }
                     } else {
-                        this.content.translateX += this.width.content;
+                        this.content.translateX += this.width;
                     }
                 }
                 this.content.switch = false;
@@ -770,6 +765,7 @@
 
     .reader .vux-header a {
         font-size: 22px;
+        margin-right: 8px;
     }
 
     .reader .vux-header .vux-header-right {
