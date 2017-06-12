@@ -76,13 +76,19 @@
                                     text: '用户不存在'
                                 });
                             } else {
-                                this.$store.commit('updateUser', {
-                                    uid: data.uid,
-                                    egold: data.egold
-                                });
+                                app.webSql.insert(app.config.webSql.sign, {
+                                    id: data.uid,
+                                    egold: data.egold,
+                                    time: new Date()
+                                }, () => {
+                                    this.$store.commit('updateUser', {
+                                        uid: data.uid,
+                                        egold: data.egold
+                                    });
 
-                                // 跳转
-                                this.$router.go(-1);
+                                    // 跳转
+                                    this.$router.go(-1);
+                                });
                             }
                         }
                     }

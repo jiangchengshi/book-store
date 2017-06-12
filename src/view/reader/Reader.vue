@@ -1,71 +1,80 @@
 <template>
-    <div class="reader" @touchstart="touchStart" @touchend="touchEnd" @touchmove="touchMove" ref="reader">
-        <div class="pull-to-refresh-layer">
-            <label style="display: block;line-height: 50px;">
-                继续向下拖动添加书签
-            </label>
-            <img src="../../image/markPull.png" style="width: 40px;">
-        </div>
-        <x-header v-show="$store.state.reader.header" title="" :left-options="{backText:''}"
-                  :right-options="{showMore: true}" @on-click-more="display.more=true"
-                  :style="{backgroundColor: setting.bgColor.header, color: setting.color.header}">
-            <a class="iconfont icon-dashang2" slot="right" @click="display.reward = true"></a>
-            <a class="iconfont icon-xiazai" slot="right" @click="display.download = true"></a>
-            <!--<a class="iconfont icon-shuqian_bookmark" slot="right"></a>-->
-        </x-header>
-        <div class="main"
-             :style="{height: screenHeight+'px',backgroundColor: setting.bgColor.main,color: setting.color.main}"
-             style="padding: 0px 10px;">
-            <div class="title" style="height: 46px; line-height: 46px;"
-                 :style="{width: (width-20)+'px', opacity:setting.opacity.title}">
-                {{data.chapter.articlename}}
-                <img v-if="content.mark" src="../../image/mark.png" style="width: 20px;float: right;">
+    <div>
+        <div class="reader" @touchstart="touchStart" @touchend="touchEnd" @touchmove="touchMove" ref="reader">
+            <div class="pull-to-refresh-layer">
+                <template v-if="content.mark">
+                    <label style="display: block;line-height: 50px;">
+                        继续向下拖动删除书签
+                    </label>
+                    <img src="../../image/markDel.png" style="width: 40px;">
+                </template>
+                <template v-else>
+                    <label style="display: block;line-height: 50px;">
+                        继续向下拖动添加书签
+                    </label>
+                    <img src="../../image/markPull.png" style="width: 40px;">
+                </template>
             </div>
-            <div class="content" ref="content"
-                 :style="{lineHeight: setting.lineHeight+'px',opacity: setting.opacity.content,fontSize: setting.fontSize+'px'}"
-                 @click="clickContent">
-                <transition @before-enter="transBeforeEnter" @enter="transEnter"
-                            @leave="transLeave" @after-leave="transAfterLeave" :css="false">
-                    <div v-show="content.switch" style="column-gap:20px"
-                         :style="{'column-width':width+'px',height: contentHeight+'px'}">
-                        {{data.chapter.content}}
-                    </div>
-                </transition>
-            </div>
-            <div class="status" style="height: 56px;line-height: 56px;"
-                 :style="{width: (width-20)+'px', opacity:setting.opacity.status}">
-                <i v-if="status.battery<10" class="iconfont icon-dianliang1"></i>
-                <i v-else-if="status.battery<30" class="iconfont icon-dianliang2"></i>
-                <i v-else-if="status.battery<60" class="iconfont icon-dianliang3"></i>
-                <i v-else-if="status.battery<90" class="iconfont icon-dianliang4"></i>
-                <i v-else class="iconfont icon-dianliang5"></i>
-                <span style="opacity: 0.56;font-family: PingFangSC-Regular;font-size: 14px;color: #1F1F1F;padding-left: 10px;">
+            <x-header v-show="$store.state.reader.header" title="" :left-options="{backText:''}"
+                      :right-options="{showMore: true}" @on-click-more="display.more=true"
+                      :style="{backgroundColor: setting.bgColor.header, color: setting.color.header}">
+                <a class="iconfont icon-dashang2" slot="right" @click="display.reward = true"></a>
+                <a class="iconfont icon-xiazai" slot="right" @click="display.download = true"></a>
+                <!--<a class="iconfont icon-shuqian_bookmark" slot="right"></a>-->
+            </x-header>
+            <div class="chapter" style="padding: 0px 10px;"
+                 :style="{height: screenHeight+'px',backgroundColor: setting.bgColor.chapter,color: setting.color.chapter}">
+                <div class="title" style="height: 46px; line-height: 46px;"
+                     :style="{width: (width-20)+'px', opacity:setting.opacity.title}">
+                    {{data.chapter.articlename}}
+                    <img v-show="content.mark" src="../../image/mark.png" style="width: 20px;float: right;">
+                </div>
+                <div class="content" ref="content"
+                     :style="{lineHeight: setting.lineHeight+'px',opacity: setting.opacity.content,fontSize: setting.fontSize+'px'}"
+                     @click="clickContent">
+                    <transition @before-enter="transBeforeEnter" @enter="transEnter"
+                                @leave="transLeave" @after-leave="transAfterLeave" :css="false">
+                        <div v-show="content.switch" style="column-gap:20px"
+                             :style="{'column-width':width+'px',height: contentHeight+'px'}">
+                            {{data.chapter.content}}
+                        </div>
+                    </transition>
+                </div>
+                <div class="status" style="height: 56px;line-height: 56px;"
+                     :style="{width: (width-20)+'px', opacity:setting.opacity.status}">
+                    <i v-if="status.battery<10" class="iconfont icon-dianliang1"></i>
+                    <i v-else-if="status.battery<30" class="iconfont icon-dianliang2"></i>
+                    <i v-else-if="status.battery<60" class="iconfont icon-dianliang3"></i>
+                    <i v-else-if="status.battery<90" class="iconfont icon-dianliang4"></i>
+                    <i v-else class="iconfont icon-dianliang5"></i>
+                    <span style="opacity: 0.56;font-family: PingFangSC-Regular;font-size: 14px;color: #1F1F1F;padding-left: 10px;">
                     {{status.time}}
                 </span>
-                <span style="float: right;">
+                    <span style="float: right;">
                     {{status.progress}} %
                 </span>
+                </div>
             </div>
+            <tabbar v-show="$store.state.reader.tabBar"
+                    :style="{backgroundColor: setting.bgColor.tabbar, color: setting.color.tabbar}">
+                <tabbar-item @on-item-click="clickTabbar">
+                    <span slot="icon"><i class="iconfont icon-mulu1"></i></span>
+                    <span slot="label">目录</span>
+                </tabbar-item>
+                <tabbar-item @on-item-click="clickTabbar">
+                    <span slot="icon"><i class="iconfont icon-diaozhengjindu-copy"></i></span>
+                    <span slot="label">进度</span>
+                </tabbar-item>
+                <tabbar-item @on-item-click="clickTabbar">
+                    <span slot="icon"><i class="iconfont icon-aa"></i></span>
+                    <span slot="label">设置</span>
+                </tabbar-item>
+                <tabbar-item @on-item-click="clickTabbar">
+                    <span slot="icon"><i class="iconfont" :class="[setting.dayNightIcon]"></i></span>
+                    <span slot="label">{{setting.dayNight}}</span>
+                </tabbar-item>
+            </tabbar>
         </div>
-        <tabbar v-show="$store.state.reader.tabBar"
-                :style="{backgroundColor: setting.bgColor.tabbar, color: setting.color.tabbar}">
-            <tabbar-item @on-item-click="clickTabbar">
-                <span slot="icon"><i class="iconfont icon-mulu1"></i></span>
-                <span slot="label">目录</span>
-            </tabbar-item>
-            <tabbar-item @on-item-click="clickTabbar">
-                <span slot="icon"><i class="iconfont icon-diaozhengjindu-copy"></i></span>
-                <span slot="label">进度</span>
-            </tabbar-item>
-            <tabbar-item @on-item-click="clickTabbar">
-                <span slot="icon"><i class="iconfont icon-aa"></i></span>
-                <span slot="label">设置</span>
-            </tabbar-item>
-            <tabbar-item @on-item-click="clickTabbar">
-                <span slot="icon"><i class="iconfont" :class="[setting.dayNightIcon]"></i></span>
-                <span slot="label">{{setting.dayNight}}</span>
-            </tabbar-item>
-        </tabbar>
 
         <!-- 目录：侧滑菜单 -->
         <popup v-model="display.catalog" position="left" width="75%" class="popup-catalog">
@@ -89,7 +98,15 @@
                     </cell>
                 </group>
             </div>
-            <div v-show="catalogItem==1">Container1</div>
+            <div v-show="catalogItem==1">
+                <group>
+                    <cell v-for="(mark, index) in data.marks" :key="index">
+                        <span slot="title">{{mark.name}}</span>
+                        <span>{{mark.translateX}}</span>
+                        <span slot="title" style="color: #989A9C;">{{mark.time}}</span>
+                    </cell>
+                </group>
+            </div>
             <div v-show="catalogItem==2">Container2</div>
         </popup>
 
@@ -264,12 +281,12 @@
                     dayNightIcon: 'icon-yejian',
                     bgColor: {
                         header: '#FFFFFF',
-                        main: '#F7F7F7',
+                        chapter: '#F7F7F7',
                         tabbar: '#FFFFFF'
                     },
                     color: {
                         header: '#162636',
-                        main: '#1F1F1F',
+                        chapter: '#1F1F1F',
                         tabbar: '#162636'
                     },
                     opacity: {
@@ -283,6 +300,7 @@
                     book: {},
                     chapter: {},
                     chapters: [],
+                    marks: [],
                     menuMore: [{
                         label: "<i class='iconfont icon-bookmark-add'></i> &nbsp;添加书签",
                         value: 'mark'
@@ -306,9 +324,9 @@
                     max: -1
                 },
                 content: {
-                    mark: true,
                     switch: true,
                     translateX: 0,
+                    mark: false,
                     touch: {
                         direction: 'x',
                         start: {
@@ -336,7 +354,7 @@
             XHeader, Tabbar, TabbarItem, Popup, Tab, TabItem, Group, Cell, XInput, Range, Actionsheet, XButton
         },
         methods: {
-            getChapterCatalogData(page){
+            getCatalogData(page){
                 app.ajax.get(app.config.api.reader.chapters + this.$route.query.id + '/' + page, {}, (resp) => {
                     if (resp.status == 200) {
                         let data = resp.data.result;
@@ -349,6 +367,13 @@
                 }, (err) => {
                 });
             },
+            getMarkData(){
+                app.webSql.query(app.config.webSql.mark, {}, {}, (rows) => {
+                    if (rows && rows.length > 0) {
+                        this.data.marks = rows;
+                    }
+                });
+            },
             getChapterData(){
                 if (this.chapterId.cur < 0) {
                     return;
@@ -359,9 +384,8 @@
 
                 // 1. 查找本地是否已缓存
                 app.webSql.query(app.config.webSql.chapter, {
-                    id: this.chapterId.cur
+                    articleid: this.chapterId.cur
                 }, {}, (rows) => {
-                    // 2. 请求服务器
                     if (rows && rows.length > 0) {
                         let item = rows.item(0);
                         this.data.chapter = {
@@ -369,6 +393,7 @@
                             content: item.content
                         };
                     } else {
+                        // 2. 请求服务器
                         app.ajax.get(app.config.api.reader.chapter + this.chapterId.cur, {}, (resp) => {
                             if (resp.status == 200) {
                                 let data = resp.data.result;
@@ -376,10 +401,12 @@
                                     this.data.chapter = data;
 
                                     // 章节信息：插入websql
-                                    app.webSql.insert(
-                                        app.config.webSql.chapter,
-                                        ['id', 'articlename', 'content', 'mark'],
-                                        [this.chapterId.cur, data.articlename, data.content, 0]
+                                    app.webSql.insert(app.config.webSql.chapter,
+                                        {
+                                            articleid: this.chapterId.cur,
+                                            articlename: data.articlename,
+                                            content: data.content
+                                        }
                                     )
                                 }
                             }
@@ -443,6 +470,19 @@
                         this.content.translateX += this.width;
                     }
                 }
+
+                // 书签
+                app.webSql.query(app.config.webSql.mark, {
+                    id: this.chapterId.cur,
+                    translateX: this.content.translateX
+                }, {}, (rows) => {
+                    if (rows && rows.length > 0) {
+                        this.content.mark = true;
+                    } else {
+                        this.content.mark = false;
+                    }
+                });
+
                 this.content.switch = false;
             },
             clickMore(key){
@@ -483,12 +523,12 @@
                     this.setting.dayNightIcon = dayModel ? 'icon-rijianmoshi' : 'icon-yejian';
                     this.setting.bgColor = {
                         header: dayModel ? '#2C3136' : '#FFFFFF',
-                        main: dayModel ? '#222224' : '#F7F7F7',
+                        chapter: dayModel ? '#222224' : '#F7F7F7',
                         tabbar: dayModel ? '#2D3136' : '#FFFFFF'
                     };
                     this.setting.color = {
                         header: dayModel ? '#BDBDBD' : '#162636',
-                        main: dayModel ? '#FFFFFF' : '#1F1F1F',
+                        chapter: dayModel ? '#FFFFFF' : '#1F1F1F',
                         tabbar: dayModel ? '#BDBDBD' : '#162636'
                     };
                     this.setting.opacity = {
@@ -582,12 +622,12 @@
                 } else {
                     this.setting.bgColor = {
                         header: '#FFFFFF',
-                        main: e.target.dataset.bgColor,
+                        chapter: e.target.dataset.bgColor,
                         tabbar: '#FFFFFF'
                     };
                     this.setting.color = {
                         header: '#1F1F1F',
-                        main: '#1F1F1F',
+                        chapter: '#1F1F1F',
                         tabbar: '#1F1F1F'
                     };
                     this.setting.opacity = {
@@ -654,42 +694,73 @@
                 this.content.switch = true;
             },
             touchStart(e){
+                // 阻止触摸事件的默认行为，即阻止滚屏
+                e.preventDefault();
+
+                this.content.touch.direction = "";
+                this.content.touch.diff.x = 0;
+                this.content.touch.diff.y = 0;
+
                 this.content.touch.start.x = e.touches[0].screenX;
                 this.content.touch.start.y = e.touches[0].screenY;
             },
             touchMove(e){
+                // 阻止触摸事件的默认行为，即阻止滚屏
+                e.preventDefault();
+
                 this.content.touch.end.x = e.touches[0].screenX;
                 this.content.touch.end.y = e.touches[0].screenY;
-
                 this.content.touch.diff.x = this.content.touch.start.x - this.content.touch.end.x;
                 this.content.touch.diff.y = this.content.touch.start.y - this.content.touch.end.y;
-                // 滑动方向：x
-                if (Math.abs(this.content.touch.diff.x) >= Math.abs(this.content.touch.diff.y)) {
-                    this.content.touch.direction = 'x';
-                    // 横向滑动：阻止触摸事件的默认行为，即阻止滚屏
-                    e.preventDefault();
-                }
-                // 滑动方向：y
-                else {
-                    if (this.content.touch.diff.y < 10) {  // 下拉
-                        this.content.touch.direction = 'y-down';
-                        this.$refs.reader.style.transform = "translateY(140px)";
+
+                if (Math.abs(this.content.touch.diff.x) > 10 || Math.abs(this.content.touch.diff.y) > 10) {
+                    // 滑动方向：x
+                    if (Math.abs(this.content.touch.diff.x) >= Math.abs(this.content.touch.diff.y)) {
+                        if (this.content.touch.diff.x > 0) {    // 左滑
+                            this.content.touch.direction = 'x-left';
+                        } else if (this.content.touch.diff.x < 0) {  // 右滑
+                            this.content.touch.direction = 'x-right';
+                        }
+                    }
+                    // 滑动方向：y
+                    else {
+                        if (this.content.touch.diff.y < 0) {  // 下拉
+                            this.content.touch.direction = 'y-down';
+                            this.$refs.reader.style.transform = "translate3d(0px, 140px, 0px)";
+                        } else if (this.content.touch.diff.y > 0) {    // 上滑
+                            this.content.touch.direction = 'y-up';
+                        }
                     }
                 }
             },
             touchEnd(e){
-                if (Math.abs(this.content.touch.diff.x) > 10 || Math.abs(this.content.touch.diff.y) > 10) {
-                    if (this.content.touch.direction == 'x') {
-                        if (this.content.touch.start.x > this.content.touch.end.x) {    // 左滑：下一页
-                            this.turnPage('next');
-                        } else if (this.content.touch.start.x < this.content.touch.end.x) {  // 右滑：上一页
-                            this.turnPage('prev');
+                if (this.content.touch.direction == 'x-left') { // 左滑：下一页
+                    this.turnPage('next');
+                } else if (this.content.touch.direction == 'x-right') {  // 右滑：上一页
+                    this.turnPage('prev');
+                } else if (this.content.touch.direction == 'y-down') {  // 下拉：添加书签
+                    setTimeout(() => {
+                        if (this.content.mark) {
+                            app.webSql.delete(app.config.webSql.mark, {
+                                id: this.chapterId.cur,
+                                translateX: this.content.translateX
+                            }, () => {
+                                this.content.mark = false;
+                                this.$refs.reader.style.transform = "translate3d(0px, 0px, 0px)";
+                            });
+                        } else {
+                            app.webSql.insert(app.config.webSql.mark, {
+                                id: this.chapterId.cur,
+                                translateX: this.content.translateX,
+                                name: this.data.chapter.articlename,
+                                content: '',
+                                time: new Date()
+                            }, () => {
+                                this.content.mark = true;
+                                this.$refs.reader.style.transform = "translate3d(0px, 0px, 0px)";
+                            });
                         }
-                    } else if (this.content.touch.direction == 'y-down') {
-                        setTimeout(() => {
-                            this.$refs.reader.style.transform = "translateY(0px)";
-                        }, 500);
-                    }
+                    }, 500);
                 }
             }
         },
@@ -715,22 +786,64 @@
                     })
                 } else {
                     // 初始化
-                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['brightness', this.setting.brightness, 'integer']);
-                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['fontSize', this.setting.fontSize, 'integer']);
-                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['fontStyle', this.setting.fontStyle, 'string']);
-                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['turnModel', this.setting.turnModel, 'integer']);
-                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['lineHeight', this.setting.lineHeight, 'integer']);
-                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['dayNight', this.setting.dayNight, 'string']);
-                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['dayNightIcon', this.setting.dayNightIcon, 'string']);
-                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['bgColor', base64.encode(JSON.stringify(this.setting.bgColor)), 'json']);
-                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['color', base64.encode(JSON.stringify(this.setting.color)), 'json']);
-                    app.webSql.insert(app.config.webSql.setting, ['key', 'value', 'type'], ['opacity', base64.encode(JSON.stringify(this.setting.opacity)), 'json']);
+                    app.webSql.insert(app.config.webSql.setting, {
+                        key: 'brightness',
+                        value: this.setting.brightness,
+                        type: 'integer'
+                    });
+                    app.webSql.insert(app.config.webSql.setting, {
+                        key: 'fontSize',
+                        value: this.setting.fontSize,
+                        type: 'integer'
+                    });
+                    app.webSql.insert(app.config.webSql.setting, {
+                        key: 'fontStyle',
+                        value: this.setting.fontStyle,
+                        type: 'string'
+                    });
+                    app.webSql.insert(app.config.webSql.setting, {
+                        key: 'turnModel',
+                        value: this.setting.turnModel,
+                        type: 'integer'
+                    });
+                    app.webSql.insert(app.config.webSql.setting, {
+                        key: 'lineHeight',
+                        value: this.setting.lineHeight,
+                        type: 'integer'
+                    });
+                    app.webSql.insert(app.config.webSql.setting, {
+                        key: 'dayNight',
+                        value: this.setting.dayNight,
+                        type: 'string'
+                    });
+                    app.webSql.insert(app.config.webSql.setting, {
+                        key: 'dayNightIcon',
+                        value: this.setting.dayNightIcon,
+                        type: 'string'
+                    });
+                    app.webSql.insert(app.config.webSql.setting, {
+                        key: 'bgColor',
+                        value: base64.encode(JSON.stringify(this.setting.bgColor)),
+                        type: 'json'
+                    });
+                    app.webSql.insert(app.config.webSql.setting, {
+                        key: 'color',
+                        value: base64.encode(JSON.stringify(this.setting.color)),
+                        type: 'json'
+                    });
+                    app.webSql.insert(app.config.webSql.setting, {
+                        key: 'opacity',
+                        value: base64.encode(JSON.stringify(this.setting.opacity)),
+                        type: 'json'
+                    });
                 }
             });
         },
         mounted(){
-            // 章节目录
-            this.getChapterCatalogData(1);
+            // 目录
+            this.getCatalogData(1);
+            // 书签
+            this.getMarkData();
 
             // 章节信息
 //            this.getChapterData();    // range组件初始化change会加载数据
@@ -753,7 +866,7 @@
 
     .reader {
         font-family: PingFangSC-Regular;
-        transition: all 1s ease;
+        transition: all .5s ease;
     }
 
     .reader .vux-header {
@@ -776,45 +889,45 @@
         float: right;
     }
 
-    .reader .main .title, .reader .main .status {
+    .reader .chapter .title, .reader .chapter .status {
         letter-spacing: 0;
         font-size: 13px;
         position: fixed;
     }
 
-    .reader .main .content {
+    .reader .chapter .content {
         padding-top: 46px;
         text-indent: 2em;
         letter-spacing: 1px;
     }
 
-    .reader .popup-catalog .weui-cell .vux-label {
+    .reader ~ .popup-catalog .weui-cell .vux-label {
         font-size: 14px;
     }
 
-    .reader .popup-catalog .iconfont {
+    .reader ~ .popup-catalog .iconfont {
         font-size: 16px;
     }
 
-    .reader .popup-progress .weui-cell {
+    .reader ~ .popup-progress .weui-cell {
         height: 36px;
     }
 
-    .reader .popup-progress .weui-cell .range-bar {
+    .reader ~ .popup-progress .weui-cell .range-bar {
         max-width: 235px;
     }
 
-    .reader .popup-progress .range-min {
+    .reader ~ .popup-progress .range-min {
         width: 36px;
         left: -48px;
     }
 
-    .reader .popup-progress .range-max {
+    .reader ~ .popup-progress .range-max {
         width: 36px;
         right: -45px;
     }
 
-    .reader .popup-progress-tip {
+    .reader ~ .popup-progress-tip {
         bottom: 56px;
         width: 60%;
         margin: auto;
@@ -822,12 +935,12 @@
         right: 0;
     }
 
-    .reader .popup-setting .font i {
+    .reader ~ .popup-setting .font i {
         border-radius: 5px;
         margin: 0px 5px;
     }
 
-    .reader .popup-setting .turn i {
+    .reader ~ .popup-setting .turn i {
         display: inline-flex;
         border-radius: 5px;
         border: solid 1px;
@@ -835,7 +948,7 @@
         margin: 0px 6px;
     }
 
-    .reader .popup-setting .compose i {
+    .reader ~ .popup-setting .compose i {
         font-size: 18px;
         padding: 5px 10px;
         border: solid 1px;
@@ -844,7 +957,7 @@
         vertical-align: middle;
     }
 
-    .reader .popup-setting .background i {
+    .reader ~ .popup-setting .background i {
         display: inline-flex;
         border-radius: 4px;
         width: 44px;
@@ -853,13 +966,9 @@
         vertical-align: middle;
     }
 
-    .reader .popup-setting i:active {
+    .reader ~ .popup-setting i:active {
         background: #D8D8D8;
         box-shadow: 3px 3px 3px #c7c7c7;
-    }
-
-    .setting-active {
-        background-color: #D8D8D8;
     }
 
     .reader .actionsheet-more .weui-actionsheet__cell {
@@ -870,16 +979,16 @@
         font-size: 16px;
     }
 
-    .reader .popup-download, .reader .popup-reward {
+    .reader ~ .popup-download, .reader .popup-reward {
         background-color: #FFFFFF;
     }
 
-    .reader .popup-download span {
+    .reader ~ .popup-download span {
         display: block;
         line-height: 30px;
     }
 
-    .reader .popup-reward div .coin {
+    .reader ~ .popup-reward div .coin {
         display: inline-block;
         padding: 5px 20px;
         border: solid 1px #57606A;
@@ -888,14 +997,18 @@
         font-size: 16px;
     }
 
-    .reader .popup-reward .vux-x-input {
+    .reader ~ .popup-reward .vux-x-input {
         font-size: 14px;
     }
 
-    .reader .status i {
+    .reader ~ .status i {
         font-size: 18px;
         opacity: 0.56;
         border-radius: 2px;
+    }
+
+    .setting-active {
+        background-color: #D8D8D8;
     }
 
     .pull-to-refresh-layer {

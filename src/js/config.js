@@ -13,6 +13,7 @@ export default {
             screen: 0,
             display: 0
         },
+        signTime: 300000,
         codeTime: 120,
         server: 'http://api.lveshu.com/',
         debug: true
@@ -20,7 +21,9 @@ export default {
     webSql: {
         shelf: 'shelf',
         chapter: 'chapter',
-        setting: 'setting'
+        setting: 'setting',
+        sign: 'sign',
+        mark: 'mark'
     },
     api: {
         focus: 'index/focus',

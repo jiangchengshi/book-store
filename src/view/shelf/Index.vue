@@ -23,7 +23,7 @@
             }
         },
         methods: {
-            initLocalBook(){
+            getBookData(){
                 // 1. 本地=> 获取书架书籍
 //                app.webSql.query(app.config.webSql.shelf, {}, {}, (rows) => {
 //                    if (rows && rows.length <= 0) {
@@ -97,7 +97,9 @@
             });
         },
         mounted(){
-            this.initLocalBook();
+            console.log('shelf.index');
+            console.log(JSON.stringify(this.$store.state.user));
+            this.getBookData();
         }
     }
 </script>

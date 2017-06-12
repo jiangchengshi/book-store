@@ -22,6 +22,7 @@ const ShelfIndex = resolve => require(['../view/shelf/Index.vue'], resolve);
 const Reader = resolve => require(['../view/reader/Reader.vue'], resolve);
 const Search = resolve => require(['../view/search/Search.vue'], resolve);
 const Mine = resolve => require(['../view/mine/Mine.vue'], resolve);
+const MineIndex = resolve => require(['../view/mine/Index.vue'], resolve);
 const Sign = resolve => require(['../view/sign/Sign.vue'], resolve);
 const SignIn = resolve => require(['../view/sign/In.vue'], resolve);
 const SignUp = resolve => require(['../view/sign/Up.vue'], resolve);
@@ -107,7 +108,13 @@ const routes = [
     },
     {
         path: '/mine',
-        component: Mine
+        component: Mine,
+        children: [
+            {
+                path: 'index',
+                component: MineIndex
+            }
+        ]
     },
     {
         path: '/sign',
@@ -137,20 +144,46 @@ vueRouter.beforeEach((to, from, next) => {
     // Loading start...
     app.store.commit('updateLoading', true);
 
-    // 首页跳转
+    // 特殊路由跳转处理
     switch (to.path) {
         case '/mall':
             next('/mall/index');
             break;
         case '/shelf':
-            next('/shelf/index');
+        case '/mine':
+            // 登录检查：获取websql中 uid
+            app.webSql.query(app.config.webSql.sign, {}, {}, (rows) => {
+                if (rows && rows.length > 0) {
+                    let row = rows.item(0);
+                    if (new Date().getTime() - new Date(row.time).getTime() < app.config.setting.signTime) {   // 5分钟
+                        app.webSql.update(app.config.webSql.sign, {
+                            time: new Date()
+                        }, {
+                            id: row.id
+                        }, function () {
+                            // 更新 store中 uid
+                            app.store.commit('updateUser', {
+                                uid: row.id,
+                                egold: row.egold
+                            });
+
+                            next(to.path + '/index');
+                        })
+                    } else {
+                        app.webSql.delete(app.config.webSql.sign, {
+                            id: row.id
+                        }, function () {
+                            next(to.path + '/index');
+                        });
+                    }
+                } else {
+                    next(to.path + '/index');
+                }
+            });
             break;
-        case '/sign':
-            next('/sign/in');
-            break;
-        default:
-            next();
     }
+
+    next();
 });
 
 vueRouter.afterEach((router) => {

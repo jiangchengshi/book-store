@@ -47,10 +47,12 @@ const initVue = function () {
         store,
         render: h => h(App)
     }).$mount('#app');
+};
 
-    // webSql
+const initWebSql = function () {
+    // 打开/创建 webSql
     webSql.open();
-    // webSql.create("shelf", {
+    // webSql.create(app.config.webSql.shelf, { // 书架
     //     // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
     //     articleid: 'INTEGER',
     //     articlename: 'TEXT',
@@ -58,19 +60,32 @@ const initVue = function () {
     //     author: 'TEXT',
     //     time: 'TIMESTAMP'
     // });
-    webSql.create("setting", {
+    webSql.create(app.config.webSql.setting, {  // 设置
         // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
         key: 'TEXT',
         value: 'TEXT',
         type: 'TEXT'
     });
-    webSql.create("chapter", {
+    webSql.create(app.config.webSql.chapter, {  // 章节
+        // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
+        articleid: 'INTEGER',
+        articlename: 'TEXT',
+        content: 'BLOB'
+    });
+    webSql.create(app.config.webSql.sign, {  // 登录用户
         // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
         id: 'INTEGER',
-        articlename: 'TEXT',
-        content: 'BLOB',
-        mark: 'INTEGER'   // 0-未添加书签；1-已添加书签
-    })
+        egold: 'INTEGER',
+        time: 'TIMESTAMP'
+    });
+    webSql.create(app.config.webSql.mark, {  // 书签
+        // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
+        id: 'INTEGER',
+        translateX: 'INTEGER',
+        name: 'TEXT',
+        content: 'TEXT',
+        time: 'TIMESTAMP'
+    });
 };
 
 if (navigator.userAgent.indexOf("Html5Plus") < 0) { //不支持5+ API
@@ -88,10 +103,11 @@ if (navigator.userAgent.indexOf("Html5Plus") < 0) { //不支持5+ API
         }
     });
 
+    // 初始化WebSql
+    initWebSql();
+
     // 初始化Vue
     initVue();
-
-    console.log(app.config.setting);
 } else { //支持5+ API
     plusready(() => {
         Object.assign(config.setting, {
@@ -109,6 +125,9 @@ if (navigator.userAgent.indexOf("Html5Plus") < 0) { //不支持5+ API
                 searchbar: 44
             }
         });
+
+        // 初始化WebSql
+        initWebSql();
 
         // 初始化Vue
         initVue();

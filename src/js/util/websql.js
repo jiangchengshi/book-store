@@ -13,11 +13,8 @@ const dbSize = 10 * 1024 * 1024;
 let db = null;
 
 export default {
-    open(){
-        /*数据库有就打开 没有就创建*/
-        db = window.openDatabase(dbName, dbVersion, dbDesc, dbSize, function (e) {
-            app.log.info(e);
-        });
+    open(){ // 数据库有就打开 没有就创建
+        db = window.openDatabase(dbName, dbVersion, dbDesc, dbSize);
     },
     create(table, column){
         let columnStr = "";
@@ -56,15 +53,16 @@ export default {
                 });
         });
     },
-    insert(table, columnArr, dataArr, callback){
-        let columnStr = "", paramStr = "";
-        columnArr.forEach(function (col, i) {
+    insert(table, data, callback){
+        let columnStr = "", paramStr = "", dataArr = [];
+        Object.keys(data).forEach(function (col, i) {
             if (i > 0) {
                 columnStr += ", ";
                 paramStr += ",";
             }
             columnStr += col;
             paramStr += "?";
+            dataArr.push(data[col]);
         });
         let sql = "INSERT INTO " + table + "(" + columnStr + ") VALUES(" + paramStr + ")";
         db.transaction(function (ctx) {
