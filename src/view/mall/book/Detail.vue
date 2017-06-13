@@ -86,6 +86,8 @@
 
         <!-- 章节购买： -->
         <popup v-model="display.buy" class="popup-buy">
+            <cell title="章节购买"
+                  style="font-family: PingFangSC-Regular;font-size: 20px;color: #162636;border-bottom: solid 1px #EDEDED;"></cell>
             <div style="padding: 10px 0px 20px 10px;">
                 <span style="display: block;font-family: PingFangSC-Regular;font-size: 15px;color: #162636;padding-bottom: 10px;">
                     您将从第 <label>10</label> 章开始购买
@@ -117,11 +119,42 @@
                 确定购买
             </x-button>
         </popup>
+        <!-- 章节购买：批量 -->
+        <popup v-model="display.buyBatch" class="popup-buyBatch">
+            <cell title="批量购买"
+                  style="font-family: PingFangSC-Regular;font-size: 20px;color: #162636;border-bottom: solid 1px #EDEDED;">
+                <i class="iconfont icon-iconjiantou-copy" slot="icon" @click="display.buy=true;display.buyBatch=false;">&nbsp;&nbsp;</i>
+            </cell>
+            <div class="buyNum" style="padding: 10px 0px 40px 10px;">
+                <span style="display: block;font-family: PingFangSC-Regular;font-size: 15px;color: #162636;padding-bottom: 10px;">
+                    购买章节数：
+                </span>
+                <x-input title="" v-model="buyNum" placeholder="输入想要购买的章节数"></x-input>
+                <span style="display: block;font-family: PingFangSC-Regular;font-size: 15px;color: #162636;float: right;padding-right: 15px;">
+                    剩余：<label>485</label> 章
+                </span>
+            </div>
+            <group>
+                <cell title="当前余额">{{$store.state.user.egold}} 阅币</cell>
+                <cell title="应付总额">
+                    <label style="color: #EE4D22;">123阅币</label>
+                </cell>
+            </group>
+            <div style="padding: 20px 0px 10px;">
+                <div style="opacity: 0.35;font-family: PingFangSC-Light;font-size: 10px;color: #162636;padding: 5px;">
+                    1、其中免费的10章，不会重复扣费
+                </div>
+            </div>
+            <x-button type="primary" action-type="button"
+                      style="background: #35B4EB;border-radius: 2px;margin-top: 10px;" @click.native="clickBuy">
+                确定购买
+            </x-button>
+        </popup>
     </div>
 </template>
 
 <script>
-    import {Group, Cell, CellBox, XButton, Rater, Scroller, Popup} from 'vux';
+    import {Group, Cell, CellBox, XInput, XButton, Rater, Scroller, Popup} from 'vux';
     import CListView from '../../components/ListView.vue';
 
     export default {
@@ -133,12 +166,13 @@
                 publicList: [],
                 buyNum: 0,
                 display: {
-                    buy: false
+                    buy: false,
+                    buyBatch: false
                 }
             }
         },
         components: {
-            Group, Cell, CellBox, XButton, Rater, Scroller, Popup, CListView
+            Group, Cell, CellBox, XInput, XButton, Rater, Scroller, Popup, CListView
         },
         methods: {
             getBookData(){
@@ -238,7 +272,8 @@
 
                 // 批量输入章节
                 if (e.target.dataset.buyNum == 0) {
-
+                    this.display.buyBatch = true;
+                    this.display.buy = false;
                 }
             },
             clickBuy(){
@@ -295,5 +330,15 @@
     .mall-book-detail .popup-buy .c-active {
         background: #35B4EB;
         border-radius: 8px;
+    }
+
+    .mall-book-detail .popup-buyBatch .weui-input {
+        border: 1px solid #C1CDD6;
+        border-radius: 8px;
+        height: 40px;
+    }
+
+    .mall-book-detail .popup-buyBatch .buyNum .weui-cell:before {
+        border: initial;
     }
 </style>
