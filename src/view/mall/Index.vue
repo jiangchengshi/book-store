@@ -2,7 +2,7 @@
     <div class="shelf-index" :style="{height:height+'px'}">
         <scroller :on-infinite="handleInfinite" :height="height+''">
             <!-- 轮播 -->
-            <c-swipe :auto="true" :loop="true" :list="data.swipe"></c-swipe>
+            <swiper :auto="true" :loop="true" :list="data.swiper"></swiper>
             <!-- 栏目导航 -->
             <div class="navigator" v-if="data.navigator.length>=5">
                 <a @click="handleNavigator('book/new')">
@@ -28,18 +28,18 @@
             </div>
             <!-- 推广展示 -->
             <div class="expand" v-if="data.expand.length>=3">
-                <div class="left">
+                <div class="left" @click="handleExpand(data.expand[0].id)">
                     <span class="name">{{data.expand[0].name}}</span>
                     <span class="desc">{{data.expand[0].desc}}</span>
                     <img :src="data.expand[0].cover">
                 </div>
                 <div class="right">
-                    <div class="recommend">
+                    <div class="recommend" @click="handleExpand(data.expand[1].id)">
                         <span class="name">{{data.expand[1].name}}</span>
                         <span class="desc">{{data.expand[1].desc}}</span>
                         <img :src="data.expand[1].cover">
                     </div>
-                    <div class="free">
+                    <div class="free" @click="handleExpand(data.expand[2].id)">
                         <span class="name">{{data.expand[2].name}}</span>
                         <span class="desc">{{data.expand[2].desc}}</span>
                         <img :src="data.expand[2].cover">
@@ -50,11 +50,11 @@
             <div class="recommend" v-for="(recommend,index) in data.recommend" :key="index">
                 <c-list-view type="book" :list="recommend.list" style="margin: 10px 0px;"></c-list-view>
                 <card style="padding: 5px;">
-                    <div slot="content" style="padding-left: 5px;" @click="handleClickTopic(recommend.topic.id)">
+                    <div slot="content" style="padding-left: 5px;" @click="handleTopic(recommend.topic.id)">
                         <p style="font-size: 14px;line-height: 20px;">{{recommend.topic.name}}</p>
                         <p style="font-size: 12px;color:#828181;">{{recommend.topic.desc}}</p>
                     </div>
-                    <img slot="footer" :src="recommend.topic.cover" @click="handleClickTopic(recommend.topic.id)"
+                    <img slot="footer" :src="recommend.topic.cover" @click="handleTopic(recommend.topic.id)"
                          style="display:block;width: 98%;margin: 5px auto 0px;">
                 </card>
             </div>
@@ -63,8 +63,7 @@
 </template>
 
 <script>
-    import {ViewBox, Panel, Card} from 'vux';
-    import CSwipe from '../components/Swipe.vue';
+    import {Swiper, Panel, Card} from 'vux';
     import CListView from '../components/ListView.vue';
 
     export default {
@@ -73,7 +72,7 @@
                 height: app.config.setting.height.display - app.config.setting.height.header - app.config.setting.height.tabbar,
                 page: 1,
                 data: {
-                    swipe: [],
+                    swiper: [],
                     navigator: [],
                     expand: [],
                     recommend: []
@@ -81,7 +80,7 @@
             }
         },
         components: {
-            ViewBox, Panel, Card, CSwipe, CListView
+            Swiper, Panel, Card, CListView
         },
         methods: {
             getSwipeData(){ // 轮播数据
@@ -89,10 +88,10 @@
                     if (resp.status == 200) {
                         let data = resp.data.result;
                         if (data) {
-                            this.data.swipe = data.map((item, index) => ({
+                            this.data.swiper = data.map((item, index) => ({
                                 title: item.name,
                                 img: item.image,
-                                url: ''
+                                url: '/mall/book/detail?id=' + item.id
                             }));
                         }
                     }
@@ -125,7 +124,7 @@
                 app.ajax.get(app.config.api.recommend + this.page, {}, (resp) => {
                     if (resp.status == 200) {
                         let data = resp.data.result;
-                        if (data && data.length > 1) {
+                        if (data && data.length > 0) {
                             this.data.recommend.push({
                                 topic: data.pop(),
                                 list: data
@@ -135,10 +134,16 @@
                 }, (err) => {
                 });
             },
+            handleSwiper(id){
+                console.log(id);
+            },
             handleNavigator(path){
                 this.$router.push({path: path});
             },
-            handleClickTopic(id){
+            handleExpand(id){
+                this.$router.push({path: '/mall/book/detail', query: {id: id}});
+            },
+            handleTopic(id){
                 this.$router.push({path: '/mall/topic/detail', query: {id: id}});
             },
             handleInfinite(done){
@@ -177,10 +182,11 @@
 </script>
 
 <style>
-    .shelf-index ._v-container{
+    .shelf-index ._v-container {
         top: 46px;
         position: fixed;
     }
+
     /* navigator */
     .shelf-index .navigator {
         display: flex;

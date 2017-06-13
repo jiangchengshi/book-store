@@ -97,8 +97,6 @@
             });
         },
         mounted(){
-            console.log('shelf.index');
-            console.log(JSON.stringify(this.$store.state.user));
             this.getBookData();
         }
     }

@@ -1,65 +1,30 @@
 <template>
-    <div ref="welcome">
-        <!--<slider ref="slider" :width="width+'px'" :height="height+'px'" :interval="3000" :speed="600" :auto="true"-->
-                <!--:control-btn="false" animation="fade">-->
-            <!--<slider-item>-->
-                <!--<div class="item-logo" style="background-color: #02C1ED;">-->
-                    <!--<a href="#">BOOK</a>-->
-                    <!--<div id="slider-1" class="animate">-->
-                        <!--<h2>小巧高能</h2>-->
-                        <!--<li>几十K的JS和CSS</li>-->
-                        <!--<li>上百种控件样式和模板</li>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</slider-item>-->
-            <!--<slider-item>-->
-                <!--<div class="item-logo" style="background-color: #67C962;">-->
-                    <!--<a href="#">BOOK</a>-->
-                    <!--<div id="slider-2" class="animate">-->
-                        <!--<h2>流畅体验</h2>-->
-                        <!--<li>下拉刷新、转场动画</li>-->
-                        <!--<li>整个世界都流畅了</li>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</slider-item>-->
-            <!--<slider-item>-->
-                <!--<div class="item-logo" style="background-color: #FCD208;">-->
-                    <!--<a href="#">BOOK</a>-->
-                    <!--<div class="animate">-->
-                        <!--<button class="mui-btn mui-btn-warning mui-btn-outlined" @tap.stop="handleTapExpr">立即体验-->
-                        <!--</button>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</slider-item>-->
-        <!--</slider>-->
-    </div>
+    <swiper auto loop :height="height+'px'">
+        <swiper-item><img src="../image/guide1.png" :style="{height:height+'px'}" @click="handleClick"></swiper-item>
+        <swiper-item><img src="../image/guide2.png" :style="{height:height+'px'}"></swiper-item>
+        <swiper-item><img src="../image/guide3.png" :style="{height:height+'px'}"></swiper-item>
+    </swiper>
 </template>
 
 <script>
-//    import {Slider, SliderItem} from "vue-easy-slider";
+    import {Swiper, SwiperItem} from "vux";
 
     export default {
         data () {
             return {
-                width: 0,
-                height: 0
+                width: app.config.setting.width.screen,
+                height: app.config.setting.height.screen
             }
         },
-//        components: {
-//            Slider, SliderItem
-//        },
+        components: {
+            Swiper, SwiperItem
+        },
         methods: {
-            handleTapExpr(e){
-                // 设置 欢迎 标识
-                app.service.setWelcome();
-
-                this.$router.push({path: 'shelf'});
-            },
-            handleSwipeLeft(e){
-                this.$refs.slider.next();
-            },
-            handleSwipeRight(e){
-                this.$refs.slider.prev();
+            handleClick(e){
+                if ((this.height - e.y) < app.config.setting.height.tabbar) {
+                    this.$store.commit('updateWelcome', true);
+                    this.$router.push({path: '/shelf'});
+                }
             }
         },
         created(){
@@ -67,14 +32,6 @@
             if (app.config.isApp) {
                 plus.navigator.setFullscreen(true);
             }
-
-            this.width = app.config.device.screenWidth;
-            this.height = app.config.device.screenHeight;
-        },
-        mounted(){
-            // 监听手势滑动
-//            this.$refs.welcome.addEventListener('swipeleft', this.handleSwipeLeft);
-//            this.$refs.welcome.addEventListener('swiperight', this.handleSwipeRight);
         }
     }
 </script>

@@ -6,9 +6,9 @@
             <grid-item :link="'/mall/classify/detail?id='+child.id+'&name='+child.name" v-for="(child, index) in data.children" :key="index">
                 <span style="float: left;padding-right: 20px;">
                     <label style="color: #162636;">{{child.name}}</label><br>
-                    <label style="color: #989A9C;">{{child.num}}本</label>
+                    <label style="color: #989A9C;font-size: 13px;">{{child.num}}本</label>
                 </span>
-                <img style="width: 30%;" :src="child.cover"/>
+                <img style="width: 40%;" :src="child.cover"/>
             </grid-item>
         </grid>
         </template>

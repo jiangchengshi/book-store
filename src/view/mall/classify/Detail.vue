@@ -1,7 +1,7 @@
 <template>
     <div class="mall-classify-detail">
         <div style="font-family: PingFangSC-Light;font-size: 15px;color: #828181;padding: 10px;">
-            此分类共收录 {{dataList.length}} 本书籍
+            此分类共收录 <label style="color: #64c4ed;">{{dataList.length}}</label> 本书籍
         </div>
         <c-list-view type="book" :list="dataList"></c-list-view>
     </div>

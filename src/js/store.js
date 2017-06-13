@@ -7,6 +7,7 @@ const store = new Vuex.Store({
     state: {
         loading: false,
         login: false,
+        welcome: false,
         header: {
             title: '首页',
             backText: '',
@@ -30,6 +31,9 @@ const store = new Vuex.Store({
         },
         updateLogin(state, login){
             state.login = login;
+        },
+        updateWelcome(state, welcome){
+            state.welcome = welcome;
         },
         updateHeader(state, payload){
             Object.assign(state.header, {

@@ -28,7 +28,7 @@
                         <x-button type="primary" plain mini @click.native="handleOrder">续订</x-button>
                     </slot>
                 </cell>
-                <x-switch title="到期自动续订" v-model="show.renew" style="font-size: 15px;"></x-switch>
+                <x-switch title="到期自动续订" v-model="renew" style="font-size: 15px;"></x-switch>
             </template>
         </group>
         <c-list-view type="book" :list="dataList"></c-list-view>
@@ -47,8 +47,8 @@
             return {
                 monthly: {},
                 dataList: [],
+                renew: true,
                 show: {
-                    renew: true,
                     dialog: false
                 }
             }
@@ -86,8 +86,10 @@
             handleOrder(e){
                 this.show.dialog = true;
             },
-            handleConfirm(){
+            handleConfirm(renew){
                 // 订阅 包月包
+                console.log('续订：' + renew);
+                this.renew = renew;
 
                 this.show.dialog = false;
                 this.$vux.toast.show({

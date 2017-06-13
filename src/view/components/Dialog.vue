@@ -61,7 +61,7 @@
                 this.$emit('cancel');
             },
             handleConfirm(){
-                this.$emit('confirm');
+                this.$emit('confirm', this.renew.length > 0 ? true : false);
             }
         },
         computed: {

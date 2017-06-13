@@ -61,18 +61,67 @@
                 </label>
             </cell>
         </group>
-        <group>
+        <group style="margin-top: 10px;">
             <cell :title="'评论(' + detail.pinfen + ')'" value="全部评论" is-link></cell>
-            <c-list-view type="review" :list="review"></c-list-view>
+            <c-list-view type="review" :list="reviewList"></c-list-view>
             <cell style="text-align: center;">
-                <a slot="inline-desc">立即评论</a>
+                <a slot="inline-desc" style="color: #35B4EB;" @click="handleReview">立即评论</a>
             </cell>
         </group>
+
+        <div style="background: #FFFFFF;color: #162636;padding: 10px 0px 10px 10px;margin-top: 10px;border-bottom: solid 1px #D9D9D9;">
+            大家都在看
+        </div>
+        <scroller lock-y :scrollbar-x=false>
+            <div class="public" v-if="publicList.length>0">
+                <img :src="pub.image" v-for="(pub, index) in publicList" :key="index" @click="handlePublic(pub.id)">
+            </div>
+            <div v-else style="padding: 10px;opacity: 0.26;color: #162636;">暂时还没有推荐</div>
+        </scroller>
+
+        <div style="font-family: PingFangSC-Regular;font-size: 12px;color: #35B4EB;padding: 20px 0px;text-align: center;"
+             @click="handleFeedback">
+            意见反馈
+        </div>
+
+        <!-- 章节购买： -->
+        <popup v-model="display.buy" class="popup-buy">
+            <div style="padding: 10px 0px 20px 10px;">
+                <span style="display: block;font-family: PingFangSC-Regular;font-size: 15px;color: #162636;padding-bottom: 10px;">
+                    您将从第 <label>10</label> 章开始购买
+                </span>
+                <label class="buyNum" @click="choiceBuyNum" :class="{'c-active': buyNum==10}"
+                       data-buy-num="10">后10章</label>
+                <label class="buyNum" @click="choiceBuyNum" :class="{'c-active': buyNum==50}"
+                       data-buy-num="50">后50章</label>
+                <label class="buyNum" @click="choiceBuyNum" :class="{'c-active': buyNum==100}"
+                       data-buy-num="100">后100章</label>
+                <label class="buyNum" @click="choiceBuyNum" data-buy-num="0">更多章节</label>
+            </div>
+            <group>
+                <cell title="当前余额">{{$store.state.user.egold}} 阅币</cell>
+                <cell title="应付总额">
+                    <label style="color: #EE4D22;">123阅币</label>
+                </cell>
+            </group>
+            <div style="padding: 20px 0px 10px;">
+                <div style="opacity: 0.35;font-family: PingFangSC-Light;font-size: 10px;color: #162636;padding: 5px;">
+                    1、批量购买章节是付费章节,如期间有免费章节和购买章节,下载时将一并下载
+                </div>
+                <div style="opacity: 0.35;font-family: PingFangSC-Light;font-size: 10px;color: #162636;padding: 5px;">
+                    2、免费章节及已购买章节不会重复扣费,请放心购买。
+                </div>
+            </div>
+            <x-button type="primary" action-type="button"
+                      style="background: #35B4EB;border-radius: 2px;margin-top: 10px;" @click.native="clickBuy">
+                确定购买
+            </x-button>
+        </popup>
     </div>
 </template>
 
 <script>
-    import {Group, Cell, CellBox, XButton, Rater} from 'vux';
+    import {Group, Cell, CellBox, XButton, Rater, Scroller, Popup} from 'vux';
     import CListView from '../../components/ListView.vue';
 
     export default {
@@ -80,11 +129,16 @@
             return {
                 score: 2,
                 detail: {},
-                review: []
+                reviewList: [],
+                publicList: [],
+                buyNum: 0,
+                display: {
+                    buy: false
+                }
             }
         },
         components: {
-            Group, Cell, CellBox, XButton, Rater, CListView
+            Group, Cell, CellBox, XButton, Rater, Scroller, Popup, CListView
         },
         methods: {
             getBookData(){
@@ -108,7 +162,19 @@
                     if (resp.status == 200) {
                         let data = resp.data.result;
                         if (data) {
-                            this.review = data;
+                            this.reviewList = data;
+                        }
+                    }
+                }, (err) => {
+                });
+            },
+            getRecommendData(page){ // 推荐数据
+                app.ajax.get(app.config.api.recommend + page, {}, (resp) => {
+                    if (resp.status == 200) {
+                        let data = resp.data.result;
+                        if (data && data.length > 0) {
+                            data.pop();
+                            this.publicList = data;
                         }
                     }
                 }, (err) => {
@@ -121,13 +187,19 @@
             },
             handleBuy(){
                 if (this.$store.state.user.uid <= 0) {
-                    this.$router.push({path: '/sign'});
+                    this.$router.push({path: '/sign/in'});
                     return;
                 }
-                this.$vux.toast.show({
-                    text: '购买成功',
-                    type: 'info'
-                })
+                this.display.buy = true;
+            },
+            handleReview(){
+
+            },
+            handlePublic(id){
+                this.$router.push({path: '/mall/book/detail', query: {id: id}});
+            },
+            handleFeedback(){
+
             },
             addShelf(func){
                 // 1. 本地=> 更新websql： 书架
@@ -160,6 +232,17 @@
                     }
                 }, (err) => {
                 });
+            },
+            choiceBuyNum(e){
+                this.buyNum = Number(e.target.dataset.buyNum);
+
+                // 批量输入章节
+                if (e.target.dataset.buyNum == 0) {
+
+                }
+            },
+            clickBuy(){
+
             }
         },
         created(){
@@ -188,5 +271,29 @@
         line-height: 25px;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    .mall-book-detail .xs-container {
+        background: #FFFFFF;
+    }
+
+    .mall-book-detail .vux-popup-dialog {
+        background: #FFFFFF;
+    }
+
+    .mall-book-detail .popup-buy .buyNum {
+        display: inline-block;
+        width: 140px;
+        padding: 5px;
+        margin: 8px 10px;
+        border: solid 1px #C1CDD6;
+        border-radius: 8px;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .mall-book-detail .popup-buy .c-active {
+        background: #35B4EB;
+        border-radius: 8px;
     }
 </style>

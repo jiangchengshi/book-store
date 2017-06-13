@@ -4,6 +4,7 @@ import VueRouter from "vue-router";
 Vue.use(VueRouter);
 
 // Views
+const Welcome = resolve => require(['../view/Welcome.vue'], resolve);
 const Mall = resolve => require(['../view/mall/Mall.vue'], resolve);
 const MallIndex = resolve => require(['../view/mall/Index.vue'], resolve);
 const MallBookNew = resolve => require(['../view/mall/book/New.vue'], resolve);
@@ -31,8 +32,8 @@ const SignPass = resolve => require(['../view/sign/Pass.vue'], resolve);
 // routes
 const routes = [
     {
-        path: '/',
-        redirect: '/shelf'
+        path: '/welcome',
+        component: Welcome,
     },
     {
         path: '/mall',
@@ -146,6 +147,13 @@ vueRouter.beforeEach((to, from, next) => {
 
     // 特殊路由跳转处理
     switch (to.path) {
+        case '/':
+            if (app.store.state.welcome) {
+                next('/shelf');
+            } else {
+                next('/welcome');
+            }
+            break;
         case '/mall':
             next('/mall/index');
             break;

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="reader" @touchstart="touchStart" @touchend="touchEnd" @touchmove="touchMove" ref="reader">
-            <div class="pull-to-refresh-layer">
+            <div class="pull-layer">
                 <template v-if="content.mark">
                     <label style="display: block;line-height: 50px;">
                         继续向下拖动删除书签
@@ -173,15 +173,15 @@
                        @click="changeLineHeight"></i>
                 </cell>
                 <cell title="背景" primary="content" class="background">
-                    <i style="background: #FFFFFF;border: 1px solid #35B4EB;" data-background-color="#FFFFFF"
-                       @click="changeBackgroundColor"></i>
-                    <i style="background: #EFDBBC;border: 1px solid #D8D8D8;" data-background-color="#EFDBBC"
-                       @click="changeBackgroundColor"></i>
-                    <i style="background: #D6E8C8;border: 1px solid #D8D8D8;" data-background-color="#D6E8C8"
-                       @click="changeBackgroundColor"></i>
-                    <i style="background: #FCE2E2;border: 1px solid #D8D8D8;" data-background-color="#FCE2E2"
-                       @click="changeBackgroundColor"></i>
-                    <i class="iconfont icon-add" data-background-color="0" @click="changeBackgroundColor"
+                    <i style="background: #FFFFFF;border: 1px solid #35B4EB;" data-bg-color="#FFFFFF"
+                       @click="changeBgColor"></i>
+                    <i style="background: #EFDBBC;border: 1px solid #D8D8D8;" data-bg-color="#EFDBBC"
+                       @click="changeBgColor"></i>
+                    <i style="background: #D6E8C8;border: 1px solid #D8D8D8;" data-bg-color="#D6E8C8"
+                       @click="changeBgColor"></i>
+                    <i style="background: #FCE2E2;border: 1px solid #D8D8D8;" data-bg-color="#FCE2E2"
+                       @click="changeBgColor"></i>
+                    <i class="iconfont icon-add" data-bg-color="0" @click="changeBgColor"
                        style="width: initial;height:initial;font-size: 16px;padding: 4px 14px;border: solid 1px;"></i>
                 </cell>
             </group>
@@ -221,14 +221,17 @@
         <popup v-model="display.reward" class="popup-reward">
             <div style="padding: 10px 0px 20px 10px;">
                 <span style="display: block;font-family: PingFangSC-Regular;font-size: 14px;color: #162636;padding-bottom: 10px;">选择打赏金额</span>
-                <label class="coin">100阅币</label>
-                <label class="coin">500阅币</label>
-                <label class="coin">1000阅币</label>
-                <label class="coin">2000阅币</label>
-                <label class="coin">10000阅币</label>
+                <label class="coin" @click="choiceReward" :class="{'c-active': rewardCoin==100}" data-reward-coin="100">100阅币</label>
+                <label class="coin" @click="choiceReward" :class="{'c-active': rewardCoin==500}" data-reward-coin="500">500阅币</label>
+                <label class="coin" @click="choiceReward" :class="{'c-active': rewardCoin==1000}"
+                       data-reward-coin="1000">1000阅币</label>
+                <label class="coin" @click="choiceReward" :class="{'c-active': rewardCoin==2000}"
+                       data-reward-coin="2000">2000阅币</label>
+                <label class="coin" @click="choiceReward" :class="{'c-active': rewardCoin==10000}"
+                       data-reward-coin="10000">10000阅币</label>
             </div>
             <group>
-                <x-input title="其他金额" placeholder="输入具体金额打赏作者(单位：阅币)" v-model="data.reward.coin"></x-input>
+                <x-input title="其他金额" placeholder="输入具体金额打赏作者(单位：阅币)" v-model="rewardCoin"></x-input>
             </group>
             <x-button type="primary" action-type="button"
                       style="background: #35B4EB;border-radius: 7px;margin-top: 10px;"
@@ -313,10 +316,7 @@
                     }, {
                         label: "<i class='iconfont icon-fenxiang1'></i> &nbsp;分享本书",
                         value: 'share'
-                    }],
-                    reward: {
-                        coin: 0
-                    }
+                    }]
                 },
                 chapterId: {
                     cur: -1,
@@ -347,7 +347,8 @@
                     battery: 0,
                     time: '',
                     progress: 0
-                }
+                },
+                rewardCoin: 0
             }
         },
         components: {
@@ -504,6 +505,9 @@
                     type: 'info'
                 })
             },
+            choiceReward(e){
+                this.rewardCoin = Number(e.target.dataset.rewardCoin);
+            },
             clickReward(){
                 this.$vux.toast.show({
                     text: '打赏成功',
@@ -616,7 +620,7 @@
                     app.webSql.update(app.config.webSql.setting, {value: this.setting.lineHeight}, {key: 'lineHeight'});
                 }
             },
-            changeBackgroundColor(e){
+            changeBgColor(e){
                 if (e.target.dataset.bgColor == 0) {
                     console.log('more');
                 } else {
@@ -869,6 +873,16 @@
         transition: all .5s ease;
     }
 
+    .reader .pull-layer {
+        width: 100%;
+        height: 140px;
+        margin-top: -140px;
+        text-align: center;
+        font-size: 14px;
+        color: #AAA;
+        background: #D9DCE0;
+    }
+
     .reader .vux-header {
         width: 100%;
         position: absolute;
@@ -979,7 +993,7 @@
         font-size: 16px;
     }
 
-    .reader ~ .popup-download, .reader .popup-reward {
+    .reader ~ .popup-download, .reader ~ .popup-reward {
         background-color: #FFFFFF;
     }
 
@@ -991,7 +1005,7 @@
     .reader ~ .popup-reward div .coin {
         display: inline-block;
         padding: 5px 20px;
-        border: solid 1px #57606A;
+        border: solid 1px #C1CDD6;
         border-radius: 8px;
         margin: 8px 10px 8px 0px;
         font-size: 16px;
@@ -1007,17 +1021,12 @@
         border-radius: 2px;
     }
 
-    .setting-active {
+    .reader ~ .popup-setting .setting-active {
         background-color: #D8D8D8;
     }
 
-    .pull-to-refresh-layer {
-        width: 100%;
-        height: 140px;
-        margin-top: -140px;
-        text-align: center;
-        font-size: 14px;
-        color: #AAA;
-        background: #D9DCE0;
+    .reader ~ .popup-reward div .c-active {
+        background: #35B4EB;
+        border-radius: 8px;
     }
 </style>
