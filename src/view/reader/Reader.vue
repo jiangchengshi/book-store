@@ -16,10 +16,10 @@
                 </template>
             </div>
             <x-header v-show="$store.state.reader.header" title="" :left-options="{backText:''}"
-                      :right-options="{showMore: true}" @on-click-more="display.more=true"
+                      :right-options="{showMore: true}" @on-click-more="show.more=true"
                       :style="{backgroundColor: setting.bgColor.header, color: setting.color.header}">
-                <a class="iconfont icon-dashang2" slot="right" @click="display.reward = true"></a>
-                <a class="iconfont icon-xiazai" slot="right" @click="display.download = true"></a>
+                <a class="iconfont icon-dashang2" slot="right" @click="show.reward = true"></a>
+                <a class="iconfont icon-xiazai" slot="right" @click="show.download = true"></a>
                 <!--<a class="iconfont icon-shuqian_bookmark" slot="right"></a>-->
             </x-header>
             <div class="chapter" style="padding: 0px 10px;"
@@ -77,7 +77,7 @@
         </div>
 
         <!-- 目录：侧滑菜单 -->
-        <popup v-model="display.catalog" position="left" width="75%" class="popup-catalog">
+        <popup v-model="show.catalog" position="left" width="75%" class="popup-catalog">
             <div style="background-color: #FFFFFF;height: 46px; line-height: 46px; padding: 0px 10px;">
                 <span>{{data.chapter.articlename}}</span>
                 <span class="iconfont icon-paixu" style="float: right;"></span>
@@ -111,7 +111,7 @@
         </popup>
 
         <!-- 进度：滑块条 -->
-        <popup v-model="display.progress" class="popup-progress">
+        <popup v-model="show.progress" class="popup-progress">
             <group>
                 <cell primary="content">
                     <range :min="chapterId.min" :max="chapterId.max" minHTML="上一章" maxHTML="下一章"
@@ -120,7 +120,7 @@
             </group>
         </popup>
         <!-- 进度：章节信息 -->
-        <popup v-model="display.progress" class="popup-progress-tip" is-transparent>
+        <popup v-model="show.progress" class="popup-progress-tip" is-transparent>
             <div style="width: 95%;background-color:#fff;border-radius:5px;padding-top:10px; text-align: center;">
                 <span style="color: #162636;letter-spacing: 0;font-size: 14px;display: block;line-height: 20px;">
                     {{data.chapter.articlename}}
@@ -132,7 +132,7 @@
         </popup>
 
         <!-- 设置：亮度、字体、翻页、排版、背景色 -->
-        <popup v-model="display.setting" class="popup-setting">
+        <popup v-model="show.setting" class="popup-setting">
             <group>
                 <cell title="亮度" primary="content">
                     <range v-model="setting.brightness"
@@ -188,11 +188,11 @@
         </popup>
 
         <!-- 更多：操作菜单 -->
-        <actionsheet v-model="display.more" :menus="data.menuMore" class="actionsheet-more"
+        <actionsheet v-model="show.more" :menus="data.menuMore" class="actionsheet-more"
                      @on-click-menu="clickMore"></actionsheet>
 
         <!-- 下载：书籍购买下载 -->
-        <popup v-model="display.download" class="popup-download">
+        <popup v-model="show.download" class="popup-download">
             <img :src="data.book.cover"
                  style="width: 110px; height: 140px; position:absolute;bottom: 140px;left: 10px;border-radius: 5px;box-shadow: 0 3px 3px #c7c7c7;">
             <div style="padding:20px 0px 20px 140px; height: 80px; border-bottom: dotted 1px #BDBDBD;">
@@ -218,7 +218,7 @@
         </popup>
 
         <!-- 打赏： -->
-        <popup v-model="display.reward" class="popup-reward">
+        <popup v-model="show.reward" class="popup-reward">
             <div style="padding: 10px 0px 20px 10px;">
                 <span style="display: block;font-family: PingFangSC-Regular;font-size: 14px;color: #162636;padding-bottom: 10px;">选择打赏金额</span>
                 <label class="coin" @click="choiceReward" :class="{'c-active': rewardCoin==100}" data-reward-coin="100">100阅币</label>
@@ -266,7 +266,7 @@
                 width: app.config.setting.width.screen,
                 screenHeight: app.config.setting.height.screen,
                 contentHeight: app.config.setting.height.screen - app.config.setting.height.header - app.config.setting.height.tabbar,
-                display: {
+                show: {
                     more: false,
                     catalog: false,
                     progress: false,
@@ -516,11 +516,11 @@
             },
             clickTabbar(index){
                 if (index == 0) {
-                    this.display.catalog = true;
+                    this.show.catalog = true;
                 } else if (index == 1) {
-                    this.display.progress = true;
+                    this.show.progress = true;
                 } else if (index == 2) {
-                    this.display.setting = true;
+                    this.show.setting = true;
                 } else if (index == 3) {
                     let dayModel = this.setting.dayNight === '夜间' ? true : false;
                     this.setting.dayNight = dayModel ? '日间' : '夜间';

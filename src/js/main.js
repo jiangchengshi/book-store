@@ -72,7 +72,7 @@ const initWebSql = function () {
         articlename: 'TEXT',
         content: 'BLOB'
     });
-    webSql.create(app.config.webSql.sign, {  // 登录用户
+    webSql.create(app.config.webSql.login, {  // 登录用户
         // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
         id: 'INTEGER',
         egold: 'INTEGER',

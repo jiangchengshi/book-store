@@ -14,8 +14,10 @@
             <x-switch title="到期自动续订" v-model="renew" style="font-size: 15px;"></x-switch>
         </group>
         <c-list-view type="monthly" link="package" :list="dataList"></c-list-view>
-        <c-dialog type="monthly" :show="show.dialog" :data="monthly" @confirm="handleConfirm"
-                  @cancel="show.dialog=false"></c-dialog>
+
+        <!-- 订购/续订 -->
+        <c-dialog type="monthly" :show="show.order" :data="monthly" @confirm="handleConfirm"
+                  @cancel="show.order=false"></c-dialog>
     </div>
 </template>
 
@@ -31,7 +33,7 @@
                 dataList: [],
                 renew: true,
                 show: {
-                    dialog: false
+                    order: false
                 }
             }
         },
@@ -62,16 +64,16 @@
                 });
             },
             handleOrder(e){
-                this.show.dialog = true;
+                this.show.order = true;
             },
             handleConfirm(renew){
                 // 订阅 包月包
                 console.log('续订：' + renew);
                 this.renew = renew;
 
-                this.show.dialog = false;
+                this.show.order = false;
                 this.$vux.toast.show({
-                    text: '订阅成功',
+                    text: '订阅成功!',
                     isShowMask: true
                 });
             }

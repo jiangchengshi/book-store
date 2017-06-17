@@ -72,12 +72,18 @@
         <div style="background: #FFFFFF;color: #162636;padding: 10px 0px 10px 10px;margin-top: 10px;border-bottom: solid 1px #D9D9D9;">
             大家都在看
         </div>
-        <scroller lock-y :scrollbar-x=false>
-            <div class="public" v-if="publicList.length>0">
-                <img :src="pub.image" v-for="(pub, index) in publicList" :key="index" @click="handlePublic(pub.id)">
-            </div>
-            <div v-else style="padding: 10px;opacity: 0.26;color: #162636;">暂时还没有推荐</div>
-        </scroller>
+        <swiper loop v-if="publicList.length>0" @on-index-change="changePublic">
+            <swiper-item v-for="n in 3" :key="n">
+                <div v-for="(pub, index) in publicList" :key="index"
+                     style="margin: 20px 0px 10px 10px;display: inline-table;">
+                    <img :src="pub.image" style="width: 80px;height: 110px;" @click="handlePublic(pub.id)">
+                    <div style="font-size:12px;text-overflow: ellipsis;white-space: nowrap;width: 80px;overflow: hidden;">
+                        {{pub.name}}
+                    </div>
+                </div>
+            </swiper-item>
+        </swiper>
+        <div v-else style="padding: 10px;opacity: 0.26;color: #162636;">暂时还没有推荐</div>
 
         <div style="font-family: PingFangSC-Regular;font-size: 12px;color: #35B4EB;padding: 20px 0px;text-align: center;"
              @click="handleFeedback">
@@ -85,7 +91,7 @@
         </div>
 
         <!-- 章节购买： -->
-        <popup v-model="display.buy" class="popup-buy">
+        <popup v-model="show.buy" class="popup-buy">
             <cell title="章节购买"
                   style="font-family: PingFangSC-Regular;font-size: 20px;color: #162636;border-bottom: solid 1px #EDEDED;"></cell>
             <div style="padding: 10px 0px 20px 10px;">
@@ -115,15 +121,15 @@
                 </div>
             </div>
             <x-button type="primary" action-type="button"
-                      style="background: #35B4EB;border-radius: 2px;margin-top: 10px;" @click.native="clickBuy">
+                      style="background: #35B4EB;border-radius: 2px;margin-top: 10px;" @click.native="confirmBuy">
                 确定购买
             </x-button>
         </popup>
         <!-- 章节购买：批量 -->
-        <popup v-model="display.buyBatch" class="popup-buyBatch">
+        <popup v-model="show.buyBatch" class="popup-buyBatch">
             <cell title="批量购买"
                   style="font-family: PingFangSC-Regular;font-size: 20px;color: #162636;border-bottom: solid 1px #EDEDED;">
-                <i class="iconfont icon-iconjiantou-copy" slot="icon" @click="display.buy=true;display.buyBatch=false;">&nbsp;&nbsp;</i>
+                <i class="iconfont icon-iconjiantou-copy" slot="icon" @click="show.buy=true;show.buyBatch=false;">&nbsp;&nbsp;</i>
             </cell>
             <div class="buyNum" style="padding: 10px 0px 40px 10px;">
                 <span style="display: block;font-family: PingFangSC-Regular;font-size: 15px;color: #162636;padding-bottom: 10px;">
@@ -146,16 +152,21 @@
                 </div>
             </div>
             <x-button type="primary" action-type="button"
-                      style="background: #35B4EB;border-radius: 2px;margin-top: 10px;" @click.native="clickBuy">
+                      style="background: #35B4EB;border-radius: 2px;margin-top: 10px;" @click.native="confirmBuy">
                 确定购买
             </x-button>
         </popup>
+
+        <!-- 评论 -->
+        <c-dialog type="review" :show="show.review" :data="detail" @publish="publishReview"
+                  @cancel="show.review=false"></c-dialog>
     </div>
 </template>
 
 <script>
-    import {Group, Cell, CellBox, XInput, XButton, Rater, Scroller, Popup} from 'vux';
+    import {Group, Cell, CellBox, XInput, XButton, Rater, Popup, Swiper, SwiperItem} from 'vux';
     import CListView from '../../components/ListView.vue';
+    import CDialog from '../../components/Dialog.vue';
 
     export default {
         data () {
@@ -165,16 +176,22 @@
                 reviewList: [],
                 publicList: [],
                 buyNum: 0,
-                display: {
+                show: {
                     buy: false,
-                    buyBatch: false
+                    buyBatch: false,
+                    review: false
                 }
             }
         },
         components: {
-            Group, Cell, CellBox, XInput, XButton, Rater, Scroller, Popup, CListView
+            Group, Cell, CellBox, XInput, XButton, Rater, Popup, Swiper, SwiperItem, CListView, CDialog
         },
         methods: {
+            initData(){
+                this.getBookData();
+                this.getReviewData(1);
+                this.getRecommendData(1);
+            },
             getBookData(){
                 app.ajax.get(app.config.api.book.detail + this.$route.query.id, {}, (resp) => {
                     if (resp.status == 200) {
@@ -221,13 +238,17 @@
             },
             handleBuy(){
                 if (this.$store.state.user.uid <= 0) {
-                    this.$router.push({path: '/sign/in'});
+                    this.$router.push({path: '/entry/login'});
                     return;
                 }
-                this.display.buy = true;
+                this.show.buy = true;
             },
             handleReview(){
-
+                if (this.$store.state.user.uid <= 0) {
+                    this.$router.push({path: '/entry/login'});
+                    return;
+                }
+                this.show.review = true
             },
             handlePublic(id){
                 this.$router.push({path: '/mall/book/detail', query: {id: id}});
@@ -272,13 +293,54 @@
 
                 // 批量输入章节
                 if (e.target.dataset.buyNum == 0) {
-                    this.display.buyBatch = true;
-                    this.display.buy = false;
+                    this.show.buyBatch = true;
+                    this.show.buy = false;
                 }
             },
-            clickBuy(){
-
-            }
+            confirmBuy(){
+                this.$vux.toast({
+                    text: '购买成功',
+                    type: 'info'
+                });
+            },
+            changePublic(index){
+                this.getRecommendData(++index);
+            },
+            publishReview(review){
+                app.ajax.post(app.config.api.review.add, {
+                    uid: this.$store.state.user.uid,
+                    articleid: this.$route.query.id,
+                    score: review.score,
+                    content: review.content
+                }, (resp) => {
+                    if (resp.status == 200) {
+                        let data = resp.data.result;
+                        if (data) {
+                            if (data.result == 1) {
+                                this.show.review = false;
+                                this.$vux.toast.show({
+                                    text: '发表成功',
+                                    type: 'info'
+                                });
+                            } else if (data.result == 2) {
+                                this.$vux.toast.show({
+                                    text: '用户不存在',
+                                    type: 'warn'
+                                });
+                            } else if (data.result == 3) {
+                                this.$vux.toast.show({
+                                    text: '书籍不存在',
+                                    type: 'warn'
+                                });
+                            }
+                        }
+                    }
+                }, (err) => {
+                });
+            },
+        },
+        watch: {
+            '$route': 'initData'
         },
         created(){
             this.$store.commit('updateHeader', {
@@ -288,8 +350,7 @@
             });
         },
         mounted(){
-            this.getBookData();
-            this.getReviewData(1);
+            this.initData();
         }
     }
 </script>
@@ -308,11 +369,7 @@
         text-overflow: ellipsis;
     }
 
-    .mall-book-detail .xs-container {
-        background: #FFFFFF;
-    }
-
-    .mall-book-detail .vux-popup-dialog {
+    .mall-book-detail .xs-container, .mall-book-detail .vux-popup-dialog, .mall-book-detail .vux-slider {
         background: #FFFFFF;
     }
 

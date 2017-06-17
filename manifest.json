@@ -275,23 +275,7 @@
   "dependencies": {
 		"pages": {
 			"index.html": {
-				"resources": [
-					"build/main.bd57255959e54e6b6054.js",
-					"build/main.3a2c114b28be1d4e6d46.js",
-					"build/main.72951a158d9ce43ee1c8.js",
-					"build/main.9591304d86d85372afcb.js",
-					"build/main.764bfb5483eeb652c4c6.js",
-					"build/main.8c88409623296515482e.js",
-					"build/main.f54faf08fbc54ddcb90f.js",
-					"build/main.4b1e80b85554cbeb0fe1.js",
-					"build/main.e5dbcbc9a428ebe8b39b.js",
-					"build/main.387f85622d3edef2b335.js",
-					"build/main.045596e333383a5ac823.js",
-					"build/main.4df3838fe96071137c0a.js",
-					"build/main.96ddf1e793b16c5de4b4.js",
-					"build/main.3e7d65b56b405c326860.js",
-					"build/main.374460839cad9d138fa7.js"
-				],
+				"resources": [],
 				"refer": [],
 				"priority": 0
 			}

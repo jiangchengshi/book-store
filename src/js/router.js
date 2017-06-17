@@ -24,10 +24,15 @@ const Reader = resolve => require(['../view/reader/Reader.vue'], resolve);
 const Search = resolve => require(['../view/search/Search.vue'], resolve);
 const Mine = resolve => require(['../view/mine/Mine.vue'], resolve);
 const MineIndex = resolve => require(['../view/mine/Index.vue'], resolve);
-const Sign = resolve => require(['../view/sign/Sign.vue'], resolve);
-const SignIn = resolve => require(['../view/sign/In.vue'], resolve);
-const SignUp = resolve => require(['../view/sign/Up.vue'], resolve);
-const SignPass = resolve => require(['../view/sign/Pass.vue'], resolve);
+const MineInfo = resolve => require(['../view/mine/Info.vue'], resolve);
+const MineAvatar = resolve => require(['../view/mine/Avatar.vue'], resolve);
+const MinePassChange = resolve => require(['../view/mine/PassChange.vue'], resolve);
+const MineNickName = resolve => require(['../view/mine/NickName.vue'], resolve);
+const MineSex = resolve => require(['../view/mine/Sex.vue'], resolve);
+const Entry = resolve => require(['../view/entry/Entry.vue'], resolve);
+const EntryLogin = resolve => require(['../view/entry/Login.vue'], resolve);
+const EntryLogon = resolve => require(['../view/entry/Logon.vue'], resolve);
+const EntryPassForget = resolve => require(['../view/entry/PassForget.vue'], resolve);
 
 // routes
 const routes = [
@@ -114,24 +119,44 @@ const routes = [
             {
                 path: 'index',
                 component: MineIndex
+            },
+            {
+                path: 'info',
+                component: MineInfo
+            },
+            {
+                path: 'avatar',
+                component: MineAvatar
+            },
+            {
+                path: 'password/change',
+                component: MinePassChange
+            },
+            {
+                path: 'nickname',
+                component: MineNickName
+            },
+            {
+                path: 'sex',
+                component: MineSex
             }
         ]
     },
     {
-        path: '/sign',
-        component: Sign,
+        path: '/entry',
+        component: Entry,
         children: [
             {
-                path: 'in',
-                component: SignIn
+                path: 'login',
+                component: EntryLogin
             },
             {
-                path: 'up',
-                component: SignUp
+                path: 'logon',
+                component: EntryLogon
             },
             {
-                path: 'pass',
-                component: SignPass
+                path: 'password/forget',
+                component: EntryPassForget
             }
         ]
     }
@@ -160,11 +185,11 @@ vueRouter.beforeEach((to, from, next) => {
         case '/shelf':
         case '/mine':
             // 登录检查：获取websql中 uid
-            app.webSql.query(app.config.webSql.sign, {}, {}, (rows) => {
+            app.webSql.query(app.config.webSql.login, {}, {}, (rows) => {
                 if (rows && rows.length > 0) {
                     let row = rows.item(0);
-                    if (new Date().getTime() - new Date(row.time).getTime() < app.config.setting.signTime) {   // 5分钟
-                        app.webSql.update(app.config.webSql.sign, {
+                    if (new Date().getTime() - new Date(row.time).getTime() < app.config.setting.loginTime) {   // 5分钟
+                        app.webSql.update(app.config.webSql.login, {
                             time: new Date()
                         }, {
                             id: row.id
@@ -178,7 +203,7 @@ vueRouter.beforeEach((to, from, next) => {
                             next(to.path + '/index');
                         })
                     } else {
-                        app.webSql.delete(app.config.webSql.sign, {
+                        app.webSql.delete(app.config.webSql.login, {
                             id: row.id
                         }, function () {
                             next(to.path + '/index');

@@ -1,7 +1,7 @@
 <template>
-    <div class="pass" style="text-align: center;">
+    <div class="up" style="text-align: center;">
         <group label-margin-right="10px">
-            <x-input required placeholder="请输入账号" v-model="telephone">
+            <x-input required placeholder="请输入账号" v-model="username">
                 <i slot="label" class="iconfont icon-shouji"></i>
             </x-input>
             <x-input required placeholder="请输入验证码" v-model="code">
@@ -11,13 +11,13 @@
                     <label :style="{color: codeTxtColor}">{{codeTxt}}</label>
                 </x-button>
             </x-input>
-            <x-input required placeholder="请输入新密码" v-model="password" type="password">
+            <x-input required placeholder="请输入密码" v-model="password" type="password">
                 <i slot="label" class="iconfont icon-mima1"></i>
             </x-input>
         </group>
         <x-button type="primary" action-type="button" :disabled="disabled"
                   style="width:95%;background-color: #35B4EB;line-height: 50px;margin-top: 10px;"
-                  @click.native="handlePass">确定
+                  @click.native="handleLogon">立即注册
         </x-button>
     </div>
 </template>
@@ -28,7 +28,7 @@
     export default {
         data () {
             return {
-                telephone: '',
+                username: '',
                 password: '',
                 code: '',
                 codeTime: app.config.setting.codeTime,
@@ -39,8 +39,8 @@
             Group, Cell, XInput, XButton
         },
         methods: {
-            handlePass(e){
-                app.ajax.post(app.config.api.sign.pass, {
+            handleLogon(e){
+                app.ajax.post(app.config.api.entry.logon, {
                     username: this.username,
                     password: this.password,
                     code: this.code
@@ -50,27 +50,27 @@
                         if (data) {
                             if (data.result == 1) {
                                 this.$vux.toast.show({
-                                    text: '修改成功',
+                                    text: '注册成功',
                                     type: 'info'
                                 });
                                 setTimeout(() => {
-                                    this.$router.push({path: '/sign/in', query: {username: this.username}});
+                                    this.$router.push({path: '/entry/login', query: {username: this.username}});
                                 }, 2000);
-                            } else if (data.result == 2) { // 用户不存在
-                                this.$vux.toast.show({
-                                    type: 'warn',
-                                    text: '用户不存在'
-                                });
-                            } else if (data.result == 3) {   // 验证码错误
+                            } else if (data.result == 2) { // 验证码错误
                                 this.$vux.toast.show({
                                     type: 'warn',
                                     text: '验证码错误'
+                                });
+                            } else if (data.result == 3) {   // 用户名已存在
+                                this.$vux.toast.show({
+                                    type: 'warn',
+                                    text: '用户名已存在'
                                 });
                             }
                         }
                     }
                 }, (err) => {
-                    console.log(err);
+                    console.error(err);
                 });
             },
             handleSendCode(e){
@@ -98,7 +98,7 @@
                 }, 1000);
 
                 // 请求发送验证码
-                app.ajax.get(app.config.api.sign.code + this.username, {}, (resp) => {
+                app.ajax.get(app.config.api.entry.sms + this.username, {}, (resp) => {
                     if (resp.status == 200) {
                         let data = resp.data.result;
                         if (data) {
@@ -110,13 +110,13 @@
                         }
                     }
                 }, (err) => {
-                    console.log(err);
+                    console.error(err);
                 });
             }
         },
         computed: {
             disabled(){
-                return (this.telephone != '' && this.password != '' && this.code != '') ? false : 'disabled';
+                return (this.username != '' && this.password != '' && this.code != '') ? false : 'disabled';
             },
             codeTxt(){
                 if (this.codeTime == app.config.setting.codeTime) {
@@ -135,7 +135,7 @@
         },
         created(){
             this.$store.commit('updateHeader', {
-                title: '找回密码',
+                title: '快速注册',
                 showBack: true
             });
         }
@@ -143,18 +143,18 @@
 </script>
 
 <style>
-    .pass .weui-cells {
+    .up .weui-cells {
         background: rgba(255, 255, 255, 0);
         width: 95%;
         margin: 0px auto;
     }
 
-    .pass .iconfont {
+    .up .iconfont {
         font-size: 22px;
         margin-right: 15px;
     }
 
-    .pass .weui-btn.weui-btn_mini.weui-btn_default.weui-btn_plain-default {
+    .up .weui-btn.weui-btn_mini.weui-btn_default.weui-btn_plain-default {
         border-width: 0px;
     }
 </style>

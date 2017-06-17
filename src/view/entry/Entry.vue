@@ -1,5 +1,5 @@
 <template>
-    <div class="sign">
+    <div class="entry">
         <x-header :title="$store.state.header.title"
                   :left-options="{showBack: $store.state.header.showBack, backText: $store.state.header.backText}">
         </x-header>
@@ -13,7 +13,7 @@
     import {XHeader} from 'vux';
 
     export default {
-        name: 'sign',
+        name: 'entry',
         data(){
             return {
                 width: app.config.setting.width.display,

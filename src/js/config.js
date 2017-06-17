@@ -13,7 +13,7 @@ export default {
             screen: 0,
             display: 0
         },
-        signTime: 300000,
+        loginTime: 300000,
         codeTime: 120,
         server: 'http://api.lveshu.com/',
         debug: true
@@ -22,7 +22,7 @@ export default {
         shelf: 'shelf',
         chapter: 'chapter',
         setting: 'setting',
-        sign: 'sign',
+        login: 'login',
         mark: 'mark'
     },
     api: {
@@ -47,7 +47,7 @@ export default {
             search: 'search',
             hot: 'search/hot'
         },
-        shelf:{
+        shelf: {
             list: 'bookcase/',
             add: 'bookcase/add',
             delete: 'bookcase/delete'
@@ -56,14 +56,25 @@ export default {
             chapters: 'chapters/',
             chapter: 'chapters/info/'
         },
-        sign: {
-            in: 'member/login',
-            up: 'member/register',
-            code: 'sms/'
+        entry: {
+            login: 'member/login',
+            logon: 'member/register',
+            sms: 'sms/',
+            password: 'member/find'
         },
-        user:{
+        mine: {
             info: 'member/',
-            base: 'memberinfo/'
+            base: 'memberinfo/',
+            avatar: 'avatar/',
+            nickname: 'nickname/',
+            sex: 'sex/',
+            password: 'password'
+        },
+        review: {
+            add: 'review/add',
+            info: 'review/info/',
+            reply: 'review/reply',
+            user: 'review/user/'
         }
     }
 }

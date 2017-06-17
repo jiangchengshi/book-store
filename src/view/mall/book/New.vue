@@ -1,6 +1,8 @@
 <template>
-    <div class="mall-book-new">
-        <c-list-view type="book" :list="dataList"></c-list-view>
+    <div class="mall-book-new" style="height: inherit;">
+        <scroller :on-infinite="handleInfinite" style="top: 46px;" :height="height+''" >
+            <c-list-view type="book" :list="dataList"></c-list-view>
+        </scroller>
     </div>
 </template>
 
@@ -10,11 +12,47 @@
     export default {
         data () {
             return {
+                height: app.config.setting.height.display - app.config.setting.height.header - app.config.setting.height.tabbar,
+                page: 1,
                 dataList: []
             }
         },
         components: {
             CListView
+        },
+        methods: {
+            getData(callback){
+                app.ajax.get(app.config.api.book.new + this.page, {}, (resp) => {
+                    if (resp.status == 200) {
+                        let data = resp.data.result;
+                        if (data && data.length>0) {
+                            this.dataList = this.dataList.concat(data);
+
+                            if(typeof callback == "function") {
+                                callback();
+                            }
+                        }else{
+                            if(typeof callback == "function") {
+                                this.page--;
+
+                                callback(true);
+                            }
+                        }
+                    }
+                }, (err) => {
+                });
+            },
+            handleInfinite(done){
+                if (this.page >= 10) {
+                    done(true);
+                    return;
+                }
+                setTimeout(() => {
+                    this.page++;
+
+                    this.getData(done);
+                }, 1500);
+            }
         },
         created(){
             this.$store.commit('updateHeader', {
@@ -24,15 +62,7 @@
             });
         },
         mounted(){
-            app.ajax.get(app.config.api.book.new, {}, (resp) => {
-                if (resp.status == 200) {
-                    let data = resp.data.result;
-                    if (data) {
-                        this.dataList = data;
-                    }
-                }
-            }, (err) => {
-            });
+            this.getData();
         }
     }
 </script>

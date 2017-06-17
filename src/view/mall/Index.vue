@@ -1,6 +1,6 @@
 <template>
-    <div class="shelf-index" :style="{height:height+'px'}">
-        <scroller :on-infinite="handleInfinite" :height="height+''">
+    <div class="mall-index" style="height: inherit;">
+        <scroller :on-infinite="handleInfinite" :height="height+''" style="top: 46px;">
             <!-- 轮播 -->
             <swiper :auto="true" :loop="true" :list="data.swiper"></swiper>
             <!-- 栏目导航 -->
@@ -120,7 +120,7 @@
                 }, (err) => {
                 });
             },
-            getRecommendData(){ // 推荐数据
+            getRecommendData(callback){ // 推荐数据
                 app.ajax.get(app.config.api.recommend + this.page, {}, (resp) => {
                     if (resp.status == 200) {
                         let data = resp.data.result;
@@ -129,6 +129,16 @@
                                 topic: data.pop(),
                                 list: data
                             });
+
+                            if(typeof callback == "function") {
+                                callback();
+                            }
+                        }else{
+                            if(typeof callback == "function") {
+                                this.page--;
+
+                                callback(true);
+                            }
                         }
                     }
                 }, (err) => {
@@ -148,17 +158,13 @@
             },
             handleInfinite(done){
                 if (this.page >= 10) {
-                    setTimeout(() => {
-                        done(true)
-                    }, 1500);
+                    done(true);
                     return;
                 }
                 setTimeout(() => {
-                    this.getRecommendData();
                     this.page++;
-                    setTimeout(() => {
-                        done();
-                    })
+
+                    this.getRecommendData(done);
                 }, 1500);
             }
         },
@@ -175,51 +181,46 @@
             this.getNavigatorData();
             // 获取 推广数据
             this.getExpandData();
-            // 获取 推荐数据：scroller初始化，加载一次数据
-//            this.getRecommendData();
+            // 获取 推荐数据
+            this.getRecommendData();
         }
     }
 </script>
 
 <style>
-    .shelf-index ._v-container {
-        top: 46px;
-        position: fixed;
-    }
-
     /* navigator */
-    .shelf-index .navigator {
+    .mall-index .navigator {
         display: flex;
         justify-content: space-around;
         background: #FFFFFF;
     }
 
-    .shelf-index .navigator a {
+    .mall-index .navigator a {
         text-align: center;
         padding: 15px;
     }
 
-    .shelf-index .navigator .iconfont {
+    .mall-index .navigator .iconfont {
         font-size: 16px;
         color: white;
         border-radius: 20px;
         padding: 5px;
     }
 
-    .shelf-index .navigator .label {
+    .mall-index .navigator .label {
         font-size: 14px;
         margin-top: 8px;
     }
 
     /* expand */
-    .shelf-index .expand {
+    .mall-index .expand {
         overflow: hidden;
         border-top: 1px solid #EEECEA;
         border-bottom: 1px solid #EEECEA;
         background-color: #FFFFFF;
     }
 
-    .shelf-index .expand .left {
+    .mall-index .expand .left {
         float: left;
         width: 40%;
         text-align: center;
@@ -227,37 +228,37 @@
         border-right: 1px solid #EEECEA;
     }
 
-    .shelf-index .expand .left span {
+    .mall-index .expand .left span {
         display: block;
     }
 
-    .shelf-index .expand .left .name {
+    .mall-index .expand .left .name {
         font-size: 22px;
         color: #EE4D22
     }
 
-    .shelf-index .expand .left .desc {
+    .mall-index .expand .left .desc {
         font-size: 15px;
         color: #BDBCBC;
         padding: 10px 0px;
     }
 
-    .shelf-index .expand .left img {
+    .mall-index .expand .left img {
         width: 100px;
         height: 120px;
     }
 
-    .shelf-index .expand .right {
+    .mall-index .expand .right {
         float: left;
         padding: 5px 10px;
     }
 
-    .shelf-index .expand .right .recommend {
+    .mall-index .expand .right .recommend {
         height: 90px;
         border-bottom: 1px solid #EEECEA;
     }
 
-    .shelf-index .expand .right .recommend img {
+    .mall-index .expand .right .recommend img {
         width: 70px;
         height: 88px;
         position: relative;
@@ -265,27 +266,27 @@
         top: -76px;
     }
 
-    .shelf-index .expand .right .recommend span {
+    .mall-index .expand .right .recommend span {
         display: block;
     }
 
-    .shelf-index .expand .right .recommend .name {
+    .mall-index .expand .right .recommend .name {
         font-size: 22px;
         color: #60AFF7;
         margin-top: 10px;
     }
 
-    .shelf-index .expand .right .recommend .desc {
+    .mall-index .expand .right .recommend .desc {
         font-size: 15px;
         color: #BDBCBC;
         padding: 10px 0px;
     }
 
-    .shelf-index .expand .right .free {
+    .mall-index .expand .right .free {
         height: 90px;
     }
 
-    .shelf-index .expand .right .free img {
+    .mall-index .expand .right .free img {
         width: 70px;
         height: 88px;
         position: relative;
@@ -293,17 +294,17 @@
         top: -68px;
     }
 
-    .shelf-index .expand .right .free span {
+    .mall-index .expand .right .free span {
         display: block;
     }
 
-    .shelf-index .expand .right .free .name {
+    .mall-index .expand .right .free .name {
         font-size: 22px;
         color: #72D66D;
         margin-top: 10px;
     }
 
-    .shelf-index .expand .right .free .desc {
+    .mall-index .expand .right .free .desc {
         font-size: 15px;
         color: #BDBCBC;
         padding: 10px 0px;

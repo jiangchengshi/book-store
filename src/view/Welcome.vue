@@ -29,7 +29,7 @@
         },
         created(){
             // 全屏显示
-            if (app.config.isApp) {
+            if (app.config.setting.isApp) {
                 plus.navigator.setFullscreen(true);
             }
         }

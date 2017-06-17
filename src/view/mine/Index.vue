@@ -1,8 +1,8 @@
 <template>
     <div class="mine-index">
         <div style="background: #FFFFFF;text-align: center;padding: 46px 0px 22px 0px;">
-            <img :src="info.avatar" style="width: 60px;height: 60px;">
-            <a style="color:#35B4EB; display: block;" @click="handleSignIn">{{info.username}}</a>
+            <img :src="info.avatar" style="width: 60px;height: 60px;" @click="handleInfo">
+            <a style="color:#35B4EB; display: block;" @click="handleLogin">{{info.username}}</a>
         </div>
         <div class="info" style="text-align: center;background: #F8F8F8;padding: 10px 0px;">
             <div style="position:relative; display: flex;justify-content: space-around;margin-bottom: 10px;">
@@ -50,11 +50,29 @@
                 </cell>
             </group>
         </div>
+        <tabbar>
+            <tabbar-item link="/mall">
+                <span slot="icon"><i class="iconfont icon-shuchengxuanzhong"></i></span>
+                <span slot="label">书城</span>
+            </tabbar-item>
+            <tabbar-item link="/search">
+                <span slot="icon"><i class="iconfont icon-sousuo2"></i></span>
+                <span slot="label">搜索</span>
+            </tabbar-item>
+            <tabbar-item link="/shelf">
+                <span slot="icon"><i class="iconfont icon-bookshelf"></i></span>
+                <span slot="label">书架</span>
+            </tabbar-item>
+            <tabbar-item link="/mine" selected>
+                <span slot="icon"><i class="iconfont icon-wode1"></i></span>
+                <span slot="label">我的</span>
+            </tabbar-item>
+        </tabbar>
     </div>
 </template>
 
 <script>
-    import {Group, Cell, XButton} from 'vux';
+    import {Group, Cell, XButton, Tabbar, TabbarItem} from 'vux';
 
     export default {
         data () {
@@ -69,11 +87,11 @@
             }
         },
         components: {
-            Group, Cell, XButton
+            Group, Cell, XButton, Tabbar, TabbarItem
         },
         methods: {
             getUserData(){
-                app.ajax.get(app.config.api.user.info + this.$store.state.user.uid, {}, (resp) => {
+                app.ajax.get(app.config.api.mine.info + this.$store.state.user.uid, {}, (resp) => {
                     if (resp.status == 200) {
                         let data = resp.data.result;
                         if (data) {
@@ -84,9 +102,17 @@
 
                 });
             },
-            handleSignIn(){
+            handleInfo(){
                 if (this.$store.state.user.uid <= 0) {
-                    this.$router.push({path: '/sign/in'});
+                    this.$router.push({path: '/entry/login'});
+                    return;
+                }
+                this.$router.push({path: '/mine/info'});
+            },
+            handleLogin(){
+                if (this.$store.state.user.uid <= 0) {
+                    this.$router.push({path: '/entry/login'});
+                    return;
                 }
             }
         },
@@ -130,8 +156,11 @@
     }
 
     .mine-index .weui-btn.weui-btn_default.weui-btn_plain-default {
-        line-height: 25px;
+        line-height: 30px;
         width: 60%;
+        background: #F8F8F8;
+        border: 1px solid #989A9C;
+        border-radius: 7px;
     }
 
     .mine-index .weui-cell.vux-tap-active.weui-cell_access {

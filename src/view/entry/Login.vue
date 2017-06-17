@@ -14,14 +14,14 @@
             </group>
             <div style="padding: 8px 40px;font-size: 15px;">
                 <a style="float: left;color: #35B4EB;" @click="handleForget">忘记密码</a>
-                <a style="float: right;color: #35B4EB;" @click="handleSignUp">立即注册</a>
+                <a style="float: right;color: #35B4EB;" @click="handleLogon">立即注册</a>
             </div>
             <x-button type="primary" action-type="button" :disabled="disabled"
                       style="width:90%;background-color: #35B4EB;line-height: 45px;margin-top: 20px;"
                       @click.native="handleLogin">登 录
             </x-button>
         </div>
-        <div class="link" style="margin-top: 100px;">
+        <div class="link" style="margin-top: 80px;">
             <divider>其他登录方式</divider>
             <div style="text-align: center;margin-top: 20px;">
                 <i class="iconfont icon-weibo" style="background-color: orange;"></i>
@@ -58,7 +58,7 @@
                 }
 
                 // 请求登录
-                app.ajax.post(app.config.api.sign.in, {
+                app.ajax.post(app.config.api.entry.login, {
                     username: this.username,
                     password: this.password
                 }, (resp) => {
@@ -76,7 +76,7 @@
                                     text: '用户不存在'
                                 });
                             } else {
-                                app.webSql.insert(app.config.webSql.sign, {
+                                app.webSql.insert(app.config.webSql.login, {
                                     id: data.uid,
                                     egold: data.egold,
                                     time: new Date()
@@ -93,14 +93,14 @@
                         }
                     }
                 }, (err) => {
-                    console.log(err);
+                    console.error(err);
                 });
             },
             handleForget(e){
-                this.$router.push({path: '/sign/pass'});
+                this.$router.push({path: '/entry/password/forget'});
             },
-            handleSignUp(e){
-                this.$router.push({path: '/sign/up'});
+            handleLogon(e){
+                this.$router.push({path: '/entry/logon'});
             }
         },
         computed: {
@@ -126,7 +126,7 @@
 <style>
     .in .logo {
         text-align: center;
-        padding: 25px 0px 30px 0px;
+        padding: 25px 0px 25px 0px;
     }
 
     .in .logo img {
