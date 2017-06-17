@@ -75,6 +75,7 @@ export default {
             info: 'review/info/',
             reply: 'review/reply',
             user: 'review/user/'
-        }
+        },
+        sign: 'signin/'
     }
 }

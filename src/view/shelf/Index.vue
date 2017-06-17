@@ -1,26 +1,44 @@
 <template>
     <div class="shelf-index">
-        <img src="../../image/sign.png" style="width:50px;height:60px;position: fixed;right: 5px;" @click="handleSign">
-        <ul class="books" v-for="book in books">
-            <li class="book" v-for="b in book" @click="handleClickBook(b.articleid)">
-                <img v-if="b.articleid!=-1" :src="b.cover">
-                <div v-else>
-                    <i class="iconfont icon-add"></i>
-                    <span>去书城看看</span>
-                </div>
-                <span class="name" v-html="b.articlename"></span>
-                <span class="author" v-html="b.author"></span>
-            </li>
-        </ul>
+        <div>
+            <img src="../../image/sign.png" style="width:50px;height:60px;position: fixed;right: 10px;"
+                 @click="handleSign">
+            <ul class="books" v-for="book in books">
+                <li class="book" v-for="b in book" @click="handleClickBook(b.articleid)">
+                    <img v-if="b.articleid!=-1" :src="b.cover">
+                    <div v-else>
+                        <i class="iconfont icon-add"></i>
+                        <span>去书城看看</span>
+                    </div>
+                    <span class="name" v-html="b.articlename"></span>
+                    <span class="author" v-html="b.author"></span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 签到 -->
+        <c-dialog type="signIn" :show="show.signIn" :data="sign" @signIn="handleSignIn" @cancel="show.signIn=false"></c-dialog>
+        <!-- 签到成功-->
+        <c-dialog type="signOk" :show="show.signOk" :data="sign" @signOk="handleSignOk" @cancel="show.signOk=false"></c-dialog>
     </div>
 </template>
 
 <script>
+    import CDialog from '../../view/components/Dialog.vue';
+
     export default {
         data () {
             return {
                 books: [],
+                sign: {},
+                show: {
+                    signIn: false,
+                    signOk: false
+                }
             }
+        },
+        components: {
+            CDialog
         },
         methods: {
             getBookData(){
@@ -48,7 +66,59 @@
                 }, (err) => {
                 });
             },
+            getSignData(){
+                app.ajax.get(app.config.api.sign + this.$store.state.user.uid, {}, (resp) => {
+                    if (resp.status == 200) {
+                        let data = resp.data.result;
+                        if (data) {
+                            this.sign = data;
+                        }
+                    }
+                }, (err) => {
+                });
+            },
             handleSign(){
+                if (this.$store.state.user.uid <= 0) {
+                    this.$router.push({path: '/entry/login'});
+                    return;
+                }
+                this.show.signIn = true;
+            },
+            handleSignIn(){
+                app.ajax.post(app.config.api.sign, {
+                    uid: this.$store.state.user.uid
+                }, (resp) => {
+                    if (resp.status == 200) {
+                        let data = resp.data.result;
+                        if (data) {
+                            if (data.result == 1) { // 1:成功
+                                // 更新用户egold
+                                let egold = Number(this.$store.state.user.egold) + Number(data.egold);
+                                this.$store.commit('updateUser', {egold: egold});
+
+                                this.show.signOk = true;
+                                this.show.signIn = false;
+                            } else if (data.result == 2) {   // 2:用户不存在
+                                this.$vux.toast.show({
+                                    text: '用户不存在',
+                                    type: 'warn'
+                                });
+                            } else if (data.result == 3) {   // 3:已签到
+                                this.$vux.toast.show({
+                                    text: '已签到',
+                                    type: 'info'
+                                });
+
+
+                                this.show.signOk = true;
+                                this.show.signIn = false;
+                            }
+                        }
+                    }
+                }, (err) => {
+                });
+            },
+            handleSignOk(){
                 this.$vux.toast.show({
                     text: '签到成功',
                     type: 'info'
@@ -102,7 +172,11 @@
             });
         },
         mounted(){
+            // 获取 书架数据
             this.getBookData();
+
+            // 获取 签到信息
+            this.getSignData();
         }
     }
 </script>
@@ -165,5 +239,9 @@
     .shelf-index .books:last-child .book:last-child div span {
         font-size: 12px;
         color: #35B4EB;
+    }
+
+    .shelf-index .weui-dialog {
+        overflow: initial;
     }
 </style>

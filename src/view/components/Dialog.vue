@@ -1,5 +1,5 @@
 <template>
-    <x-dialog v-model="isShow">
+    <x-dialog v-model="isShow" hide-on-blur @on-hide="handleCancel">
         <template v-if="type=='monthly'">
             <div class="monthly">
                 <cell title="订阅超值包月，免费畅读一个月"></cell>
@@ -55,6 +55,76 @@
                 </div>
             </div>
         </template>
+        <template v-else-if="type=='signIn'">
+            <div class="sign-in">
+                <div style="position: absolute;top: -40px;left:30%;width: 120px;height: 120px;background-color: #FFFFFF;border-radius: 56px;">
+                    <img src="../../image/signIn.png" style="width: 120px;height: 120px;">
+                </div>
+                <div style="text-align: center;margin-top: 100px;">
+                    <img src="../../image/signToken.png" style="width: 150px;border-radius: 56px;">
+                </div>
+                <div style="text-align:center;font-family: PingFangSC-Regular;font-size: 12px;color: #57606A;margin: 20px 0px;">
+                    已经连续签到
+                    <span style="font-family: PingFangSC-Medium;font-size: 14px;color: #F46F5C;">{{data.continue}}</span>
+                    天，今日送您
+                    <span style="font-family: PingFangSC-Medium;font-size: 14px;color: #F46F5C;">{{data.number}}</span>
+                    书券
+                </div>
+                <div class="record" v-if="data.list && data.list.length>0" style="color: #FFFFFF;text-align: center;">
+                    <div class="item" style="background-color: #35B4EB;">
+                        <span class="item-txt">
+                            <label v-if="data.list[0]>0">已签</label>
+                            <label v-else>未签</label>
+                        </span>
+                        <span class="item-num">{{data.list[0]}}</span>
+                    </div>
+                    <div class="item" style="background-color: #FFA300;">
+                        <span class="item-txt">
+                            <label v-if="data.list[1]>0">已签</label>
+                            <label v-else>未签</label>
+                        </span>
+                        <span class="item-num">{{data.list[1]}}</span>
+                    </div>
+                    <div class="item" style="background-color: #C0C7CB;">
+                        <span class="item-txt">未签</span>
+                        <span class="item-num">{{data.list[2]}}</span>
+                    </div>
+                    <div class="item" style="background-color: #C0C7CB;">
+                        <span class="item-txt">未签</span>
+                        <span class="item-num">{{data.list[3]}}</span>
+                    </div>
+                    <div class="item" style="background-color: #C0C7CB;">
+                        <span class="item-txt">未签</span>
+                        <span class="item-num">{{data.list[4]}}</span>
+                    </div>
+                </div>
+                <div style="text-align: center;padding: 30px 0px;">
+                    <span style="display:inline-block;width: 70%;line-height:30px;background: linear-gradient(#FFA300, #fec550);color:#FFFFFF;border-radius: 30px;padding: 5px 0px;"
+                          @click="handleSignIn">立即签到</span>
+                </div>
+            </div>
+        </template>
+        <template v-else-if="type=='signOk'">
+            <div class="sign-ok">
+                <div style="position: absolute;top: -40px;left:30%;width: 120px;height: 120px;background-color: #FFFFFF;border-radius: 56px;">
+                    <img src="../../image/signOk.png" style="width: 120px;height: 120px;border-radius: 56px;">
+                </div>
+                <div style="text-align: center;margin-top: 100px;font-family: PingFangSC-Medium;font-size: 18px;color: #57606A;">
+                    今日签到成功！
+                </div>
+                <div style="text-align: center;ont-family: PingFangSC-Regular;font-size: 14px;color: #57606A;margin: 8px 0px;">
+                    获得
+                </div>
+                <div style="text-align:center;font-family: PingFangSC-Regular;font-size: 12px;color: #57606A;margin: 10px 0px;">
+                    <span style="font-family: PingFangSC-Semibold;font-size: 50px;color: #EE4D22;">{{data.number}}</span>
+                    <span style="font-family: PingFangSC-Regular;font-size: 14px;color: #EE4D22;">书券</span>
+                </div>
+                <div style="text-align: center;padding: 30px 0px;">
+                    <span style="display:inline-block;width: 70%;line-height:30px;background: linear-gradient(#FFA300, #fec550);color:#FFFFFF;border-radius: 30px;padding: 5px 0px;"
+                          @click="handleSignOk">查看我的书券</span>
+                </div>
+            </div>
+        </template>
     </x-dialog>
 </template>
 
@@ -84,6 +154,12 @@
             },
             handlePublish(){
                 this.$emit('publish', this.review);
+            },
+            handleSignIn(){
+                this.$emit('signIn');
+            },
+            handleSignOk(){
+                this.$emit('signOk');
             }
         },
         computed: {
@@ -125,5 +201,27 @@
 
     .review .weui-cells .score {
         padding: 10px 20px;
+    }
+
+    .sign-in .record .item {
+        width: 45px;
+        height: 55px;
+        border-radius: 4px;
+        display: inline-block;
+        margin: 0px 2px;
+    }
+
+    .sign-in .record .item .item-txt {
+        float: left;
+        background: rgba(255, 255, 255, 0.5);
+        font-size: 12px;
+        width: 100%;
+        line-height: 20px;
+    }
+
+    .sign-in .record .item .item-num {
+        float: left;
+        margin-left: 10px;
+        line-height: 30px;
     }
 </style>

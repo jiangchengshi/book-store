@@ -1,7 +1,7 @@
 <template>
     <div class="pass-forget" style="text-align: center;">
         <group label-margin-right="10px">
-            <x-input required placeholder="请输入账号" v-model="telephone">
+            <x-input required placeholder="请输入账号" v-model="username">
                 <i slot="label" class="iconfont icon-shouji"></i>
             </x-input>
             <x-input required placeholder="请输入验证码" v-model="code">
@@ -28,7 +28,7 @@
     export default {
         data () {
             return {
-                telephone: '',
+                username: '',
                 password: '',
                 code: '',
                 codeTime: app.config.setting.codeTime,

@@ -1,5 +1,5 @@
 <template>
-    <div class="mall-classify-detail">
+    <div class="mall-classify-detail" style="overflow: scroll;" :style="{height:height+'px'}">
         <div style="font-family: PingFangSC-Light;font-size: 15px;color: #828181;padding: 10px;">
             此分类共收录 <label style="color: #64c4ed;">{{dataList.length}}</label> 本书籍
         </div>
@@ -13,6 +13,7 @@
     export default {
         data () {
             return {
+                height: app.config.setting.height.display - app.config.setting.height.header - app.config.setting.height.tabbar,
                 dataList: []
             }
         },
