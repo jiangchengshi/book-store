@@ -2,7 +2,7 @@
     <div class="shelf">
         <x-header :title="$store.state.header.title"
                   :left-options="{showBack: $store.state.header.showBack, backText: $store.state.header.backText}">
-            <span v-show="$store.state.header.showClean" slot="right">整理</span>
+            <span slot="right" @click="handleTidy" style="color:#35B4EB;">{{$store.state.header.tidyText}}</span>
         </x-header>
         <div style="overflow: scroll;" :style="{height: height+'px'}">
             <router-view></router-view>
@@ -40,6 +40,19 @@
         },
         components: {
             XHeader, Tabbar, TabbarItem
+        },
+        methods: {
+            handleTidy(){
+                if (this.$store.state.user.uid <= 0) {
+                    this.$router.push({path: '/entry/login'});
+                    return;
+                }
+                let tidyText = this.$store.state.header.tidyText == '整理' ? '完成' : '整理';
+                this.$store.commit('updateHeader', {
+                    title: '书架',
+                    tidyText: tidyText
+                });
+            }
         }
     }
 </script>

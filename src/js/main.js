@@ -90,6 +90,7 @@ const initWebSql = function () {
 
 if (navigator.userAgent.indexOf("Html5Plus") < 0) { //不支持5+ API
     Object.assign(config.setting, {
+        platform: navigator.appName,
         width: {
             screen: window.screen.availWidth,
             display: window.screen.availWidth

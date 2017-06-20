@@ -1,11 +1,16 @@
 <template>
     <div class="shelf-index">
-        <div>
+        <div style="height: inherit;">
             <img src="../../image/sign.png" style="width:50px;height:60px;position: fixed;right: 10px;"
                  @click="handleSign">
             <ul class="books" v-for="book in books">
                 <li class="book" v-for="b in book" @click="handleClickBook(b.articleid)">
-                    <img v-if="b.articleid!=-1" :src="b.cover">
+                    <div v-if="b.articleid!=-1">
+                        <img :src="b.cover" :class="{tidy: tidy && b.del}"
+                             style="width: 90px;height: 110px;float: left;">
+                        <icon v-if="tidy && b.del" type="success"
+                              style="color: #ee4d22;float: left;margin-left: -33px;margin-top: 78px;opacity: 1;"></icon>
+                    </div>
                     <div v-else>
                         <i class="iconfont icon-add"></i>
                         <span>去书城看看</span>
@@ -15,15 +20,21 @@
                 </li>
             </ul>
         </div>
+        <x-button v-show="tidy" action-type="button" @click="handleDelete"
+                  style="position:absolute; bottom: 10px;background: #35B4EB;border-radius: 7px;color: #FFFFFF;">删除
+        </x-button>
 
         <!-- 签到 -->
-        <c-dialog type="signIn" :show="show.signIn" :data="sign" @signIn="handleSignIn" @cancel="show.signIn=false"></c-dialog>
+        <c-dialog type="signIn" :show="show.signIn" :data="sign" @signIn="handleSignIn"
+                  @cancel="show.signIn=false"></c-dialog>
         <!-- 签到成功-->
-        <c-dialog type="signOk" :show="show.signOk" :data="sign" @signOk="handleSignOk" @cancel="show.signOk=false"></c-dialog>
+        <c-dialog type="signOk" :show="show.signOk" :data="sign" @signOk="handleSignOk"
+                  @cancel="show.signOk=false"></c-dialog>
     </div>
 </template>
 
 <script>
+    import {Icon, XButton} from 'vux';
     import CDialog from '../../view/components/Dialog.vue';
 
     export default {
@@ -38,7 +49,7 @@
             }
         },
         components: {
-            CDialog
+            Icon, XButton, CDialog
         },
         methods: {
             getBookData(){
@@ -60,7 +71,7 @@
                     if (resp.status == 200) {
                         let data = resp.data.result;
                         if (data) {
-                            this.handleShelf(data);
+                            this.fillShelf(data);
                         }
                     }
                 }, (err) => {
@@ -108,10 +119,6 @@
                                     text: '已签到',
                                     type: 'info'
                                 });
-
-
-                                this.show.signOk = true;
-                                this.show.signIn = false;
                             }
                         }
                     }
@@ -120,24 +127,78 @@
             },
             handleSignOk(){
                 this.$vux.toast.show({
-                    text: '签到成功',
+                    text: '看看我的券吧',
                     type: 'info'
                 })
             },
             handleClickBook(id){
-                if (id == -1) {
-                    this.$router.push({path: '/mall'});
-                } else {
-                    this.$router.push({path: '/reader', query: {id: id}});
+                if (!this.tidy) {   // true：非整理状态，点击进入书籍阅读
+                    if (id == -1) {
+                        this.$router.push({path: '/mall'});
+                    } else {
+                        this.$router.push({path: '/reader', query: {id: id}});
+                    }
+                } else {    // 整理状态
+                    for (let i = 0; i < this.books.length; i++) {
+                        let _books = this.books[i];
+                        for (let j = 0; j < _books.length; j++) {
+                            if (_books[j].articleid == id) {
+                                _books[j].del = !_books[j].del;
+                                return;
+                            }
+                        }
+                    }
                 }
             },
-            handleShelf(rows){
-                let bookArr = [];
+            handleDelete(){
+                let delBookId = [];
+                for (let i = 0; i < this.books.length; i++) {
+                    let _books = this.books[i];
+                    for (let j = 0; j < _books.length; j++) {
+                        if (_books[j].del) {
+                            delBookId.push(_books[j].articleid);
+                        }
+                    }
+                }
+                if (delBookId.length <= 0) {
+                    this.$vux.toast.show({
+                        text: '请选择书架中的书籍',
+                        type: 'warn'
+                    });
+                    return;
+                }
 
-                Object.keys(rows).forEach(function (i) {
-                    bookArr.push(rows[i]);
+                // 请求删除
+                app.ajax.post(app.config.api.shelf.delete, {
+                    uid: this.$store.state.user.uid,
+                    articleid: delBookId.join(',')
+                }, (resp) => {
+                    if (resp.status == 200) {
+                        let data = resp.data.result;
+                        if (data) {
+                            if (data.result == 1) { // 1：成功
+                                this.$vux.toast.show({
+                                    text: '删除成功',
+                                    type: 'info'
+                                });
+                                this.getBookData();
+                            } else if (data.result == 2) {   // 2:用户不存在
+                                this.$vux.toast.show({
+                                    text: '用户不存在',
+                                    type: 'warn'
+                                });
+                            } else if (data.result == 3) {   // 3:书籍不存在
+                                this.$vux.toast.show({
+                                    text: '书籍不存在',
+                                    type: 'warn'
+                                });
+                            }
+                        }
+                    }
+                }, (err) => {
                 });
-
+            },
+            fillShelf(bookArr){
                 // mall-link
                 bookArr.push({
                     articleid: -1,
@@ -149,6 +210,12 @@
                 // 书籍分3层
                 let _books = [];
                 bookArr.forEach((book, i) => {
+                    // 默认 del标识为false
+                    if (book.articleid != -1) {
+                        book.del = false;
+                    }
+
+                    // 书架 一层3本书籍
                     if (i > 0 && i % 3 == 0) { // 3, 6
                         this.books.push(_books);
                         _books = [];
@@ -160,6 +227,22 @@
                 });
             }
         },
+        computed: {
+            tidy(){
+                let tidy = this.$store.state.header.tidyText == '完成';
+                if (!tidy) {
+                    for (let i = 0; i < this.books.length; i++) {
+                        let _books = this.books[i];
+                        for (let j = 0; j < _books.length; j++) {
+                            if (_books[j].del) {
+                                _books[j].del = false;
+                            }
+                        }
+                    }
+                }
+                return tidy;
+            }
+        },
         created(){
             // 非全屏显示
             if (app.config.setting.isApp) {
@@ -167,8 +250,7 @@
             }
 
             this.$store.commit('updateHeader', {
-                title: '书架',
-                showClean: true
+                title: '书架'
             });
         },
         mounted(){
@@ -191,18 +273,13 @@
 
     .shelf-index ul {
         list-style: none;
-        padding: 15px 0px;
+        padding: 16px 0px;
         margin: 0px auto;
     }
 
     .shelf-index .books .book {
         display: inline-block;
         margin: 0px 5px 0px 20px;
-    }
-
-    .shelf-index .books .book img {
-        width: 90px;
-        height: 110px;
     }
 
     .shelf-index .books .book span {
@@ -243,5 +320,9 @@
 
     .shelf-index .weui-dialog {
         overflow: initial;
+    }
+
+    .shelf-index .books .book .tidy {
+        opacity: 0.3;
     }
 </style>

@@ -24,9 +24,9 @@
         <div class="link" style="margin-top: 80px;">
             <divider>其他登录方式</divider>
             <div style="text-align: center;margin-top: 20px;">
-                <i class="iconfont icon-weibo" style="background-color: orange;"></i>
-                <i class="iconfont icon-qq" style="background-color: dodgerblue;"></i>
-                <i class="iconfont icon-weixin" style="background-color: green;"></i>
+                <i class="iconfont icon-weibo2" style="background-color: orange;"></i>
+                <i class="iconfont icon-qq4" style="background-color: dodgerblue;"></i>
+                <i class="iconfont icon-weixin5" style="background-color: green;"></i>
             </div>
         </div>
     </div>
@@ -162,8 +162,9 @@
 
     .in .link .iconfont {
         color: white;
-        font-size: 36px;
-        border-radius: 10px;
+        font-size: 30px;
+        border-radius: 25px;
         margin: 0px 20px;
+        padding: 4px;
     }
 </style>
