@@ -11,6 +11,9 @@ const MallBookNew = resolve => require(['../view/mall/book/New.vue'], resolve);
 const MallBookFree = resolve => require(['../view/mall/book/Free.vue'], resolve);
 const MallBookSpecial = resolve => require(['../view/mall/book/Special.vue'], resolve);
 const MallBookDetail = resolve => require(['../view/mall/book/Detail.vue'], resolve);
+const MallBookTicket = resolve => require(['../view/mall/book/Ticket.vue'], resolve);
+const MallBookFlower = resolve => require(['../view/mall/book/FLower.vue'], resolve);
+const MallBookReward = resolve => require(['../view/mall/book/Reward.vue'], resolve);
 const MallBookCatalog = resolve => require(['../view/mall/book/Catalog.vue'], resolve);
 const MallMonthlyList = resolve => require(['../view/mall/monthly/List.vue'], resolve);
 const MallMonthlyDetail = resolve => require(['../view/mall/monthly/Detail.vue'], resolve);
@@ -18,6 +21,7 @@ const MallMonthlyPackage = resolve => require(['../view/mall/monthly/Package.vue
 const MallClassifyList = resolve => require(['../view/mall/classify/List.vue'], resolve);
 const MallClassifyDetail = resolve => require(['../view/mall/classify/Detail.vue'], resolve);
 const MallTopicDetail = resolve => require(['../view/mall/topic/Detail.vue'], resolve);
+const ReCharge = resolve => require(['../view/recharge/Recharge.vue'], resolve);
 const Shelf = resolve => require(['../view/shelf/Shelf.vue'], resolve);
 const ShelfIndex = resolve => require(['../view/shelf/Index.vue'], resolve);
 const Reader = resolve => require(['../view/reader/Reader.vue'], resolve);
@@ -63,6 +67,18 @@ const routes = [
             {
                 path: 'book/detail',
                 component: MallBookDetail
+            },
+            {
+                path: 'book/ticket',
+                component: MallBookTicket
+            },
+            {
+                path: 'book/flower',
+                component: MallBookFlower
+            },
+            {
+                path: 'book/reward',
+                component: MallBookReward
             },
             {
                 path: 'book/catalog',
@@ -159,6 +175,10 @@ const routes = [
                 component: EntryPassForget
             }
         ]
+    },
+    {
+        path: '/recharge',
+        component: ReCharge
     }
 ];
 

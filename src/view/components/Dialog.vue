@@ -34,7 +34,7 @@
                               style="width: 45%;border-radius: 30px;background: #989A9C;color: #FFFFFF;">
                         取消支付
                     </x-button>
-                    <x-button @click.native="handleConfirm"
+                    <x-button @click.native="handleBuyConfirm"
                               style="width: 45%;border-radius: 30px; background: #35B4EB;color: #FFFFFF;">
                         确认支付
                     </x-button>
@@ -125,6 +125,34 @@
                 </div>
             </div>
         </template>
+        <template v-else-if="type=='ticketConfirm'">
+            <div style="text-align: center;margin: 30px 0px;">
+                <img src="../../image/gift.png" style="width: 60px;">
+            </div>
+            <div style="margin:10px 0px;text-align:center;font-family: PingFangSC-Regular;font-size: 16px;color: #989A9C;">
+                您正在对《{{data.name}}》进行{{data.action}}
+            </div>
+            <div style="margin-bottom:50px;text-align: center;font-family: PingFangSC-Regular;font-size: 18px;color: #57606A;">
+                赏金 <label style="color: #EE4D22;">{{data.egold}}</label> 阅币
+            </div>
+            <x-button action-type="button" @click.native="handleTicketConfirm"
+                      style="background: #35B4EB;border-radius: 4px;color: #FFFFFF;">确定
+            </x-button>
+        </template>
+        <template v-else-if="type=='balanceLess'">
+            <div style="text-align: center;margin: 30px 0px;">
+                <img src="../../image/balance.png" style="width: 60px;">
+            </div>
+            <div style="margin:10px 0px;text-align:center;font-family: PingFangSC-Regular;font-size: 16px;color: #9FA1A3;">
+                账户余额不足了！
+            </div>
+            <div style="margin-bottom:50px;text-align: center;font-family: PingFangSC-Regular;font-size: 18px;color: #57606A;">
+                请充值后进行{{data.action}}
+            </div>
+            <x-button action-type="button" @click.native="handleRecharge"
+                      style="background: #35B4EB;border-radius: 4px;color: #FFFFFF;">立即充值
+            </x-button>
+        </template>
     </x-dialog>
 </template>
 
@@ -149,7 +177,7 @@
             handleCancel(){
                 this.$emit('cancel');
             },
-            handleConfirm(){
+            handleBuyConfirm(){
                 this.$emit('confirm', this.renew.length > 0 ? true : false);
             },
             handlePublish(){
@@ -160,6 +188,12 @@
             },
             handleSignOk(){
                 this.$emit('signOk');
+            },
+            handleTicketConfirm(){
+                this.$emit('confirm');
+            },
+            handleRecharge(){
+                this.$router.push({path: '/recharge'})
             }
         },
         computed: {

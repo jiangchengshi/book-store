@@ -35,15 +35,15 @@
         </div>
         <div style="position:relative; display: flex;justify-content: space-around;background: #FFFFFF;
             padding: 8px 0px;margin-top: 2px; margin-bottom: 10px;">
-            <a>
+            <a @click="handleTicket">
                 <span style="font-size:12px;color: #B4EEB4;">月票</span>
                 <div class="label">{{detail.vipvote}}</div>
             </a>
-            <a>
+            <a @click="handleFlower">
                 <span style="font-size:12px;color: #FF4500;">鲜花</span>
                 <div class="label">{{detail.flower}}</div>
             </a>
-            <a>
+            <a  @click="handleReward">
                 <span style="font-size:12px;color: #5CA8E9;">打赏</span>
                 <div class="label">{{detail.sale}}</div>
             </a>
@@ -242,6 +242,27 @@
                     return;
                 }
                 this.show.buy = true;
+            },
+            handleTicket(){ // 月票
+                if(this.$store.state.user.uid<=0){
+                    this.$router.push({path: '/entry/login'});
+                    return;
+                }
+                this.$router.push({path: '/mall/book/ticket', query: {id: this.$route.query.id, name: this.detail.articlename}});
+            },
+            handleFlower(){ // 鲜花
+                if(this.$store.state.user.uid<=0){
+                    this.$router.push({path: '/entry/login'});
+                    return;
+                }
+                this.$router.push({path: '/mall/book/flower', query: {id: this.$route.query.id, name: this.detail.articlename}});
+            },
+            handleReward(){ // 打赏
+                if(this.$store.state.user.uid<=0){
+                    this.$router.push({path: '/entry/login'});
+                    return;
+                }
+                this.$router.push({path: '/mall/book/reward', query: {id: this.$route.query.id, name: this.detail.articlename}});
             },
             handleReview(){
                 if (this.$store.state.user.uid <= 0) {

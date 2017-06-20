@@ -35,7 +35,19 @@ export default {
             free: 'free/',
             special: 'special/',
             detail: 'detail/',
-            review: 'review/'
+            review: 'review/',
+            ticket: {
+                get: 'vipvote/',
+                add: 'vipvote/add'
+            },
+            flower:{
+                get: 'flower/',
+                add: 'flower/add'
+            },
+            reward:{
+                get: 'gift/',
+                add: 'gift/add'
+            }
         },
         monthly: {
             monthly: 'monthly/',
