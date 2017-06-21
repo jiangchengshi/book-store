@@ -54,11 +54,16 @@ const store = new Vuex.Store({
             }
         },
         updateUser(state, payload){
-            if (payload && payload.uid > 0) {
-                state.user.uid = payload.uid;
-            }
-            if (payload && payload.egold > 0) {
-                state.user.egold = payload.egold;
+            if (payload) {
+                if (payload.uid > 0) {
+                    state.user.uid = payload.uid;
+                }
+                if (payload.egold > 0) {
+                    state.user.egold = payload.egold;
+                }
+            } else {
+                state.user.uid = 0;
+                state.user.egold = 0;
             }
         }
     }

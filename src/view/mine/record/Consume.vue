@@ -1,0 +1,60 @@
+<template>
+    <div class="mine-recharge">
+        <x-header :title="$store.state.header.title"
+                  :left-options="{showBack: $store.state.header.showBack, backText: $store.state.header.backText}">
+        </x-header>
+        <div v-if="consume && consume.length>0">
+            <div v-for="(con, key, index) in consume" :key="index">
+                <group :title="key+'月'">
+                    <cell :title="detail.articlename" :inline-desc="detail.buytime" v-for="(detail, index) in con"
+                          :key="index">
+                        <label style="font-family: PingFangSC-Medium;font-size: 18px;color: #EE4D22;">{{detail.price}}</label>
+                        <label style="color: #EE4D22;">阅币</label>
+                    </cell>
+                </group>
+            </div>
+        </div>
+        <div v-else style="text-align: center;margin-top: 40px;">
+            <img src="../../../image/unMatch.png" width="80px">
+            <div>对不起，暂无新记录！</div>
+        </div>
+    </div>
+</template>
+
+<script>
+    import {XHeader, Group, Cell} from 'vux';
+
+    export default {
+        data () {
+            return {
+                consume: {}
+            }
+        },
+        components: {
+            XHeader, Group, Cell
+        },
+        methods: {
+            getData(){
+                app.ajax.get(app.config.api.mine.consume + this.$store.state.user.uid, {}, (resp) => {
+                    if (resp.status == 200) {
+                        let data = resp.data.result;
+                        if (data) {
+                            this.consume = data;
+                        }
+                    }
+                }, (err) => {
+
+                });
+            }
+        },
+        created(){
+            this.$store.commit('updateHeader', {
+                title: '消费记录',
+                showBack: true
+            });
+        },
+        mounted(){
+            this.getData();
+        }
+    }
+</script>

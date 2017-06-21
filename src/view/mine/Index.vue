@@ -19,33 +19,33 @@
                     <div><label>{{info.continue}}</label> 天</div>
                 </a>
             </div>
-            <x-button action-type="button" :plain="true">充值</x-button>
+            <x-button action-type="button" :plain="true" @click.native="handleRecharge">充值</x-button>
         </div>
         <div>
             <group>
-                <cell title="充值记录" is-link>
+                <cell title="充值记录" is-link link="/mine/record/recharge">
                     <i slot="icon" class="iconfont icon-chongzhi" style="color: #9ed18b;"></i>
                 </cell>
-                <cell title="消费记录" is-link>
+                <cell title="消费记录" is-link link="/mine/record/consume">
                     <i slot="icon" class="iconfont icon-xiaofeijilu" style="color: #f5ce8e;"></i>
                 </cell>
-                <cell title="打赏记录" is-link>
+                <cell title="打赏记录" is-link link="/mine/record/reward">
                     <i slot="icon" class="iconfont icon-dashang1" style="color: #f393af;"></i>
                 </cell>
             </group>
             <group>
-                <cell title="我的评论" is-link>
+                <cell title="我的评论" is-link link="/mine/review">
                     <i slot="icon" class="iconfont icon-pinglun" style="color: #66c9f3;"></i>
                 </cell>
-                <cell title="我的消息" is-link>
+                <cell title="我的消息" is-link link="/mine/news">
                     <i slot="icon" class="iconfont icon-icon066" style="color: #f6cf8f;"></i>
                 </cell>
-                <cell title="意见反馈" is-link>
+                <cell title="意见反馈" is-link link="/feedback">
                     <i slot="icon" class="iconfont icon-yijianfankui" style="color: #d9b4fb;"></i>
                 </cell>
             </group>
             <group>
-                <cell title="设置" is-link>
+                <cell title="设置" is-link link="/setting">
                     <i slot="icon" class="iconfont icon-chaozhidijia-01" style="color: #8e9397;"></i>
                 </cell>
             </group>
@@ -114,6 +114,13 @@
                     this.$router.push({path: '/entry/login'});
                     return;
                 }
+            },
+            handleRecharge(){
+                if (this.$store.state.user.uid <= 0) {
+                    this.$router.push({path: '/entry/login'});
+                    return;
+                }
+                this.$router.push({path: '/recharge'});
             }
         },
         mounted(){
@@ -156,7 +163,7 @@
     }
 
     .mine-index .weui-btn.weui-btn_default.weui-btn_plain-default {
-        line-height: 30px;
+        line-height: 32px;
         width: 60%;
         background: #F8F8F8;
         border: 1px solid #989A9C;
@@ -164,6 +171,6 @@
     }
 
     .mine-index .weui-cell.vux-tap-active.weui-cell_access {
-        padding: 3px 15px;
+        padding: 4px 15px;
     }
 </style>

@@ -20,7 +20,7 @@ import log from "./util/log";
 // 引入Iconfont字体
 import "../css/iconfont.css";
 // 引入Vux公共组件
-import {AjaxPlugin, ToastPlugin} from "vux";
+import {AjaxPlugin, ToastPlugin, ConfirmPlugin} from "vux";
 // 引入Vue-Scroller组件
 import VueScroller from "vue-scroller";
 // 主Vue
@@ -36,6 +36,7 @@ const initVue = function () {
     // Vux Plugin
     Vue.use(AjaxPlugin);
     Vue.use(ToastPlugin);
+    Vue.use(ConfirmPlugin);
     Vue.use(VueScroller);
 
     // Vuex加载Loading

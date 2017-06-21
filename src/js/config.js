@@ -80,7 +80,16 @@ export default {
             avatar: 'avatar/',
             nickname: 'nickname/',
             sex: 'sex/',
-            password: 'password'
+            password: 'password',
+            recharge: 'paylog/',
+            consume: 'sale/',
+            reward: {
+                reward: 'actlog/gift/',
+                flower: 'actlog/flower/',
+                ticket: 'actlog/vipvote/'
+            },
+            review: 'review/user/',
+            news: 'message/'
         },
         review: {
             add: 'review/add',
@@ -88,6 +97,9 @@ export default {
             reply: 'review/reply',
             user: 'review/user/'
         },
-        sign: 'signin/'
+        sign: 'signin/',
+        setting: {
+            feedback: 'message/add'
+        }
     }
 }

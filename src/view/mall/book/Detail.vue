@@ -1,5 +1,5 @@
 <template>
-    <div class="mall-book-detail">
+    <div class="mall-book-detail" style="height: inherit;">
         <div class="detail" style="margin-top: 20px;height: 140px;background-color: #FFFFFF;">
             <div style="padding: 10px 0px 10px 140px;">
                 <div class="title" style="font-family: PingFangSC-Medium;font-size: 16px;color: #162636;">

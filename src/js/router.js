@@ -21,7 +21,7 @@ const MallMonthlyPackage = resolve => require(['../view/mall/monthly/Package.vue
 const MallClassifyList = resolve => require(['../view/mall/classify/List.vue'], resolve);
 const MallClassifyDetail = resolve => require(['../view/mall/classify/Detail.vue'], resolve);
 const MallTopicDetail = resolve => require(['../view/mall/topic/Detail.vue'], resolve);
-const ReCharge = resolve => require(['../view/recharge/Recharge.vue'], resolve);
+const Recharge = resolve => require(['../view/recharge/Recharge.vue'], resolve);
 const Shelf = resolve => require(['../view/shelf/Shelf.vue'], resolve);
 const ShelfIndex = resolve => require(['../view/shelf/Index.vue'], resolve);
 const Reader = resolve => require(['../view/reader/Reader.vue'], resolve);
@@ -33,10 +33,18 @@ const MineAvatar = resolve => require(['../view/mine/Avatar.vue'], resolve);
 const MinePassChange = resolve => require(['../view/mine/PassChange.vue'], resolve);
 const MineNickName = resolve => require(['../view/mine/NickName.vue'], resolve);
 const MineSex = resolve => require(['../view/mine/Sex.vue'], resolve);
+const MineRecordRecharge = resolve => require(['../view/mine/record/Recharge.vue'], resolve);
+const MineRecordConsume = resolve => require(['../view/mine/record/Consume.vue'], resolve);
+const MineRecordReward = resolve => require(['../view/mine/record/Reward.vue'], resolve);
+const MineReview = resolve => require(['../view/mine/Review.vue'], resolve);
+const MineNews = resolve => require(['../view/mine/News.vue'], resolve);
 const Entry = resolve => require(['../view/entry/Entry.vue'], resolve);
 const EntryLogin = resolve => require(['../view/entry/Login.vue'], resolve);
 const EntryLogon = resolve => require(['../view/entry/Logon.vue'], resolve);
 const EntryPassForget = resolve => require(['../view/entry/PassForget.vue'], resolve);
+const SystemFeedback = resolve => require(['../view/system/Feedback.vue'], resolve);
+const SystemSetting = resolve => require(['../view/system/Setting.vue'], resolve);
+const SystemAbout = resolve => require(['../view/system/About.vue'], resolve);
 
 // routes
 const routes = [
@@ -155,6 +163,26 @@ const routes = [
             {
                 path: 'sex',
                 component: MineSex
+            },
+            {
+                path: 'record/recharge',
+                component: MineRecordRecharge
+            },
+            {
+                path: 'record/consume',
+                component: MineRecordConsume
+            },
+            {
+                path: 'record/reward',
+                component: MineRecordReward
+            },
+            {
+                path: 'review',
+                component: MineReview
+            },
+            {
+                path: 'news',
+                component: MineNews
             }
         ]
     },
@@ -173,12 +201,28 @@ const routes = [
             {
                 path: 'password/forget',
                 component: EntryPassForget
+            },
+            {
+                path: 'logout',
+                redirect: '/mall/index'
             }
         ]
     },
     {
         path: '/recharge',
-        component: ReCharge
+        component: Recharge
+    },
+    {
+        path: '/feedback',
+        component: SystemFeedback
+    },
+    {
+        path: '/setting',
+        component: SystemSetting
+    },
+    {
+        path: '/about',
+        component: SystemAbout
     }
 ];
 

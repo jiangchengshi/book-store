@@ -9,7 +9,7 @@
                 <i v-show="$store.state.header.showShare" class="iconfont icon-zuihouyibanfenxiang"></i>
             </router-link>
         </x-header>
-        <div :style="{height: height+'px', width: width+'px'}">
+        <div style="overflow: scroll;" :style="{height: height+'px', width: width+'px'}">
             <router-view></router-view>
         </div>
         <tabbar>
