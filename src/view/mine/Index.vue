@@ -168,9 +168,11 @@
         background: #F8F8F8;
         border: 1px solid #989A9C;
         border-radius: 7px;
+        color: #989A9C;
+        font-size: 15px;
     }
 
     .mine-index .weui-cell.vux-tap-active.weui-cell_access {
-        padding: 4px 15px;
+        padding: 3px 15px;
     }
 </style>

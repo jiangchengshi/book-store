@@ -7,7 +7,7 @@
                 <li class="book" v-for="b in book" @click="handleClickBook(b.articleid)">
                     <div v-if="b.articleid!=-1">
                         <img :src="b.cover" :class="{tidy: tidy && b.del}"
-                             style="width: 90px;height: 110px;float: left;">
+                             style="width: 85px;height: 110px;float: left;">
                         <icon v-if="tidy && b.del" type="success"
                               style="color: #ee4d22;float: left;margin-left: -33px;margin-top: 78px;opacity: 1;"></icon>
                     </div>
@@ -292,6 +292,7 @@
 
     .shelf-index .books .book .name {
         font-size: 14px;
+        margin-top: 2px;
     }
 
     .shelf-index .books .book .author {

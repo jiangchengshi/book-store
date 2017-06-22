@@ -15,7 +15,9 @@
                             </div>
                             <div style="margin-left: 50px;">
                                 <span style="display: block;font-size: 16px;color: #162636;">{{data.title}}</span>
-                                <span style="display: block;opacity: 0.56;font-size: 12px;color: #162636;">{{data.summary}}</span>
+                                <span style="display: block;opacity: 0.56;font-size: 12px;color: #162636;text-overflow:ellipsis;overflow: hidden;white-space:nowrap;">
+                                    {{data.summary}}
+                                </span>
                             </div>
                         </div>
                     </timeline-item>

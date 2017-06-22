@@ -275,7 +275,11 @@
                 this.$router.push({path: '/mall/book/detail', query: {id: id}});
             },
             handleFeedback(){
-
+                if(this.$store.state.user.uid<=0){
+                    this.$router.push({path: '/entry/login'});
+                    return;
+                }
+                this.$router.push({path: '/feedback'});
             },
             addShelf(func){
                 // 1. 本地=> 更新websql： 书架

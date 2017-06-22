@@ -32,7 +32,10 @@
     export default {
         data () {
             return {
-                recharge: {}
+                recharge: {
+                    username: '',
+                    egold: 0
+                }
             }
         },
         components: {
