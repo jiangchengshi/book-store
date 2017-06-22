@@ -1,27 +1,28 @@
 <template>
     <div class="shelf-index">
-        <div style="height: inherit;">
-            <img src="../../image/sign.png" style="width:50px;height:60px;position: fixed;right: 10px;"
+        <div>
+            <img src="../../image/sign.png" style="width:50px;height:60px;position: fixed;right: 10px;z-index: 1;"
                  @click="handleSign">
-            <ul class="books" v-for="book in books">
-                <li class="book" v-for="b in book" @click="handleClickBook(b.articleid)">
-                    <div v-if="b.articleid!=-1">
-                        <img :src="b.cover" :class="{tidy: tidy && b.del}"
+            <grid>
+                <grid-item v-for="book in books" :key="book.articleid" @on-item-click="handleClickBook(book.articleid)">
+                    <div v-if="book.articleid!=-1">
+                        <img :src="book.cover" :class="{tidy: tidy && book.del}"
                              style="width: 85px;height: 110px;float: left;">
-                        <icon v-if="tidy && b.del" type="success"
+                        <icon v-if="tidy && book.del" type="success"
                               style="color: #ee4d22;float: left;margin-left: -33px;margin-top: 78px;opacity: 1;"></icon>
                     </div>
                     <div v-else>
                         <i class="iconfont icon-add"></i>
                         <span>去书城看看</span>
                     </div>
-                    <span class="name" v-html="b.articlename"></span>
-                    <span class="author" v-html="b.author"></span>
-                </li>
-            </ul>
+                    <span class="name" v-html="book.articlename"></span>
+                    <span class="author" v-html="book.author"></span>
+                </grid-item>
+            </grid>
         </div>
-        <x-button v-show="tidy" action-type="button" @click="handleDelete"
-                  style="position:absolute; bottom: 10px;background: #35B4EB;border-radius: 7px;color: #FFFFFF;">删除
+        <x-button v-show="tidy" action-type="button" @click.native="handleDelete"
+                  style="position:fixed;bottom:0px;line-height:53px;background: #35B4EB;border-radius: 7px;color: #FFFFFF;z-index: 600;">
+            删除
         </x-button>
 
         <!-- 签到 -->
@@ -34,7 +35,7 @@
 </template>
 
 <script>
-    import {Icon, XButton} from 'vux';
+    import {Grid, GridItem, Icon, XButton} from 'vux';
     import CDialog from '../../view/components/Dialog.vue';
 
     export default {
@@ -49,7 +50,7 @@
             }
         },
         components: {
-            Icon, XButton, CDialog
+            Grid, GridItem, Icon, XButton, CDialog
         },
         methods: {
             getBookData(){
@@ -140,12 +141,9 @@
                     }
                 } else {    // 整理状态
                     for (let i = 0; i < this.books.length; i++) {
-                        let _books = this.books[i];
-                        for (let j = 0; j < _books.length; j++) {
-                            if (_books[j].articleid == id) {
-                                _books[j].del = !_books[j].del;
-                                return;
-                            }
+                        if (this.books[i].articleid == id) {
+                            this.books[i].del = !this.books[i].del;
+                            return;
                         }
                     }
                 }
@@ -153,11 +151,8 @@
             handleDelete(){
                 let delBookId = [];
                 for (let i = 0; i < this.books.length; i++) {
-                    let _books = this.books[i];
-                    for (let j = 0; j < _books.length; j++) {
-                        if (_books[j].del) {
-                            delBookId.push(_books[j].articleid);
-                        }
+                    if (this.books[i].del) {
+                        delBookId.push(this.books[i].articleid);
                     }
                 }
                 if (delBookId.length <= 0) {
@@ -199,6 +194,9 @@
                 });
             },
             fillShelf(bookArr){
+                // 清空
+                this.books = [];
+
                 // mall-link
                 bookArr.push({
                     articleid: -1,
@@ -207,23 +205,13 @@
                     cover: ''
                 });
 
-                // 书籍分3层
-                let _books = [];
+                // 书籍删除标识
                 bookArr.forEach((book, i) => {
                     // 默认 del标识为false
                     if (book.articleid != -1) {
                         book.del = false;
                     }
-
-                    // 书架 一层3本书籍
-                    if (i > 0 && i % 3 == 0) { // 3, 6
-                        this.books.push(_books);
-                        _books = [];
-                    }
-                    _books.push(book);
-                    if (i == bookArr.length - 1) {
-                        this.books.push(_books);
-                    }
+                    this.books.push(book);
                 });
             }
         },
@@ -232,11 +220,8 @@
                 let tidy = this.$store.state.header.tidyText == '完成';
                 if (!tidy) {
                     for (let i = 0; i < this.books.length; i++) {
-                        let _books = this.books[i];
-                        for (let j = 0; j < _books.length; j++) {
-                            if (_books[j].del) {
-                                _books[j].del = false;
-                            }
+                        if (this.books[i].del) {
+                            this.books[i].del = false;
                         }
                     }
                 }
@@ -268,21 +253,9 @@
         height: inherit;
         width: 100%;
         position: relative;
-        background-color: #F8F8F8;
     }
 
-    .shelf-index ul {
-        list-style: none;
-        padding: 16px 0px;
-        margin: 0px auto;
-    }
-
-    .shelf-index .books .book {
-        display: inline-block;
-        margin: 0px 5px 0px 20px;
-    }
-
-    .shelf-index .books .book span {
+    .shelf-index .weui-grids a span {
         display: block;
         width: 96px;
         height: 16px;
@@ -290,17 +263,18 @@
         overflow: hidden;
     }
 
-    .shelf-index .books .book .name {
+    .shelf-index .weui-grids a .name {
         font-size: 14px;
         margin-top: 2px;
+        color: #162636;
     }
 
-    .shelf-index .books .book .author {
+    .shelf-index .weui-grids a .author {
         font-size: 12px;
         color: #989A9C;
     }
 
-    .shelf-index .books:last-child .book:last-child div {
+    .shelf-index .weui-grids:last-child a:last-child div {
         width: 90px;
         height: 110px;
         border: dashed 1px #35B4EB;
@@ -309,12 +283,12 @@
         vertical-align: middle;
     }
 
-    .shelf-index .books:last-child .book:last-child div .iconfont {
+    .shelf-index .weui-grids:last-child a:last-child div .iconfont {
         font-size: 35px;
         color: #35B4EB;
     }
 
-    .shelf-index .books:last-child .book:last-child div span {
+    .shelf-index .weui-grids:last-child a:last-child div span {
         font-size: 12px;
         color: #35B4EB;
     }
@@ -323,7 +297,11 @@
         overflow: initial;
     }
 
-    .shelf-index .books .book .tidy {
+    .shelf-index .weui-grids a .tidy {
         opacity: 0.3;
+    }
+
+    .shelf-index .weui-grids .weui-grid:before, .shelf-index .weui-grids .weui-grid:after {
+        border: initial;
     }
 </style>

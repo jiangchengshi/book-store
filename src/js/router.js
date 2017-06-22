@@ -45,6 +45,7 @@ const EntryPassForget = resolve => require(['../view/entry/PassForget.vue'], res
 const SystemFeedback = resolve => require(['../view/system/Feedback.vue'], resolve);
 const SystemSetting = resolve => require(['../view/system/Setting.vue'], resolve);
 const SystemAbout = resolve => require(['../view/system/About.vue'], resolve);
+const Test = resolve => require(['../view/Test.vue'], resolve);
 
 // routes
 const routes = [
@@ -223,6 +224,10 @@ const routes = [
     {
         path: '/about',
         component: SystemAbout
+    },
+    {
+        path: '/test',
+        component: Test
     }
 ];
 

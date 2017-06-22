@@ -13,7 +13,7 @@ let webpackConfig = {
         // 此字段配置如果不正确，发布后资源定位不对，比如：css里面的精灵图路径错误
         publicPath: NODE_ENV === 'DEV' ? '/build/' : './build/',
         filename: NODE_ENV === 'DEV' ? 'main.js' : 'main.[hash].js',
-        chunkFilename: NODE_ENV ==='DEV'?'[name].[id].js':'[name].[id].[hash].js'
+        chunkFilename: NODE_ENV ==='DEV'?'[name].js':'[name].[hash].js'
     },
     module: {
         rules: [

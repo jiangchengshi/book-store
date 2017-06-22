@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="reader" @touchstart="touchStart" @touchend="touchEnd" @touchmove="touchMove" ref="reader">
+        <div class="reader" ref="reader">
             <div class="pull-layer">
                 <template v-if="content.mark">
                     <label style="display: block;line-height: 50px;">
@@ -29,14 +29,12 @@
                     {{data.chapter.articlename}}
                     <img v-show="content.mark" src="../../image/mark.png" style="width: 20px;float: right;">
                 </div>
-                <div class="content" ref="content"
-                     :style="{lineHeight: setting.lineHeight+'px',opacity: setting.opacity.content,fontSize: setting.fontSize+'px'}"
-                     @click="clickContent">
+                <div class="content" ref="content" @touchstart="touchStart" @touchend="touchEnd" @touchmove="touchMove"
+                     :style="{lineHeight: setting.lineHeight+'px',opacity: setting.opacity.content,fontSize: setting.fontSize+'px'}">
                     <transition @before-enter="transBeforeEnter" @enter="transEnter"
                                 @leave="transLeave" @after-leave="transAfterLeave" :css="false">
                         <div v-show="content.switch" style="column-gap:20px"
-                             :style="{'column-width':width+'px',height: contentHeight+'px'}">
-                            {{data.chapter.content}}
+                             :style="{'column-width':width+'px',height: contentHeight+'px'}" v-html="data.chapter.content">
                         </div>
                     </transition>
                 </div>
@@ -114,7 +112,9 @@
         <popup v-model="show.progress" class="popup-progress">
             <group>
                 <cell primary="content">
-                    <range :min="chapterId.min" :max="chapterId.max" minHTML="上一章" maxHTML="下一章"
+                    <range :min="chapterId.min" :max="chapterId.max"
+                           minHTML="<x-button plain @click.native=trunPage('prev')>上一章</x-button>"
+                           maxHTML="<span @click=trunPage('next')>下一章</span>"
                            @on-change="changeChapter"></range>
                 </cell>
             </group>
@@ -328,7 +328,7 @@
                     translateX: 0,
                     mark: false,
                     touch: {
-                        direction: 'x',
+                        direction: 'none',
                         start: {
                             x: 0,
                             y: 0
@@ -399,6 +399,11 @@
                             if (resp.status == 200) {
                                 let data = resp.data.result;
                                 if (data) {
+                                    // 换行
+                                    console.log(data.content);
+                                    data.content = "<p>" + data.content.replace(/\r\n\r\n/g, '</p><br/><p>') + "</p>";
+                                    console.log(data.content);
+
                                     this.data.chapter = data;
 
                                     // 章节信息：插入websql
@@ -428,17 +433,22 @@
                 });
             },
             clickContent(e){
-                if (e.x >= this.width * 0.3 && e.x <= this.width * 0.7) {
-                    this.$store.commit('updateReaderBar');
-                } else {
-                    if (e.x < this.width * 0.3) {  // 上一页
-                        this.turnPage('prev');
-                    } else if (e.x > this.width * 0.7) { // 下一页
-                        this.turnPage('next');
+                console.log(e);
+                if (e.y > app.config.setting.height.header
+                    && e.y < (app.config.setting.height.screen - app.config.setting.height.tabbar)){
+                    if (e.x >= this.width * 0.3 && e.x <= this.width * 0.7) {
+                        this.$store.commit('updateReaderBar');
+                    } else {
+                        if (e.x < this.width * 0.3) {  // 上一页
+                            this.turnPage('prev');
+                        } else if (e.x > this.width * 0.7) { // 下一页
+                            this.turnPage('next');
+                        }
                     }
                 }
             },
             turnPage(direction){
+                console.log(direction);
                 if (direction == 'prev') {
                     if (this.content.translateX <= 0) {
                         if (this.chapterId.cur <= this.chapterId.min) {
@@ -577,7 +587,14 @@
             },
             changeBrightness(){
                 if (app.config.setting.isApp) {
-                    plus.screen.setBrightness(this.setting.brightness);
+                    try {
+                        plus.screen.setBrightness(Number(this.setting.brightness));
+                    } catch (err) {
+                        this.$vux.toast.show({
+                            text: err,
+                            type: 'warn'
+                        })
+                    }
 
                     // 更新websql：亮度
                     app.webSql.update(app.config.webSql.setting, {value: this.setting.brightness}, {key: 'brightness'});
@@ -698,10 +715,9 @@
                 this.content.switch = true;
             },
             touchStart(e){
-                // 阻止触摸事件的默认行为，即阻止滚屏
                 e.preventDefault();
 
-                this.content.touch.direction = "";
+                this.content.touch.direction = "none";
                 this.content.touch.diff.x = 0;
                 this.content.touch.diff.y = 0;
 
@@ -709,15 +725,14 @@
                 this.content.touch.start.y = e.touches[0].screenY;
             },
             touchMove(e){
-                // 阻止触摸事件的默认行为，即阻止滚屏
-                e.preventDefault();
-
                 this.content.touch.end.x = e.touches[0].screenX;
                 this.content.touch.end.y = e.touches[0].screenY;
                 this.content.touch.diff.x = this.content.touch.start.x - this.content.touch.end.x;
                 this.content.touch.diff.y = this.content.touch.start.y - this.content.touch.end.y;
 
                 if (Math.abs(this.content.touch.diff.x) > 10 || Math.abs(this.content.touch.diff.y) > 10) {
+                    e.preventDefault();
+
                     // 滑动方向：x
                     if (Math.abs(this.content.touch.diff.x) >= Math.abs(this.content.touch.diff.y)) {
                         if (this.content.touch.diff.x > 0) {    // 左滑
@@ -735,6 +750,8 @@
                             this.content.touch.direction = 'y-up';
                         }
                     }
+                } else {
+                    this.content.touch.direction = 'none';
                 }
             },
             touchEnd(e){
@@ -765,6 +782,8 @@
                             });
                         }
                     }, 500);
+                } else if (this.content.touch.direction == 'none') {
+                    this.clickContent({x: e.changedTouches[0].screenX, y: e.changedTouches[0].screenY});
                 }
             }
         },
@@ -846,11 +865,12 @@
         mounted(){
             // 目录
             this.getCatalogData(1);
+
             // 书签
             this.getMarkData();
 
             // 章节信息
-//            this.getChapterData();    // range组件初始化change会加载数据
+            this.getChapterData();    // range组件初始化change会加载数据
 
             // 书籍详情
             this.getBookData(this.$route.query.id);
@@ -911,8 +931,11 @@
 
     .reader .chapter .content {
         padding-top: 46px;
-        text-indent: 2em;
         letter-spacing: 1px;
+    }
+
+    .reader .chapter .content p {
+        text-indent: 2em;
     }
 
     .reader ~ .popup-catalog .weui-cell .vux-label {
