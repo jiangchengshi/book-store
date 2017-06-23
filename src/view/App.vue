@@ -3,7 +3,7 @@
         <transition name="fade" mode="out-in">
             <router-view></router-view>
         </transition>
-        <loading v-model="loading" text="拼命加载中"></loading>
+        <loading v-model="show" :text="text"></loading>
     </div>
 </template>
 
@@ -16,8 +16,19 @@
             Loading
         },
         computed: {
-            loading(){
-                return this.$store.state.loading;
+            show(){
+                return this.$store.state.loading.show;
+            },
+            text(){
+                return this.$store.state.loading.text;
+            }
+        },
+        mounted(){
+            // 监听 物理返回键
+            if (app.config.setting.isApp) {
+                plus.key.addEventListener('backbutton', function (e) {
+                    console.log(JSON.stringify(e));
+                }, false);
             }
         }
     }

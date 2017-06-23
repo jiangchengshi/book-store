@@ -54,76 +54,77 @@
         },
         methods: {
             getBookData(){
-                // 1. 本地=> 获取书架书籍
-//                app.webSql.query(app.config.webSql.shelf, {}, {}, (rows) => {
-//                    if (rows && rows.length <= 0) {
-//                        this.$vux.toast.show({
-//                            text: '还没有添加过书籍哦!',
-//                            isShowMask: true
-//                        });
-//                        return;
-//                    }
-//
-//                    this.handleShelf(rows);
-//                });
-
-                // 2. 请求服务=> 获取书架书籍
-                app.ajax.get(app.config.api.shelf.list + this.$store.state.user.uid, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.fillShelf(data);
+                // 1. 有网络：请求服务=> 获取书架书籍
+                if (app.service.hasNetwork()) {
+                    app.ajax.get(app.config.api.shelf.list + this.$store.state.user.uid, {},
+                        (data) => {
+                            this.fillShelf(data.result);
+                        }, (err) => {
+                            this.$vux.toast.show({
+                                text: '系统异常，请稍后重试...',
+                                type: 'warn'
+                            });
+                            app.log.error(err);
+                        });
+                }
+                // 2. 无网络：本地=> 获取书架书籍
+                else {
+                    app.webSql.query(app.config.webSql.shelf, {}, {}, (rows) => {
+                        if (rows && rows.length <= 0) {
+                            this.$vux.toast.show({
+                                text: '还没有添加过书籍哦!',
+                                isShowMask: true
+                            });
+                            return;
                         }
-                    }
-                }, (err) => {
-                });
+
+                        this.fillShelf(rows);
+                    });
+                }
             },
             getSignData(){
-                app.ajax.get(app.config.api.sign + this.$store.state.user.uid, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.sign = data;
-                        }
-                    }
-                }, (err) => {
-                });
+                app.ajax.get(app.config.api.sign + this.$store.state.user.uid, {},
+                    (data) => {
+                        this.sign = data.result;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             handleSign(){
-                if (this.$store.state.user.uid <= 0) {
-                    this.$router.push({path: '/entry/login'});
-                    return;
-                }
                 this.show.signIn = true;
             },
             handleSignIn(){
                 app.ajax.post(app.config.api.sign, {
                     uid: this.$store.state.user.uid
-                }, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            if (data.result == 1) { // 1:成功
-                                // 更新用户egold
-                                let egold = Number(this.$store.state.user.egold) + Number(data.egold);
-                                this.$store.commit('updateUser', {egold: egold});
+                }, (data) => {
+                    if (data.result.result == 1) { // 1:成功
+                        // 更新用户egold
+                        let egold = Number(this.$store.state.user.egold) + Number(data.result.egold);
+                        this.$store.commit('updateUser', {egold: egold});
 
-                                this.show.signOk = true;
-                                this.show.signIn = false;
-                            } else if (data.result == 2) {   // 2:用户不存在
-                                this.$vux.toast.show({
-                                    text: '用户不存在',
-                                    type: 'warn'
-                                });
-                            } else if (data.result == 3) {   // 3:已签到
-                                this.$vux.toast.show({
-                                    text: '已签到',
-                                    type: 'info'
-                                });
-                            }
-                        }
+                        this.show.signOk = true;
+                        this.show.signIn = false;
+                    } else if (data.result.result == 2) {   // 2:用户不存在
+                        this.$vux.toast.show({
+                            text: '用户不存在',
+                            type: 'warn'
+                        });
+                    } else if (data.result.result == 3) {   // 3:已签到
+                        this.$vux.toast.show({
+                            text: '已签到',
+                            type: 'info'
+                        });
                     }
                 }, (err) => {
+                    this.$vux.toast.show({
+                        text: '系统异常，请稍后重试...',
+                        type: 'warn'
+                    });
+                    app.log.error(err);
                 });
             },
             handleSignOk(){
@@ -167,30 +168,30 @@
                 app.ajax.post(app.config.api.shelf.delete, {
                     uid: this.$store.state.user.uid,
                     articleid: delBookId.join(',')
-                }, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            if (data.result == 1) { // 1：成功
-                                this.$vux.toast.show({
-                                    text: '删除成功',
-                                    type: 'info'
-                                });
-                                this.getBookData();
-                            } else if (data.result == 2) {   // 2:用户不存在
-                                this.$vux.toast.show({
-                                    text: '用户不存在',
-                                    type: 'warn'
-                                });
-                            } else if (data.result == 3) {   // 3:书籍不存在
-                                this.$vux.toast.show({
-                                    text: '书籍不存在',
-                                    type: 'warn'
-                                });
-                            }
-                        }
+                }, (data) => {
+                    if (data.result.result == 1) { // 1：成功
+                        this.$vux.toast.show({
+                            text: '删除成功',
+                            type: 'info'
+                        });
+                        this.getBookData();
+                    } else if (data.result.result == 2) {   // 2:用户不存在
+                        this.$vux.toast.show({
+                            text: '用户不存在',
+                            type: 'warn'
+                        });
+                    } else if (data.result.result == 3) {   // 3:书籍不存在
+                        this.$vux.toast.show({
+                            text: '书籍不存在',
+                            type: 'warn'
+                        });
                     }
                 }, (err) => {
+                    this.$vux.toast.show({
+                        text: '系统异常，请稍后重试...',
+                        type: 'warn'
+                    });
+                    app.log.error(err);
                 });
             },
             fillShelf(bookArr){

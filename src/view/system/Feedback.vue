@@ -48,24 +48,23 @@
                     uid: this.$store.state.user.uid,
                     content: this.content,
                     contact: this.contact
-                }, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            if (data.result == 1) { // 1:成功
-                                this.$vux.toast.show({
-                                    text: '感谢您的反馈'
-                                });
-                            } else if (data.result == 2) {   // 2:用户不存在
-                                this.$vux.toast.show({
-                                    type: 'warn',
-                                    text: '用户不存在'
-                                });
-                            }
-                        }
+                }, (data) => {
+                    if (data.result == 1) { // 1:成功
+                        this.$vux.toast.show({
+                            text: '感谢您的反馈'
+                        });
+                    } else if (data.result == 2) {   // 2:用户不存在
+                        this.$vux.toast.show({
+                            type: 'warn',
+                            text: '用户不存在'
+                        });
                     }
                 }, (err) => {
-                    console.error(err);
+                    this.$vux.toast.show({
+                        text: '系统异常，请稍后重试...',
+                        type: 'warn'
+                    });
+                    app.log.error(err);
                 });
             }
         },

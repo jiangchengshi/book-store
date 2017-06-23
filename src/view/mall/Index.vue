@@ -84,65 +84,73 @@
         },
         methods: {
             getSwipeData(){ // 轮播数据
-                app.ajax.get(app.config.api.focus, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.data.swiper = data.map((item, index) => ({
+                app.ajax.get(app.config.api.focus, {},
+                    (data) => {
+                        if (data.result && data.result.length > 0) {
+                            this.data.swiper = data.result.map((item, index) => ({
                                 title: item.name,
                                 img: item.image,
                                 url: '/mall/book/detail?id=' + item.id
                             }));
                         }
-                    }
-                }, (err) => {
-                });
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             getNavigatorData(){ // 导航菜单数据
-                app.ajax.get(app.config.api.navigator, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.data.navigator = data;
-                        }
-                    }
-                }, (err) => {
-                });
+                app.ajax.get(app.config.api.navigator, {},
+                    (data) => {
+                        this.data.navigator = data.result;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             getExpandData(){  // 推广数据
-                app.ajax.get(app.config.api.recommend2, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.data.expand = data;
-                        }
-                    }
-                }, (err) => {
-                });
+                app.ajax.get(app.config.api.recommend2, {},
+                    (data) => {
+                        this.data.expand = data.result;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             getRecommendData(callback){ // 推荐数据
-                app.ajax.get(app.config.api.recommend + this.page, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data && data.length > 0) {
+                app.ajax.get(app.config.api.recommend + this.page, {},
+                    (data) => {
+                        if (data.result && data.result.length > 0) {
                             this.data.recommend.push({
-                                topic: data.pop(),
-                                list: data
+                                topic: data.result.pop(),
+                                list: data.result
                             });
 
-                            if(typeof callback == "function") {
+                            if (typeof callback == "function") {
                                 callback();
                             }
-                        }else{
-                            if(typeof callback == "function") {
+                        } else {
+                            if (typeof callback == "function") {
                                 this.page--;
 
                                 callback(true);
                             }
                         }
-                    }
-                }, (err) => {
-                });
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             handleSwiper(id){
                 console.log(id);

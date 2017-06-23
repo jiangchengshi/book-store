@@ -22,11 +22,10 @@
         },
         methods: {
             getData(callback){
-                app.ajax.get(app.config.api.book.free + this.page, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data && data.length > 0) {
-                            this.dataList = this.dataList.concat(data);
+                app.ajax.get(app.config.api.book.free + this.page, {},
+                    (data) => {
+                        if (data.result && data.result.length > 0) {
+                            this.dataList = this.dataList.concat(data.result);
 
                             if (typeof callback == "function") {
                                 callback();
@@ -38,9 +37,13 @@
                                 callback(true);
                             }
                         }
-                    }
-                }, (err) => {
-                });
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             handleInfinite(done){
                 if (this.page >= 10) {

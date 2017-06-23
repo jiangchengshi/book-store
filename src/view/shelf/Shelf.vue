@@ -43,10 +43,6 @@
         },
         methods: {
             handleTidy(){
-                if (this.$store.state.user.uid <= 0) {
-                    this.$router.push({path: '/entry/login'});
-                    return;
-                }
                 let tidyText = this.$store.state.header.tidyText == '整理' ? '完成' : '整理';
                 this.$store.commit('updateHeader', {
                     title: '书架',

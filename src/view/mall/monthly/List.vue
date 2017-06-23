@@ -24,15 +24,16 @@
             });
         },
         mounted(){
-            app.ajax.get(app.config.api.monthly.monthly, {}, (resp) => {
-                if (resp.status == 200) {
-                    let data = resp.data.result;
-                    if (data) {
-                        this.dataList = data;
-                    }
-                }
-            }, (err) => {
-            });
+            app.ajax.get(app.config.api.monthly.monthly, {},
+                (data) => {
+                    this.dataList = data.result;
+                }, (err) => {
+                    this.$vux.toast.show({
+                        text: '系统异常，请稍后重试...',
+                        type: 'warn'
+                    });
+                    app.log.error(err);
+                });
         }
     }
 </script>

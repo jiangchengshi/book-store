@@ -43,15 +43,16 @@
         },
         methods: {
             getData(){
-                app.ajax.get(app.config.api.mine.avatar + this.$store.state.user.uid, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.avatar = data.avatar;
-                        }
-                    }
-                }, (err) => {
-                });
+                app.ajax.get(app.config.api.mine.avatar + this.$store.state.user.uid, {},
+                    (data) => {
+                        this.avatar = data.result.avatar;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             clickMenu(key){
                 switch (key) {

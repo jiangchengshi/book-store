@@ -40,29 +40,16 @@
         },
         methods: {
             getUserBaseData(){
-                app.ajax.get(app.config.api.mine.base + this.$store.state.user.uid, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.info = data;
-                        }
-                    }
-                }, (err) => {
-
-                });
-            },
-            handleInfo(){
-                if (this.$store.state.user.uid <= 0) {
-                    this.$router.push({path: '/entry/login'});
-                    return;
-                }
-                this.$router.push({path: '/mine/info'});
-            },
-            handleLogin(){
-                if (this.$store.state.user.uid <= 0) {
-                    this.$router.push({path: '/entry/login'});
-                    return;
-                }
+                app.ajax.get(app.config.api.mine.base + this.$store.state.user.uid, {},
+                    (data) => {
+                        this.info = data.result;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             }
         },
         created(){
@@ -72,9 +59,7 @@
             });
         },
         mounted(){
-            if (this.$store.state.user.uid > 0) {
-                this.getUserBaseData();
-            }
+            this.getUserBaseData();
         }
     }
 </script>

@@ -91,22 +91,18 @@
         },
         methods: {
             getUserData(){
-                app.ajax.get(app.config.api.mine.info + this.$store.state.user.uid, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.info = data;
-                        }
-                    }
-                }, (err) => {
-
-                });
+                app.ajax.get(app.config.api.mine.info + this.$store.state.user.uid, {},
+                    (data) => {
+                        this.info = data.result;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             handleInfo(){
-                if (this.$store.state.user.uid <= 0) {
-                    this.$router.push({path: '/entry/login'});
-                    return;
-                }
                 this.$router.push({path: '/mine/info'});
             },
             handleLogin(){
@@ -116,17 +112,11 @@
                 }
             },
             handleRecharge(){
-                if (this.$store.state.user.uid <= 0) {
-                    this.$router.push({path: '/entry/login'});
-                    return;
-                }
                 this.$router.push({path: '/recharge'});
             }
         },
         mounted(){
-            if (this.$store.state.user.uid > 0) {
-                this.getUserData();
-            }
+            this.getUserData();
         }
     }
 </script>

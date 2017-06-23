@@ -43,16 +43,16 @@
         },
         methods: {
             getData(){
-                app.ajax.get(app.config.api.mine.recharge + this.$store.state.user.uid, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.recharge = data;
-                        }
-                    }
-                }, (err) => {
-
-                });
+                app.ajax.get(app.config.api.mine.recharge + this.$store.state.user.uid, {},
+                    (data) => {
+                        this.recharge = data.result;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             }
         },
         created(){

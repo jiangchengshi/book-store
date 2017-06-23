@@ -2,26 +2,30 @@
     <x-dialog v-model="isShow" hide-on-blur @on-hide="handleCancel">
         <template v-if="type=='monthly'">
             <div class="monthly">
-                <cell title="订阅超值包月，免费畅读一个月"></cell>
-                <div class="weui-panel weui-panel_access">
-                    <a class="weui-media-box weui-media-box_appmsg">
-                        <div class="weui-media-box__hd">
-                            <img class="weui-media-box__thumb" :src="data.image" alt="">
+                <cell title="订阅超值包月，免费畅读一个月" style="border-bottom: 1px solid #BDBDBD;"></cell>
+                <group class="info" style="padding: 10px 0px;">
+                    <cell-box>
+                        <div v-if="data.image && data.image.length>0" style="display: inline-block;">
+                            <img :src="data.image[1]"
+                                 style="height: 80px;transform: scale3d(0.8,0.8,1);position: relative;left: 0px;box-shadow: 2px 5px 2px #888888;">
+                            <img :src="data.image[2]"
+                                 style="height: 80px;transform: scale3d(0.8,0.8,1);position: relative;left: -10px;box-shadow: 2px 5px 2px #888888;">
+                            <img :src="data.image[0]"
+                                 style="height: 80px;transform: scale3d(1,1,1);position: relative;left: -100px;box-shadow: 2px 5px 2px #888888;">
                         </div>
-                        <div class="weui-media-box__bd">
-                            <h4 class="weui-media-box__title">{{data.name}}
-                                <span style="font-size: 12px;color: #989A9C;">({{data.num}}本)</span>
-                            </h4>
-                            <p class="weui-media-box__desc" style="font-size: 14px;color: #989A9C;">{{data.desc}}</p>
-                            <p style="font-size: 12px;color: #989A9C;">原价： ￥
-                                <span style="text-decoration: line-through;">1{{data.priceOri}}</span>
+                        <div style="display: inline-block;margin-left: -60px;text-align: left">
+                            <p style="font-size: 18px;color: #162636;line-height: 25px;">{{data.name}}
+                                <span style="font-size: 12px;color: #989A9C;">({{data.book_num}}本)</span>
                             </p>
-                            <p style="font-size: 14px;color: #162636;">现价： ￥
-                                <span style="color: red;">2{{data.priceNow}}</span>
+                            <p style="font-size: 14px;color: #989A9C;line-height: 25px;">{{data.desc}}</p>
+                            <p style="font-size: 12px;color: #989A9C;line-height: 30px;">原价： ￥
+                                <span style="text-decoration: line-through;">{{data.old_price}}</span>
                             </p>
+                            <p style="font-size: 15px;color: #162636;">现价： ￥
+                                <span style="color: red;">{{data.price}} /月</span></p>
                         </div>
-                    </a>
-                </div>
+                    </cell-box>
+                </group>
                 <checklist v-model="renew" :options="[{key:data.id, value:'一个月后自动续订'}]" :max="1" :min="0"></checklist>
                 <group>
                     <cell title="话费支付">
@@ -204,18 +208,29 @@
     }
 </script>
 <style>
-    .monthly .weui-media-box_appmsg .weui-media-box__hd {
-        height: 75px;
-        line-height: 75px;
-    }
-
-    .monthly .weui-media-box__bd p {
-        line-height: 20px;
+    .monthly .info .weui-cells:after {
+        border: initial;
     }
 
     .monthly .weui-cell.weui-check_label .weui-cell__bd {
         color: #989A9C;
         font-size: 14px;
+    }
+
+    .monthly .weui-panel:after, .monthly .weui-cells:before {
+        border: initial;
+    }
+
+    .monthly .weui-media-box {
+        padding: 15px 15px 0px;
+    }
+
+    .monthly .weui-cell.weui-check_label .weui-cell__bd {
+        text-align: left;
+    }
+
+    .monthly .weui-cells.vux-no-group-title .weui-cell {
+        padding: 5px 15px;
     }
 
     .review .weui-cells__title {

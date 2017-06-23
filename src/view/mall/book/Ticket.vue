@@ -64,15 +64,16 @@
         },
         methods: {
             getData(){
-                app.ajax.get(app.config.api.book.ticket.get + this.$store.state.user.uid, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            Object.assign(this.info, data);
-                        }
-                    }
-                }, (err) => {
-                });
+                app.ajax.get(app.config.api.book.ticket.get + this.$store.state.user.uid, {},
+                    (data) => {
+                        Object.assign(this.info, data.result);
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             handleTicket(){
                 if (this.ticket.num <= 0) {
@@ -91,28 +92,28 @@
                     uid: this.$store.state.user.uid,
                     num: this.ticket.num,
                     articleid: this.$route.query.id
-                }, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            if (data.result == 1) { // 1:成功
-                                this.$vux.toast.show({
-                                    text: '赠送月票成功'
-                                });
+                }, (data) => {
+                    if (data.result == 1) { // 1:成功
+                        this.$vux.toast.show({
+                            text: '赠送月票成功'
+                        });
 
-                                this.getData();
-                            } else if (data.result == 2) {   // 2:余额不足
-                                this.show.less = true;
-                                this.show.confirm = false;
-                            } else if (data.result == 3) {   // 3:书籍不存在
-                                this.$vux.toast.show({
-                                    text: '书籍不存在',
-                                    type: 'warn'
-                                });
-                            }
-                        }
+                        this.getData();
+                    } else if (data.result == 2) {   // 2:余额不足
+                        this.show.less = true;
+                        this.show.confirm = false;
+                    } else if (data.result == 3) {   // 3:书籍不存在
+                        this.$vux.toast.show({
+                            text: '书籍不存在',
+                            type: 'warn'
+                        });
                     }
                 }, (err) => {
+                    this.$vux.toast.show({
+                        text: '系统异常，请稍后重试...',
+                        type: 'warn'
+                    });
+                    app.log.error(err);
                 });
             }
         },

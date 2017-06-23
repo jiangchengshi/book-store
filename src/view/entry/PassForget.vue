@@ -44,33 +44,32 @@
                     username: this.username,
                     password: this.password,
                     code: this.code
-                }, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            if (data.result == 1) {
-                                this.$vux.toast.show({
-                                    text: '修改成功',
-                                    type: 'info'
-                                });
-                                setTimeout(() => {
-                                    this.$router.push({path: '/entry/login', query: {username: this.username}});
-                                }, 2000);
-                            } else if (data.result == 2) { // 用户不存在
-                                this.$vux.toast.show({
-                                    type: 'warn',
-                                    text: '用户不存在'
-                                });
-                            } else if (data.result == 3) {   // 验证码错误
-                                this.$vux.toast.show({
-                                    type: 'warn',
-                                    text: '验证码错误'
-                                });
-                            }
-                        }
+                }, (data) => {
+                    if (data.result.result == 1) {
+                        this.$vux.toast.show({
+                            text: '修改成功',
+                            type: 'info'
+                        });
+                        setTimeout(() => {
+                            this.$router.push({path: '/entry/login', query: {username: this.username}});
+                        }, 2000);
+                    } else if (data.result.result == 2) { // 用户不存在
+                        this.$vux.toast.show({
+                            type: 'warn',
+                            text: '用户不存在'
+                        });
+                    } else if (data.result.result == 3) {   // 验证码错误
+                        this.$vux.toast.show({
+                            type: 'warn',
+                            text: '验证码错误'
+                        });
                     }
                 }, (err) => {
-                    console.error(err);
+                    this.$vux.toast.show({
+                        text: '系统异常，请稍后重试...',
+                        type: 'warn'
+                    });
+                    app.log.error(err);
                 });
             },
             handleSendCode(e){
@@ -91,6 +90,7 @@
                 let task = setInterval(() => {
                     this.codeTime--;
                     if (this.codeTime == 0) {
+                        // 清除定时任务
                         clearInterval(task);
                         this.codeTime = app.config.setting.codeTime;
                         this.codeDisabled = false;
@@ -98,20 +98,31 @@
                 }, 1000);
 
                 // 请求发送验证码
-                app.ajax.get(app.config.api.entry.sms + this.username, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            validateCode = data.code;
+                app.ajax.get(app.config.api.entry.sms + this.username, {},
+                    (data) => {
+                        if (data.result.code) {
                             this.$vux.toast.show({
                                 text: '验证码已发送，请注意查收',
                                 type: 'info'
                             });
+                        } else {
+                            this.$vux.toast.show({
+                                text: '验证码发送失败，请稍后重试...',
+                                type: 'warn'
+                            });
+
+                            // 清除定时任务
+                            clearInterval(task);
+                            this.codeTime = app.config.setting.codeTime;
+                            this.codeDisabled = false;
                         }
-                    }
-                }, (err) => {
-                    console.error(err);
-                });
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             }
         },
         computed: {

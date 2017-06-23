@@ -34,7 +34,8 @@
                     <transition @before-enter="transBeforeEnter" @enter="transEnter"
                                 @leave="transLeave" @after-leave="transAfterLeave" :css="false">
                         <div v-show="content.switch" style="column-gap:20px"
-                             :style="{'column-width':width+'px',height: contentHeight+'px'}" v-html="data.chapter.content">
+                             :style="{'column-width':width+'px',height: contentHeight+'px'}"
+                             v-html="data.chapter.content">
                         </div>
                     </transition>
                 </div>
@@ -348,25 +349,27 @@
                     time: '',
                     progress: 0
                 },
-                rewardCoin: 0
+                rewardCoin: 0,
+                page: 1
             }
         },
         components: {
             XHeader, Tabbar, TabbarItem, Popup, Tab, TabItem, Group, Cell, XInput, Range, Actionsheet, XButton
         },
         methods: {
-            getCatalogData(page){
-                app.ajax.get(app.config.api.reader.chapters + this.$route.query.id + '/' + page, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.chapterId.min = data.min_chapterid;
-                            this.chapterId.max = data.max_chapterid;
-                            this.data.chapters = data.result;
-                        }
-                    }
-                }, (err) => {
-                });
+            getCatalogData(){
+                app.ajax.get(app.config.api.reader.chapters + this.$route.query.id + '/' + this.page, {},
+                    (data) => {
+                        this.chapterId.min = data.result.min_chapterid;
+                        this.chapterId.max = data.result.max_chapterid;
+                        this.data.chapters = data.result.result;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             getMarkData(){
                 app.webSql.query(app.config.webSql.mark, {}, {}, (rows) => {
@@ -395,47 +398,47 @@
                         };
                     } else {
                         // 2. 请求服务器
-                        app.ajax.get(app.config.api.reader.chapter + this.chapterId.cur, {}, (resp) => {
-                            if (resp.status == 200) {
-                                let data = resp.data.result;
-                                if (data) {
-                                    // 换行
-                                    console.log(data.content);
-                                    data.content = "<p>" + data.content.replace(/\r\n\r\n/g, '</p><br/><p>') + "</p>";
-                                    console.log(data.content);
+                        app.ajax.get(app.config.api.reader.chapter + this.chapterId.cur, {},
+                            (data) => {
+                                // 换行
+                                data.result.content = "<p>" + data.result.content.replace(/\r\n\r\n/g, '</p><br/><p>') + "</p>";
 
-                                    this.data.chapter = data;
+                                this.data.chapter = data.result;
 
-                                    // 章节信息：插入websql
-                                    app.webSql.insert(app.config.webSql.chapter,
-                                        {
-                                            articleid: this.chapterId.cur,
-                                            articlename: data.articlename,
-                                            content: data.content
-                                        }
-                                    )
-                                }
-                            }
-                        }, (err) => {
-                        });
+                                // 章节信息：插入websql
+                                app.webSql.insert(app.config.webSql.chapter,
+                                    {
+                                        articleid: this.chapterId.cur,
+                                        articlename: data.result.articlename,
+                                        content: data.result.content
+                                    }
+                                )
+                            }, (err) => {
+                                this.$vux.toast.show({
+                                    text: '系统异常，请稍后重试...',
+                                    type: 'warn'
+                                });
+                                app.log.error(err);
+                            });
                     }
                 });
             },
-            getBookData(id){
-                app.ajax.get(app.config.api.book.detail + id, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.data.book = data;
-                        }
-                    }
-                }, (err) => {
-                });
+            getBookData(){
+                app.ajax.get(app.config.api.book.detail + this.$route.query.id, {},
+                    (data) => {
+                        this.data.book = data.result;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             clickContent(e){
                 console.log(e);
                 if (e.y > app.config.setting.height.header
-                    && e.y < (app.config.setting.height.screen - app.config.setting.height.tabbar)){
+                    && e.y < (app.config.setting.height.screen - app.config.setting.height.tabbar)) {
                     if (e.x >= this.width * 0.3 && e.x <= this.width * 0.7) {
                         this.$store.commit('updateReaderBar');
                     } else {
@@ -484,7 +487,7 @@
 
                 // 书签
                 app.webSql.query(app.config.webSql.mark, {
-                    id: this.chapterId.cur,
+                    chapterid: this.chapterId.cur,
                     translateX: this.content.translateX
                 }, {}, (rows) => {
                     if (rows && rows.length > 0) {
@@ -588,7 +591,7 @@
             changeBrightness(){
                 if (app.config.setting.isApp) {
                     try {
-                        plus.screen.setBrightness(Number(this.setting.brightness));
+                        plus.screen.setBrightness(this.setting.brightness / 100);
                     } catch (err) {
                         this.$vux.toast.show({
                             text: err,
@@ -763,7 +766,7 @@
                     setTimeout(() => {
                         if (this.content.mark) {
                             app.webSql.delete(app.config.webSql.mark, {
-                                id: this.chapterId.cur,
+                                chapterid: this.chapterId.cur,
                                 translateX: this.content.translateX
                             }, () => {
                                 this.content.mark = false;
@@ -771,7 +774,7 @@
                             });
                         } else {
                             app.webSql.insert(app.config.webSql.mark, {
-                                id: this.chapterId.cur,
+                                chapterid: this.chapterId.cur,
                                 translateX: this.content.translateX,
                                 name: this.data.chapter.articlename,
                                 content: '',
@@ -785,6 +788,58 @@
                 } else if (this.content.touch.direction == 'none') {
                     this.clickContent({x: e.changedTouches[0].screenX, y: e.changedTouches[0].screenY});
                 }
+            },
+            initSettingDB(){
+                app.webSql.insert(app.config.webSql.setting, {
+                    key: 'brightness',
+                    value: this.setting.brightness,
+                    type: 'integer'
+                });
+                app.webSql.insert(app.config.webSql.setting, {
+                    key: 'fontSize',
+                    value: this.setting.fontSize,
+                    type: 'integer'
+                });
+                app.webSql.insert(app.config.webSql.setting, {
+                    key: 'fontStyle',
+                    value: this.setting.fontStyle,
+                    type: 'string'
+                });
+                app.webSql.insert(app.config.webSql.setting, {
+                    key: 'turnModel',
+                    value: this.setting.turnModel,
+                    type: 'integer'
+                });
+                app.webSql.insert(app.config.webSql.setting, {
+                    key: 'lineHeight',
+                    value: this.setting.lineHeight,
+                    type: 'integer'
+                });
+                app.webSql.insert(app.config.webSql.setting, {
+                    key: 'dayNight',
+                    value: this.setting.dayNight,
+                    type: 'string'
+                });
+                app.webSql.insert(app.config.webSql.setting, {
+                    key: 'dayNightIcon',
+                    value: this.setting.dayNightIcon,
+                    type: 'string'
+                });
+                app.webSql.insert(app.config.webSql.setting, {
+                    key: 'bgColor',
+                    value: base64.encode(JSON.stringify(this.setting.bgColor)),
+                    type: 'json'
+                });
+                app.webSql.insert(app.config.webSql.setting, {
+                    key: 'color',
+                    value: base64.encode(JSON.stringify(this.setting.color)),
+                    type: 'json'
+                });
+                app.webSql.insert(app.config.webSql.setting, {
+                    key: 'opacity',
+                    value: base64.encode(JSON.stringify(this.setting.opacity)),
+                    type: 'json'
+                });
             }
         },
         created(){
@@ -796,7 +851,7 @@
             this.$store.commit('updateReaderBar', {header: false, tabBar: false});
 
             // 加载websql 设置信息
-            app.webSql.query(app.config.webSql.setting, {}, (rows) => {
+            app.webSql.query(app.config.webSql.setting, {}, {}, (rows) => {
                 if (rows && rows.length > 0) {
                     Object.keys(rows).forEach((i) => {
                         if (rows[i].type == "integer") {
@@ -809,62 +864,13 @@
                     })
                 } else {
                     // 初始化
-                    app.webSql.insert(app.config.webSql.setting, {
-                        key: 'brightness',
-                        value: this.setting.brightness,
-                        type: 'integer'
-                    });
-                    app.webSql.insert(app.config.webSql.setting, {
-                        key: 'fontSize',
-                        value: this.setting.fontSize,
-                        type: 'integer'
-                    });
-                    app.webSql.insert(app.config.webSql.setting, {
-                        key: 'fontStyle',
-                        value: this.setting.fontStyle,
-                        type: 'string'
-                    });
-                    app.webSql.insert(app.config.webSql.setting, {
-                        key: 'turnModel',
-                        value: this.setting.turnModel,
-                        type: 'integer'
-                    });
-                    app.webSql.insert(app.config.webSql.setting, {
-                        key: 'lineHeight',
-                        value: this.setting.lineHeight,
-                        type: 'integer'
-                    });
-                    app.webSql.insert(app.config.webSql.setting, {
-                        key: 'dayNight',
-                        value: this.setting.dayNight,
-                        type: 'string'
-                    });
-                    app.webSql.insert(app.config.webSql.setting, {
-                        key: 'dayNightIcon',
-                        value: this.setting.dayNightIcon,
-                        type: 'string'
-                    });
-                    app.webSql.insert(app.config.webSql.setting, {
-                        key: 'bgColor',
-                        value: base64.encode(JSON.stringify(this.setting.bgColor)),
-                        type: 'json'
-                    });
-                    app.webSql.insert(app.config.webSql.setting, {
-                        key: 'color',
-                        value: base64.encode(JSON.stringify(this.setting.color)),
-                        type: 'json'
-                    });
-                    app.webSql.insert(app.config.webSql.setting, {
-                        key: 'opacity',
-                        value: base64.encode(JSON.stringify(this.setting.opacity)),
-                        type: 'json'
-                    });
+                    this.initSettingDB();
                 }
             });
         },
         mounted(){
             // 目录
-            this.getCatalogData(1);
+            this.getCatalogData();
 
             // 书签
             this.getMarkData();
@@ -873,7 +879,7 @@
             this.getChapterData();    // range组件初始化change会加载数据
 
             // 书籍详情
-            this.getBookData(this.$route.query.id);
+            this.getBookData();
 
             // 电量
             this.showBattery();

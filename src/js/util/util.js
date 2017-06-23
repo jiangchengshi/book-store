@@ -129,7 +129,7 @@ export default {
             } else if (typeof(value) === "object") {
                 plus.storage.setItem(key, JSON.stringify(value));
             } else {
-                plus.storage.setItem(key, value);
+                plus.storage.setItem(key, value.toString());
             }
         } else {
             if (!window || !window.localStorage) {

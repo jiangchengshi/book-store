@@ -67,32 +67,35 @@
         },
         methods: {
             getHotData(page){ // 热门搜索词
-                app.ajax.get(app.config.api.search.hot, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data && data.length > 1) {
-                            this.data.hot = data;
-                        }
-                    }
-                }, (err) => {
-                });
+                app.ajax.get(app.config.api.search.hot, {},
+                    (data) => {
+                        this.data.hot = data.result;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             handleSubmit(){
                 this.showResult = true;
                 app.ajax.post(app.config.api.search.search,
                     {
                         'keyword': this.keyword
-                    }, (resp) => {
-                        if (resp.status == 200) {
-                            let data = resp.data.result;
-                            if (data && data.length > 0) {
-                                this.result = 'match';
-                                this.data.result = data;
-                            } else {
-                                this.result = 'unMatch';
-                            }
+                    }, (data) => {
+                        if (data.result && data.result.length > 0) {
+                            this.result = 'match';
+                            this.data.result = data;
+                        } else {
+                            this.result = 'unMatch';
                         }
                     }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
                     });
             },
             handleFocus(){

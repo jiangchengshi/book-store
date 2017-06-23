@@ -1,6 +1,6 @@
 <template>
     <div class="mall-book-new" style="height: inherit;">
-        <scroller :on-infinite="handleInfinite" style="top: 46px;" :height="height+''" >
+        <scroller :on-infinite="handleInfinite" style="top: 46px;" :height="height+''">
             <c-list-view type="book" :list="dataList"></c-list-view>
         </scroller>
     </div>
@@ -22,25 +22,28 @@
         },
         methods: {
             getData(callback){
-                app.ajax.get(app.config.api.book.new + this.page, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data && data.length>0) {
-                            this.dataList = this.dataList.concat(data);
+                app.ajax.get(app.config.api.book.new + this.page, {},
+                    (data) => {
+                        if (data.result && data.result.length > 0) {
+                            this.dataList = this.dataList.concat(data.result);
 
-                            if(typeof callback == "function") {
+                            if (typeof callback == "function") {
                                 callback();
                             }
-                        }else{
-                            if(typeof callback == "function") {
+                        } else {
+                            if (typeof callback == "function") {
                                 this.page--;
 
                                 callback(true);
                             }
                         }
-                    }
-                }, (err) => {
-                });
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             handleInfinite(done){
                 if (this.page >= 10) {

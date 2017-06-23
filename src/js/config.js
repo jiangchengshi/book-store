@@ -5,6 +5,10 @@ export default {
     setting: {
         isApp: false,
         platform: 'web',
+        network: {
+            num: 1,
+            txt: 'None'
+        },
         width: {
             screen: 0,
             display: 0
@@ -40,18 +44,19 @@ export default {
                 get: 'vipvote/',
                 add: 'vipvote/add'
             },
-            flower:{
+            flower: {
                 get: 'flower/',
                 add: 'flower/add'
             },
-            reward:{
+            reward: {
                 get: 'gift/',
                 add: 'gift/add'
             }
         },
         monthly: {
             monthly: 'monthly/',
-            info: 'monthly/info/'
+            info: 'monthly/info/',
+            buy: 'monthly/buy'
         },
         classify: 'sort/',
         topic: 'topic/',
@@ -100,6 +105,14 @@ export default {
         sign: 'signin/',
         setting: {
             feedback: 'message/add'
+        },
+        buy: {
+            chapter: 'chapters/buy',
+            chapters: {
+                batch: 'chapters/batchbuy',
+                option: 'batchbuy/option/',
+                price: 'batchbuy/'
+            }
         }
     }
 }

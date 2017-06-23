@@ -28,30 +28,31 @@
         },
         methods: {
             getData(){
-                app.ajax.get(app.config.api.topic + 1, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.topic = data;
-                            this.dataList = data.booklist.map((book) => {
-                                return {
-                                    id: book.articleid,
-                                    name: book.articlename,
-                                    author: book.author,
-                                    image: book.image,
-                                    intro: book.intro,
-                                    score: book.score
-                                }
-                            });
-                            this.$store.commit('updateHeader', {
-                                title: data.title,
-                                showBack: true,
-                                showSearch: true
-                            });
-                        }
-                    }
-                }, (err) => {
-                });
+                app.ajax.get(app.config.api.topic + this.$route.query.id, {},
+                    (data) => {
+                        this.topic = data.result;
+                        this.dataList = data.result.booklist.map((book) => {
+                            return {
+                                id: book.articleid,
+                                name: book.articlename,
+                                author: book.author,
+                                image: book.image,
+                                intro: book.intro,
+                                score: book.score
+                            }
+                        });
+                        this.$store.commit('updateHeader', {
+                            title: data.result.title,
+                            showBack: true,
+                            showSearch: true
+                        });
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             }
         },
         created(){

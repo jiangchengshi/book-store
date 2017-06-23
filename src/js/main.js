@@ -13,6 +13,8 @@ import plusready from "./plus/ready";
 import ajax from "./util/ajax";
 // 引入Util
 import util from "./util/util";
+// 引入Service
+import service from './util/service';
 // 引入WebSql
 import webSql from "./util/websql";
 // 引入Log
@@ -20,14 +22,14 @@ import log from "./util/log";
 // 引入Iconfont字体
 import "../css/iconfont.css";
 // 引入Vux公共组件
-import {AjaxPlugin, ToastPlugin, ConfirmPlugin} from "vux";
+import {AjaxPlugin, ConfirmPlugin, ToastPlugin} from "vux";
 // 引入Vue-Scroller组件
 import VueScroller from "vue-scroller";
 // 主Vue
 import App from "../view/App.vue";
 
 // 工具配置
-window.app = Object.assign({}, {config, ajax, util, webSql, log});
+window.app = Object.assign({}, {config, ajax, util, service, webSql, log});
 
 const initVue = function () {
     // 移除移动端点击延迟
@@ -53,14 +55,14 @@ const initVue = function () {
 const initWebSql = function () {
     // 打开/创建 webSql
     webSql.open();
-    // webSql.create(app.config.webSql.shelf, { // 书架
-    //     // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
-    //     articleid: 'INTEGER',
-    //     articlename: 'TEXT',
-    //     cover: 'TEXT',
-    //     author: 'TEXT',
-    //     time: 'TIMESTAMP'
-    // });
+    webSql.create(app.config.webSql.shelf, { // 书架
+        // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
+        articleid: 'INTEGER',
+        articlename: 'TEXT',
+        cover: 'TEXT',
+        author: 'TEXT',
+        time: 'TIMESTAMP'
+    });
     webSql.create(app.config.webSql.setting, {  // 设置
         // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
         key: 'TEXT',
@@ -75,13 +77,13 @@ const initWebSql = function () {
     });
     webSql.create(app.config.webSql.login, {  // 登录用户
         // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
-        id: 'INTEGER',
+        uid: 'INTEGER',
         egold: 'INTEGER',
         time: 'TIMESTAMP'
     });
     webSql.create(app.config.webSql.mark, {  // 书签
         // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
-        id: 'INTEGER',
+        chapterid: 'INTEGER',
         translateX: 'INTEGER',
         name: 'TEXT',
         content: 'TEXT',
@@ -92,6 +94,10 @@ const initWebSql = function () {
 if (navigator.userAgent.indexOf("Html5Plus") < 0) { //不支持5+ API
     Object.assign(config.setting, {
         platform: navigator.appName,
+        network: {
+            num: window.navigator.onLine ? 2 : 1,
+            txt: window.navigator.onLine ? 'Ethernet' : 'None'
+        },
         width: {
             screen: window.screen.availWidth,
             display: window.screen.availWidth
@@ -115,6 +121,10 @@ if (navigator.userAgent.indexOf("Html5Plus") < 0) { //不支持5+ API
         Object.assign(config.setting, {
             isApp: plus.os.name === "Android" || plus.os.name === "iOS",
             platform: plus.os.name,
+            network: {
+                num: plus.networkinfo.getCurrentType(),
+                txt: networkType[plus.networkinfo.getCurrentType()]
+            },
             width: {
                 screen: plus.screen.resolutionWidth,
                 display: plus.display.resolutionWidth,
@@ -135,3 +145,13 @@ if (navigator.userAgent.indexOf("Html5Plus") < 0) { //不支持5+ API
         initVue();
     })
 }
+
+const networkType = {
+    0: 'Unknown',
+    1: 'None',
+    2: 'Ethernet',
+    3: 'WiFi',
+    4: '2G',
+    5: '3G',
+    6: '4G'
+};

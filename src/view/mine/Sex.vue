@@ -39,41 +39,40 @@
         },
         methods: {
             getData(){
-                app.ajax.get(app.config.api.mine.sex + this.$store.state.user.uid, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.sex = data.sex;
-                        }
-                    }
-                }, (err) => {
-                    console.error(err);
-                });
+                app.ajax.get(app.config.api.mine.sex + this.$store.state.user.uid, {},
+                    (data) => {
+                        this.sex = data.result.sex;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             handleNickName(e){
                 app.ajax.post(app.config.api.mine.sex, {
                     uid: this.$store.state.user.uid,
                     sex: this.sex
-                }, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            if (data.result == 1) { // 1:成功
-                                this.$vux.toast.show({
-                                    text: '修改成功',
-                                    type: 'info'
-                                });
-                                this.$router.push({path: '/mine/info'});
-                            } else if (data.result == 2) { // 2：用户不存在
-                                this.$vux.toast.show({
-                                    type: 'warn',
-                                    text: '用户不存在'
-                                });
-                            }
-                        }
+                }, (data) => {
+                    if (data.result.result == 1) { // 1:成功
+                        this.$vux.toast.show({
+                            text: '修改成功',
+                            type: 'info'
+                        });
+                        this.$router.push({path: '/mine/info'});
+                    } else if (data.result.result == 2) { // 2：用户不存在
+                        this.$vux.toast.show({
+                            type: 'warn',
+                            text: '用户不存在'
+                        });
                     }
                 }, (err) => {
-                    console.error(err);
+                    this.$vux.toast.show({
+                        text: '系统异常，请稍后重试...',
+                        type: 'warn'
+                    });
+                    app.log.error(err);
                 });
             }
         },

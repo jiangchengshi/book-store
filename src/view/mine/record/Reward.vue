@@ -86,40 +86,40 @@
         },
         methods: {
             getRewardData(){
-                app.ajax.get(app.config.api.mine.reward.reward + this.$store.state.user.uid, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.data.reward = data;
-                        }
-                    }
-                }, (err) => {
-
-                });
+                app.ajax.get(app.config.api.mine.reward.reward + this.$store.state.user.uid, {},
+                    (data) => {
+                        this.data.reward = data.result;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             getFlowerData(){
-                app.ajax.get(app.config.api.mine.reward.flower + this.$store.state.user.uid, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.data.flower = data;
-                        }
-                    }
-                }, (err) => {
-
-                });
+                app.ajax.get(app.config.api.mine.reward.flower + this.$store.state.user.uid, {},
+                    (data) => {
+                        this.data.flower = data.result;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             getTicketData(){
-                app.ajax.get(app.config.api.mine.reward.ticket + this.$store.state.user.uid, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.data.ticket = data;
-                        }
-                    }
-                }, (err) => {
-
-                });
+                app.ajax.get(app.config.api.mine.reward.ticket + this.$store.state.user.uid, {},
+                    (data) => {
+                        this.data.ticket = data.result;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             handleClickTab(index){
                 if (index == 0) {

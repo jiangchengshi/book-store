@@ -1,8 +1,8 @@
 <template>
-    <swiper auto loop :height="height+'px'">
-        <swiper-item><img src="../image/guide1.png" :style="{height:height+'px'}" @click="handleClick"></swiper-item>
+    <swiper auto :height="height+'px'" @on-index-change="goToIndex">
+        <swiper-item><img src="../image/guide1.png" :style="{height:height+'px'}"></swiper-item>
         <swiper-item><img src="../image/guide2.png" :style="{height:height+'px'}"></swiper-item>
-        <swiper-item><img src="../image/guide3.png" :style="{height:height+'px'}"></swiper-item>
+        <swiper-item><img src="../image/guide3.png" :style="{height:height+'px'}" @click="handleClick"></swiper-item>
     </swiper>
 </template>
 
@@ -20,10 +20,20 @@
             Swiper, SwiperItem
         },
         methods: {
+            goToIndex(index){
+                if (index == 2) {
+                    // 设置welcome状态为1
+                    app.util.localStorage('welcome', 1);
+
+                    // 跳转
+                    setTimeout(() => {
+                        this.$router.push({path: '/'});
+                    }, 1000);
+                }
+            },
             handleClick(e){
                 if ((this.height - e.y) < app.config.setting.height.tabbar) {
-                    this.$store.commit('updateWelcome', true);
-                    this.$router.push({path: '/shelf'});
+                    this.goToIndex(2);
                 }
             }
         },

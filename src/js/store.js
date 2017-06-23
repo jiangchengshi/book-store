@@ -5,9 +5,10 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
-        loading: false,
-        login: false,
-        welcome: false,
+        loading: {
+            show: false,
+            text: '数据加载中，请稍后...'
+        },
         header: {
             title: '首页',
             backText: '',
@@ -26,14 +27,13 @@ const store = new Vuex.Store({
         }
     },
     mutations: {
-        updateLoading(state, loading){
-            state.loading = loading;
-        },
-        updateLogin(state, login){
-            state.login = login;
-        },
-        updateWelcome(state, welcome){
-            state.welcome = welcome;
+        updateLoading(state, payload){
+            if (payload) {
+                state.loading.show = payload.show;
+                if (payload.text) {
+                    state.loading.text = payload.text;
+                }
+            }
         },
         updateHeader(state, payload){
             Object.assign(state.header, {
@@ -63,7 +63,7 @@ const store = new Vuex.Store({
                 }
             } else {
                 state.user.uid = 0;
-                state.user.egold = 0;
+                state.user.egold = 0
             }
         }
     }

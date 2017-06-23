@@ -237,60 +237,96 @@ const vueRouter = new VueRouter({
 
 vueRouter.beforeEach((to, from, next) => {
     // Loading start...
-    app.store.commit('updateLoading', true);
+    let text = "页面奔跑中,请稍后...";
+    if (!app.service.hasNetwork()) {
+        text = "网络连接异常，请确认...";
+    }
+    app.store.commit('updateLoading', {
+        show: true,
+        text: text
+    });
 
-    // 特殊路由跳转处理
     switch (to.path) {
         case '/':
-            if (app.store.state.welcome) {
-                next('/shelf');
+            if (app.util.localStorage('welcome') == 1) {    // 非首次进入，跳过欢迎轮播页
+                localShelf(function (rows) {
+                    if (rows && rows.length > 0) {  // 书架有书籍信息，则跳转书架
+                        next('/shelf');
+                    } else {  // 反之，则跳转 书城
+                        next('/mall');
+                    }
+                });
             } else {
                 next('/welcome');
             }
             break;
         case '/mall':
-            next('/mall/index');
+            next(to.path + '/index');
             break;
         case '/shelf':
         case '/mine':
-            // 登录检查：获取websql中 uid
-            app.webSql.query(app.config.webSql.login, {}, {}, (rows) => {
-                if (rows && rows.length > 0) {
-                    let row = rows.item(0);
-                    if (new Date().getTime() - new Date(row.time).getTime() < app.config.setting.loginTime) {   // 5分钟
-                        app.webSql.update(app.config.webSql.login, {
-                            time: new Date()
-                        }, {
-                            id: row.id
-                        }, function () {
-                            // 更新 store中 uid
-                            app.store.commit('updateUser', {
-                                uid: row.id,
-                                egold: row.egold
-                            });
-
-                            next(to.path + '/index');
-                        })
-                    } else {
-                        app.webSql.delete(app.config.webSql.login, {
-                            id: row.id
-                        }, function () {
-                            next(to.path + '/index');
-                        });
-                    }
-                } else {
-                    next(to.path + '/index');
-                }
+            checkLogin(function () {
+                next(to.path + '/index');
+            }, function () {
+                next('/entry/login');
             });
             break;
+        case '/mall/book/detail':
+        case '/mall/monthly/detail':
+            checkLogin(function () {
+                next();
+            }, function () {
+                next('/entry/login');
+            });
+        default:
+            next();
     }
-
-    next();
 });
 
 vueRouter.afterEach((router) => {
     // Loading end...
-    app.store.commit('updateLoading', false);
+    let interval = 0;
+    if (!app.service.hasNetwork()) {
+        interval = 3000;
+    }
+    setTimeout(function () {
+        app.store.commit('updateLoading', {
+            show: false
+        });
+    }, interval);
 });
+
+const checkLogin = function (cb_suc, cb_err) {
+    if (app.store.state.user.uid <= 0) {   // 登录过，重新打开应用
+        app.webSql.query(app.config.webSql.login, {}, {}, (rows) => {
+            if (rows && rows.length > 0) {  // 登录过，store赋值
+                let row = rows.item(0);
+                app.store.commit('updateUser', {
+                    uid: row.uid,
+                    egold: row.egold
+                });
+
+                if (typeof cb_suc == "function") {
+                    cb_suc();
+                }
+            } else {  // 未登录，跳转未登录页面
+                if (typeof cb_err == "function") {
+                    cb_err();
+                }
+            }
+        });
+    } else {  // 已登录，跳转业务页面
+        if (typeof cb_suc == "function") {
+            cb_suc();
+        }
+    }
+};
+const localShelf = function (callback) {
+    app.webSql.query(app.config.webSql.shelf, {}, {}, (rows) => {
+        if (typeof callback == "function") {
+            callback(rows);
+        }
+    });
+};
 
 export default vueRouter;

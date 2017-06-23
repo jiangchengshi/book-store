@@ -49,36 +49,35 @@
                     oldpwd: this.password.old,
                     newpwd: this.password.new,
                     renewpwd: this.password.confirm
-                }, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            if (data.result == 1) { // 1:成功
-                                this.$vux.toast.show({
-                                    text: '修改成功',
-                                    type: 'info'
-                                });
-                                this.$router.push({path: '/entry/login'});
-                            } else if (data.result == 2) { // 2：用户不存在
-                                this.$vux.toast.show({
-                                    type: 'warn',
-                                    text: '用户不存在'
-                                });
-                            } else if (data.result == 3) {   // 3：旧密码不正确
-                                this.$vux.toast.show({
-                                    type: 'warn',
-                                    text: '旧密码不正确'
-                                });
-                            } else if (data.result == 4) {   // 4：两次输入的密码不一致
-                                this.$vux.toast.show({
-                                    type: 'warn',
-                                    text: '两次输入的密码不一致'
-                                });
-                            }
-                        }
+                }, (data) => {
+                    if (data.result.result == 1) { // 1:成功
+                        this.$vux.toast.show({
+                            text: '修改成功',
+                            type: 'info'
+                        });
+                        this.$router.push({path: '/entry/login'});
+                    } else if (data.result.result == 2) { // 2：用户不存在
+                        this.$vux.toast.show({
+                            type: 'warn',
+                            text: '用户不存在'
+                        });
+                    } else if (data.result.result == 3) {   // 3：旧密码不正确
+                        this.$vux.toast.show({
+                            type: 'warn',
+                            text: '旧密码不正确'
+                        });
+                    } else if (data.result.result == 4) {   // 4：两次输入的密码不一致
+                        this.$vux.toast.show({
+                            type: 'warn',
+                            text: '两次输入的密码不一致'
+                        });
                     }
                 }, (err) => {
-                    console.error(err);
+                    this.$vux.toast.show({
+                        text: '系统异常，请稍后重试...',
+                        type: 'warn'
+                    });
+                    app.log.error(err);
                 });
             }
         },

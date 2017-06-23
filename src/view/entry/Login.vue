@@ -61,39 +61,38 @@
                 app.ajax.post(app.config.api.entry.login, {
                     username: this.username,
                     password: this.password
-                }, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            if (data.result == 2) { // 账号密码错误
-                                this.$vux.toast.show({
-                                    type: 'warn',
-                                    text: '账号或密码错误'
-                                });
-                            } else if (data.result == 3) {   // 用户不存在
-                                this.$vux.toast.show({
-                                    type: 'warn',
-                                    text: '用户不存在'
-                                });
-                            } else {
-                                app.webSql.insert(app.config.webSql.login, {
-                                    id: data.uid,
-                                    egold: data.egold,
-                                    time: new Date()
-                                }, () => {
-                                    this.$store.commit('updateUser', {
-                                        uid: data.uid,
-                                        egold: data.egold
-                                    });
+                }, (data) => {
+                    if (data.result.result == 2) { // 账号密码错误
+                        this.$vux.toast.show({
+                            type: 'warn',
+                            text: '账号或密码错误'
+                        });
+                    } else if (data.result.result == 3) {   // 用户不存在
+                        this.$vux.toast.show({
+                            type: 'warn',
+                            text: '用户不存在'
+                        });
+                    } else {
+                        app.webSql.insert(app.config.webSql.login, {
+                            uid: data.result.uid,
+                            egold: data.result.egold,
+                            time: new Date()
+                        }, () => {
+                            this.$store.commit('updateUser', {
+                                uid: data.result.uid,
+                                egold: data.result.egold
+                            });
 
-                                    // 跳转
-                                    this.$router.go(-1);
-                                });
-                            }
-                        }
+                            // 跳转
+                            this.$router.push({path: '/'})
+                        });
                     }
                 }, (err) => {
-                    console.error(err);
+                    this.$vux.toast.show({
+                        text: '系统异常，请稍后重试...',
+                        type: 'warn'
+                    });
+                    app.log.error(err);
                 });
             },
             handleForget(e){

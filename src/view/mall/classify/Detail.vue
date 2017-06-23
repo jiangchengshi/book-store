@@ -22,15 +22,16 @@
         },
         methods: {
             getData(id){
-                app.ajax.get(app.config.api.classify + id, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data && data.length > 0) {
-                            this.dataList = data;
-                        }
-                    }
-                }, (err) => {
-                });
+                app.ajax.get(app.config.api.classify + id, {},
+                    (data) => {
+                        this.dataList = data.result;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             }
         },
         created(){

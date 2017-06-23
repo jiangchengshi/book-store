@@ -18,6 +18,7 @@
     export default {
         data () {
             return {
+                page: 1,
                 dataList: []
             }
         },
@@ -25,16 +26,17 @@
             Group, Cell
         },
         methods: {
-            getData(page){
-                app.ajax.get(app.config.api.reader.chapters + this.$route.query.id + '/' + page, {}, (resp) => {
-                    if (resp.status == 200) {
-                        let data = resp.data.result;
-                        if (data) {
-                            this.dataList = data.result;
-                        }
-                    }
-                }, (err) => {
-                });
+            getData(){
+                app.ajax.get(app.config.api.reader.chapters + this.$route.query.id + '/' + this.page, {},
+                    (data) => {
+                        this.dataList = data.result;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             }
         },
         created(){
@@ -44,7 +46,7 @@
             });
         },
         mounted(){
-            this.getData(1);
+            this.getData();
         }
     }
 </script>

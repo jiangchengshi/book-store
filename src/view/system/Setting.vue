@@ -59,10 +59,3 @@
         }
     }
 </script>
-
-<style scoped>
-    .main {
-        margin: 0;
-        padding: 0;
-    }
-</style>
