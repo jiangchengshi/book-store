@@ -24,8 +24,8 @@
         </x-button>
 
         <!-- 送鲜花 确认-->
-        <c-dialog type="ticketConfirm" :show="show.confirm" :data="flower" @confirm="confirmFlower"
-                  @cancel="show.confirm=false"></c-dialog>
+        <c-dialog type="reward" :show="show.reward" :data="flower" @confirm="confirmFlower"
+                  @cancel="show.reward=false"></c-dialog>
         <!-- 阅币余额不足-->
         <c-dialog type="balanceLess" :show="show.less" :data="flower" @cancel="show.less=false"></c-dialog>
     </div>
@@ -49,7 +49,7 @@
                     action: '送鲜花'
                 },
                 show: {
-                    confirm: false,
+                    reward: false,
                     less: false
                 }
             }
@@ -85,7 +85,7 @@
                 }
 
                 this.flower.egold = this.egold;
-                this.show.confirm = true;
+                this.show.reward = true;
             },
             confirmFlower(){
                 app.ajax.post(app.config.api.book.flower.add, {
@@ -93,10 +93,13 @@
                     num: this.flower.num,
                     articleid: this.$route.query.id
                 }, (data) => {
+                    this.show.reward = false;
+
                     if (data.result.result == 1) { // 1:成功
                         this.$vux.toast.show({
                             text: '赠送月票成功'
                         });
+                        this.getData();
                     } else if (data.result.result == 2) {   // 2:余额不足
                         this.show.less = true;
                         this.show.confirm = false;

@@ -22,7 +22,7 @@ import log from "./util/log";
 // 引入Iconfont字体
 import "../css/iconfont.css";
 // 引入Vux公共组件
-import {AjaxPlugin, ConfirmPlugin, ToastPlugin} from "vux";
+import {ToastPlugin, AlertPlugin, ConfirmPlugin, AjaxPlugin} from "vux";
 // 引入Vue-Scroller组件
 import VueScroller from "vue-scroller";
 // 主Vue
@@ -36,9 +36,10 @@ const initVue = function () {
     FastClick.attach(document.body);
 
     // Vux Plugin
-    Vue.use(AjaxPlugin);
     Vue.use(ToastPlugin);
+    Vue.use(AlertPlugin);
     Vue.use(ConfirmPlugin);
+    Vue.use(AjaxPlugin);
     Vue.use(VueScroller);
 
     // Vuex加载Loading

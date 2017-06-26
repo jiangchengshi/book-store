@@ -10,7 +10,11 @@
         </tab>
         <swiper v-model="selected" :show-dots="false">
             <swiper-item>
-                <div v-if="data.reward && data.reward.length>0">
+                <div v-if="data.reward instanceof Array" style="text-align: center;margin-top: 40px;">
+                    <img src="../../../image/unMatch.png" width="80px">
+                    <div>对不起，暂无新记录！</div>
+                </div>
+                <div v-else>
                     <div v-for="(con, key, index) in data.reward" :key="index">
                         <group :title="key+'月'">
                             <cell :title="detail.articlename" :inline-desc="detail.buytime"
@@ -22,13 +26,13 @@
                         </group>
                     </div>
                 </div>
-                <div v-else style="text-align: center;margin-top: 40px;">
+            </swiper-item>
+            <swiper-item>
+                <div v-if="data.flower instanceof Array" style="text-align: center;margin-top: 40px;">
                     <img src="../../../image/unMatch.png" width="80px">
                     <div>对不起，暂无新记录！</div>
                 </div>
-            </swiper-item>
-            <swiper-item>
-                <div v-if="data.flower && data.flower.length>0">
+                <div v-else>
                     <div v-for="(con, key, index) in data.flower" :key="index">
                         <group :title="key+'月'">
                             <cell :title="detail.articlename" :inline-desc="detail.buytime"
@@ -40,13 +44,13 @@
                         </group>
                     </div>
                 </div>
-                <div v-else style="text-align: center;margin-top: 40px;">
+            </swiper-item>
+            <swiper-item>
+                <div v-if="data.ticket instanceof Array" style="text-align: center;margin-top: 40px;">
                     <img src="../../../image/unMatch.png" width="80px">
                     <div>对不起，暂无新记录！</div>
                 </div>
-            </swiper-item>
-            <swiper-item>
-                <div v-if="data.ticket && data.ticket.length>0">
+                <div v-else>
                     <div v-for="(con, key, index) in data.ticket" :key="index">
                         <group :title="key+'月'">
                             <cell :title="detail.articlename" :inline-desc="detail.buytime"
@@ -57,10 +61,6 @@
                             </cell>
                         </group>
                     </div>
-                </div>
-                <div v-else style="text-align: center;margin-top: 40px;">
-                    <img src="../../../image/unMatch.png" width="80px">
-                    <div>对不起，暂无新记录！</div>
                 </div>
             </swiper-item>
         </swiper>

@@ -24,8 +24,8 @@
         </x-button>
 
         <!-- 投票 确认 -->
-        <c-dialog type="ticketConfirm" :show="show.confirm" :data="ticket" @confirm="confirmTicket"
-                  @cancel="show.confirm=false"></c-dialog>
+        <c-dialog type="reward" :show="show.reward" :data="ticket" @confirm="confirmTicket"
+                  @cancel="show.reward=false"></c-dialog>
         <!-- 阅币余额不足-->
         <c-dialog type="balanceLess" :show="show.less" :data="ticket" @cancel="show.less=false"></c-dialog>
     </div>
@@ -49,7 +49,7 @@
                     action: '投票'
                 },
                 show: {
-                    confirm: false,
+                    reward: false,
                     less: false
                 }
             }
@@ -85,7 +85,7 @@
                 }
 
                 this.ticket.egold = this.egold;
-                this.show.confirm = true;
+                this.show.reward = true;
             },
             confirmTicket(){
                 app.ajax.post(app.config.api.book.ticket.add, {
@@ -93,16 +93,17 @@
                     num: this.ticket.num,
                     articleid: this.$route.query.id
                 }, (data) => {
-                    if (data.result == 1) { // 1:成功
+                    this.show.reward = false;
+
+                    if (data.result.result == 1) { // 1:成功
                         this.$vux.toast.show({
                             text: '赠送月票成功'
                         });
-
                         this.getData();
-                    } else if (data.result == 2) {   // 2:余额不足
+                    } else if (data.result.result == 2) {   // 2:余额不足
                         this.show.less = true;
                         this.show.confirm = false;
-                    } else if (data.result == 3) {   // 3:书籍不存在
+                    } else if (data.result.result == 3) {   // 3:书籍不存在
                         this.$vux.toast.show({
                             text: '书籍不存在',
                             type: 'warn'

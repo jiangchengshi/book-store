@@ -26,10 +26,10 @@
         </x-button>
 
         <!-- 签到 -->
-        <c-dialog type="signIn" :show="show.signIn" :data="sign" @signIn="handleSignIn"
+        <c-dialog type="signIn" :show="show.signIn" :data="sign" @confirm="handleSignIn"
                   @cancel="show.signIn=false"></c-dialog>
         <!-- 签到成功-->
-        <c-dialog type="signOk" :show="show.signOk" :data="sign" @signOk="handleSignOk"
+        <c-dialog type="signOk" :show="show.signOk" :data="sign" @confirm="handleSignOk"
                   @cancel="show.signOk=false"></c-dialog>
     </div>
 </template>
@@ -128,10 +128,8 @@
                 });
             },
             handleSignOk(){
-                this.$vux.toast.show({
-                    text: '看看我的券吧',
-                    type: 'info'
-                })
+                this.show.signOk = false;
+                this.$router.push({path: '/mine/token'});
             },
             handleClickBook(id){
                 if (!this.tidy) {   // true：非整理状态，点击进入书籍阅读

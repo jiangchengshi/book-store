@@ -8,7 +8,11 @@
                 <x-button action-type="button" style="background-color: #35B4EB;color: #FFFFFF;">充值</x-button>
             </cell>
         </group>
-        <div v-if="recharge.logs && recharge.logs.length>0">
+        <div v-if="recharge.logs instanceof Array" style="text-align: center;margin-top: 40px;">
+            <img src="../../../image/unMatch.png" width="80px">
+            <div>对不起，暂无新记录！</div>
+        </div>
+        <div v-else>
             <div v-for="(log, key, index) in recharge.logs" :key="index">
                 <group :title="key+'月'">
                     <cell :title="detail.paytype" :inline-desc="detail.buytime" v-for="(detail, index) in log"
@@ -18,10 +22,6 @@
                     </cell>
                 </group>
             </div>
-        </div>
-        <div v-else style="text-align: center;margin-top: 40px;">
-            <img src="../../../image/unMatch.png" width="80px">
-            <div>对不起，暂无新记录！</div>
         </div>
     </div>
 </template>

@@ -1,62 +1,66 @@
 <template>
     <div class="mall-monthly-detail">
         <group>
-            <cell :title="monthly.name" :inline-desc="monthly.desc"
-                  :value="'共'+monthly.book_num+'本'" :link="{path: '/mall/monthly/package', query: {id: monthly.id}}"
+            <cell :title="detail.name" :inline-desc="detail.desc"
+                  :value="'共'+detail.num+'本'" :link="{path: '/mall/monthly/package', query: {id: detail.id}}"
                   is-link>
-                <div slot="icon">
-                    <img :src="monthly.image[0]"
+                <div slot="icon" v-if="detail.image && detail.image.length>0">
+                    <img :src="detail.image[1]"
                          style="height: 60px;transform: scale3d(0.8,0.8,1);position: relative;left: 0px;box-shadow: 2px 5px 2px #888888;">
-                    <img :src="monthly.image[2]"
+                    <img :src="detail.image[2]"
                          style="height: 60px;transform: scale3d(0.8,0.8,1);position: relative;left: -10px;box-shadow: 2px 5px 2px #888888;">
-                    <img :src="monthly.image[1]"
+                    <img :src="detail.image[0]"
                          style="height: 60px;transform: scale3d(1,1,1);position: relative;left: -80px;box-shadow: 2px 5px 2px #888888;">
                 </div>
             </cell>
-            <cell v-if="monthly.endtime==0" style="font-size: 15px;">
+            <cell v-if="detail.endtime==0" style="font-size: 15px;">
                 <slot>
                     <x-button type="primary" plain mini @click.native="handleBuy">订购</x-button>
                 </slot>
             </cell>
-            <cell v-else :title="monthly.endtime+' 到期'" style="font-size: 15px;">
+            <cell v-else :title="detail.endtime+' 到期'" style="font-size: 15px;">
                 <slot>
                     <x-button type="primary" plain mini @click.native="handleBuy">续订</x-button>
                 </slot>
             </cell>
-            <x-switch title="到期自动续订" v-model="renew" style="font-size: 15px;"></x-switch>
         </group>
         <c-list-view type="monthly" link="package" :list="dataList"></c-list-view>
 
         <!-- 订购/续订 -->
-        <c-dialog type="monthly" :show="show.buy" :data="monthly" @confirm="handleConfirm"
+        <c-dialog type="monthly" :show="show.buy" :data="detail" @confirm="confirmBuy"
                   @cancel="show.buy=false"></c-dialog>
     </div>
 </template>
 
 <script>
-    import {XHeader, Group, Cell, XButton, XSwitch} from 'vux';
+    import {XHeader, Group, Cell, XButton,dateFormat } from 'vux';
     import CListView from '../../components/ListView.vue';
     import CDialog from '../../components/Dialog.vue';
 
     export default {
         data () {
             return {
-                monthly: {},
+                detail: {},
                 dataList: [],
-                renew: true,
                 show: {
-                    buy: false
+                    buy: false,
+                    charges: false
                 }
             }
         },
         components: {
-            XHeader, Group, Cell, XButton, XSwitch, CListView, CDialog
+            XHeader, Group, Cell, XButton, CListView, CDialog
         },
         methods: {
             getDetailData(){
-                app.ajax.get(app.config.api.monthly.monthly + this.$route.query.id, {},
+                app.ajax.get(app.config.api.monthly.info + this.$route.query.id + "/" + this.$store.state.user.uid, {},
                     (data) => {
-                        this.monthly = data.result;
+                        this.detail = data.result;
+
+                        // 若已购买，则格式化到期时间
+                        if(this.detail.endtime>0){
+                            this.detail.endtime = dateFormat(this.detail.endtime, 'YYYY-MM-DD');
+                        }
                     }, (err) => {
                         this.$vux.toast.show({
                             text: '系统异常，请稍后重试...',
@@ -80,21 +84,24 @@
             handleBuy(e){
                 this.show.buy = true;
             },
-            handleConfirm(renew){
-                // 订阅 包月包
-                this.renew = renew;
+            confirmBuy(renew){
+                let _this = this;
 
                 app.ajax.post(app.config.api.monthly.buy, {
                     uid: this.$store.state.user.uid,
                     baoid: this.$route.query.id,
-                    autobuy: this.renew
+                    autobuy: renew
                 }, (data) => {
+                    this.show.buy = false;
+
                     if (data.result.result == 1) { // 1：成功
-                        this.$vux.toast.show({
-                            text: '订阅成功',
-                            type: 'info'
+                        this.$vux.alert.show({
+                            title: '系統提示',
+                            content: '恭喜阁下，订阅成功!',
+                            onHide(){
+                                _this.getDetailData();
+                            }
                         });
-                        this.show.buy = false;
                     } else if (data.result.result == 2) {   // 2:用户不存在
                         this.$vux.toast.show({
                             text: '用户不存在',
@@ -105,12 +112,16 @@
                             text: '包不存在',
                             type: 'warn'
                         });
-                    } else if (data.result.result == 3) {   //  4:用户余额不足
-                        this.$vux.toast.show({
-                            text: '用户余额不足',
-                            type: 'warn'
+                    } else if (data.result.result == 4) {   //  4:用户余额不足
+                        this.$vux.alert.show({
+                            title: '系統提示',
+                            content: '用户余额不足',
+                            buttonText: '去充值',
+                            onHide(){
+                                _this.$router.push({path: '/recharge'});
+                            }
                         });
-                    } else if (data.result.result == 3) {   //  5：已经购买过了
+                    } else if (data.result.result == 5) {   //  5：已经购买过了
                         this.$vux.toast.show({
                             text: '已经购买过了',
                             type: 'warn'

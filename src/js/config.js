@@ -113,6 +113,10 @@ export default {
                 option: 'batchbuy/option/',
                 price: 'batchbuy/'
             }
+        },
+        recharge:{
+            recharge: 'buy/',
+            note: 'buy/note'
         }
     }
 }

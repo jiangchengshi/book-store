@@ -3,9 +3,10 @@
         <template v-if="type=='monthly'">
             <div class="monthly">
                 <cell title="订阅超值包月，免费畅读一个月" style="border-bottom: 1px solid #BDBDBD;"></cell>
-                <group class="info" style="padding: 10px 0px;">
+                <group class="info" style="padding-top: 10px;">
                     <cell-box>
-                        <div v-if="data.image && data.image.length>0" style="display: inline-block;">
+                        <div v-if="data.image && data.image.length>0"
+                             style="display: inline-block;position: absolute;">
                             <img :src="data.image[1]"
                                  style="height: 80px;transform: scale3d(0.8,0.8,1);position: relative;left: 0px;box-shadow: 2px 5px 2px #888888;">
                             <img :src="data.image[2]"
@@ -13,11 +14,12 @@
                             <img :src="data.image[0]"
                                  style="height: 80px;transform: scale3d(1,1,1);position: relative;left: -100px;box-shadow: 2px 5px 2px #888888;">
                         </div>
-                        <div style="display: inline-block;margin-left: -60px;text-align: left">
+                        <div style="display: inline-block;margin-left: 125px;text-align: left;">
                             <p style="font-size: 18px;color: #162636;line-height: 25px;">{{data.name}}
                                 <span style="font-size: 12px;color: #989A9C;">({{data.book_num}}本)</span>
                             </p>
-                            <p style="font-size: 14px;color: #989A9C;line-height: 25px;">{{data.desc}}</p>
+                            <p style="font-size: 14px;color: #989A9C;line-height: 25px;width:150px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
+                                {{data.desc}}</p>
                             <p style="font-size: 12px;color: #989A9C;line-height: 30px;">原价： ￥
                                 <span style="text-decoration: line-through;">{{data.old_price}}</span>
                             </p>
@@ -26,19 +28,13 @@
                         </div>
                     </cell-box>
                 </group>
-                <checklist v-model="renew" :options="[{key:data.id, value:'一个月后自动续订'}]" :max="1" :min="0"></checklist>
-                <group>
-                    <cell title="话费支付">
-                        <i slot="icon" class="iconfont icon-iconfontsimqia"
-                           style="margin-right: 10px;color: #F9B248;"></i>
-                    </cell>
-                </group>
+                <checklist v-model="monthly.renew" :options="options.renew" :max="1" :min="0"></checklist>
                 <div style="padding: 5px 0px 15px; text-align: center;">
                     <x-button @click.native="handleCancel"
                               style="width: 45%;border-radius: 30px;background: #989A9C;color: #FFFFFF;">
                         取消支付
                     </x-button>
-                    <x-button @click.native="handleBuyConfirm"
+                    <x-button @click.native="handleConfirm('monthly')"
                               style="width: 45%;border-radius: 30px; background: #35B4EB;color: #FFFFFF;">
                         确认支付
                     </x-button>
@@ -55,7 +51,8 @@
                 </group>
                 <div style="text-align: center;padding: 10px 0px;">
                     <span @click="handleCancel" style="display:inline-block;width: 48%;color: #989A9C;">取消</span>
-                    <span @click="handlePublish" style="display:inline-block;width: 48%;color: #989A9C;">发表</span>
+                    <span @click="handleConfirm('review')"
+                          style="display:inline-block;width: 48%;color: #989A9C;">发表</span>
                 </div>
             </div>
         </template>
@@ -104,7 +101,7 @@
                 </div>
                 <div style="text-align: center;padding: 30px 0px;">
                     <span style="display:inline-block;width: 70%;line-height:30px;background: linear-gradient(#FFA300, #fec550);color:#FFFFFF;border-radius: 30px;padding: 5px 0px;"
-                          @click="handleSignIn">立即签到</span>
+                          @click="handleConfirm('signIn')">立即签到</span>
                 </div>
             </div>
         </template>
@@ -125,79 +122,98 @@
                 </div>
                 <div style="text-align: center;padding: 30px 0px;">
                     <span style="display:inline-block;width: 70%;line-height:30px;background: linear-gradient(#FFA300, #fec550);color:#FFFFFF;border-radius: 30px;padding: 5px 0px;"
-                          @click="handleSignOk">查看我的书券</span>
+                          @click="handleConfirm('signOk')">查看我的书券</span>
                 </div>
             </div>
         </template>
-        <template v-else-if="type=='ticketConfirm'">
-            <div style="text-align: center;margin: 30px 0px;">
-                <img src="../../image/gift.png" style="width: 60px;">
+        <template v-else-if="type=='reward'">
+            <div class="reward" style="padding: 0px 30px;">
+                <div style="text-align: center;margin: 30px 0px;">
+                    <img src="../../image/gift.png" style="width: 60px;">
+                </div>
+                <div style="margin:10px 0px;text-align:center;font-family: PingFangSC-Regular;font-size: 16px;color: #989A9C;">
+                    您正在对《{{data.name}}》进行{{data.action}}
+                </div>
+                <div style="margin-bottom:50px;text-align: center;font-family: PingFangSC-Regular;font-size: 18px;color: #57606A;">
+                    赏金 <label style="color: #EE4D22;">{{data.egold}}</label> 阅币
+                </div>
+                <x-button action-type="button" @click.native="handleConfirm('reward')"
+                          style="background: #35B4EB;border-radius: 4px;color: #FFFFFF;margin-bottom: 30px;">确定
+                </x-button>
             </div>
-            <div style="margin:10px 0px;text-align:center;font-family: PingFangSC-Regular;font-size: 16px;color: #989A9C;">
-                您正在对《{{data.name}}》进行{{data.action}}
-            </div>
-            <div style="margin-bottom:50px;text-align: center;font-family: PingFangSC-Regular;font-size: 18px;color: #57606A;">
-                赏金 <label style="color: #EE4D22;">{{data.egold}}</label> 阅币
-            </div>
-            <x-button action-type="button" @click.native="handleTicketConfirm"
-                      style="background: #35B4EB;border-radius: 4px;color: #FFFFFF;">确定
-            </x-button>
         </template>
-        <template v-else-if="type=='balanceLess'">
-            <div style="text-align: center;margin: 30px 0px;">
-                <img src="../../image/balance.png" style="width: 60px;">
+        <template v-else-if="type=='balance'">
+            <div class="balance">
+                <div style="text-align: center;margin: 30px 0px;">
+                    <img src="../../image/balance.png" style="width: 60px;">
+                </div>
+                <div style="margin:10px 0px;text-align:center;font-family: PingFangSC-Regular;font-size: 16px;color: #9FA1A3;">
+                    账户余额不足了！
+                </div>
+                <div style="margin-bottom:50px;text-align: center;font-family: PingFangSC-Regular;font-size: 18px;color: #57606A;">
+                    请充值后进行{{data.action}}
+                </div>
+                <x-button action-type="button" @click.native="handleConfirm('balance')"
+                          style="background: #35B4EB;border-radius: 4px;color: #FFFFFF;">立即充值
+                </x-button>
             </div>
-            <div style="margin:10px 0px;text-align:center;font-family: PingFangSC-Regular;font-size: 16px;color: #9FA1A3;">
-                账户余额不足了！
+        </template>
+        <template v-else-if="type=='note'">
+            <div class="note" style="font-family: PingFangSC-Regular;padding: 5px 10px;">
+                <div style="font-size: 20px;color: #162636;line-height: 50px;">
+                    关于阅币
+                </div>
+                <div style="font-size: 16px;line-height: 40px;float: left;" v-html="data"></div>
+                <x-button action-type="button" @click.native="handleConfirm('note')"
+                          style="background: #35B4EB;border-radius: 4px;color: #FFFFFF;">关闭
+                </x-button>
             </div>
-            <div style="margin-bottom:50px;text-align: center;font-family: PingFangSC-Regular;font-size: 18px;color: #57606A;">
-                请充值后进行{{data.action}}
-            </div>
-            <x-button action-type="button" @click.native="handleRecharge"
-                      style="background: #35B4EB;border-radius: 4px;color: #FFFFFF;">立即充值
-            </x-button>
         </template>
     </x-dialog>
 </template>
 
 <script>
-    import {XDialog, Group, Cell, Checklist, XTextarea, XButton, Rater} from 'vux';
+    import {XDialog, Group, Cell, CellBox, Checklist, XTextarea, XButton, Rater} from 'vux';
 
     export default {
         data () {
             return {
-                renew: [],
+                monthly: {
+                    renew: ['renew']
+                },
                 review: {
                     score: 1,
                     content: ''
+                },
+                options: {
+                    renew: [{key: 'renew', value: '一个月后自动续订'}]
                 }
             }
         },
         props: ['type', 'show', 'data'],
         components: {
-            XDialog, Group, Cell, Checklist, XTextarea, XButton, Rater
+            XDialog, Group, Cell, CellBox, Checklist, XTextarea, XButton, Rater
         },
         methods: {
             handleCancel(){
                 this.$emit('cancel');
             },
-            handleBuyConfirm(){
-                this.$emit('confirm', this.renew.length > 0 ? true : false);
-            },
-            handlePublish(){
-                this.$emit('publish', this.review);
-            },
-            handleSignIn(){
-                this.$emit('signIn');
-            },
-            handleSignOk(){
-                this.$emit('signOk');
-            },
-            handleTicketConfirm(){
-                this.$emit('confirm');
-            },
-            handleRecharge(){
-                this.$router.push({path: '/recharge'})
+            handleConfirm(type){
+                switch (type) {
+                    case 'monthly':
+                        this.$emit('confirm', this.monthly.renew.length);
+                        break;
+                    case 'review':
+                        this.$emit('confirm', this.review);
+                        break;
+                    case 'signIn':
+                    case 'signOk':
+                    case 'reward':
+                    case 'balance':
+                    case 'note':
+                        this.$emit('confirm');
+                        break;
+                }
             }
         },
         computed: {
@@ -231,6 +247,10 @@
 
     .monthly .weui-cells.vux-no-group-title .weui-cell {
         padding: 5px 15px;
+    }
+
+    .monthly .info .vux-cell-box > div {
+        padding-right: initial;
     }
 
     .review .weui-cells__title {

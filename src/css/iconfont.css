@@ -1,6 +1,6 @@
 @font-face {
     font-family: "iconfont";
-    src: url('font/iconfont.ttf?t=1497837063460') format('truetype')
+    src: url('font/iconfont.ttf?t=1498272816508') format('truetype');
 }
 
 .iconfont {
@@ -51,7 +51,7 @@
     content: "\e61a";
 }
 
-.icon-weixin5:before {
+.icon-weixin:before {
     content: "\e62e";
 }
 
@@ -59,7 +59,7 @@
     content: "\e68c";
 }
 
-.icon-qq4:before {
+.icon-qq:before {
     content: "\e657";
 }
 
@@ -115,7 +115,7 @@
     content: "\e606";
 }
 
-.icon-weibo2:before {
+.icon-weibo:before {
     content: "\e673";
 }
 
@@ -191,10 +191,6 @@
     content: "\e608";
 }
 
-.icon-zhifu:before {
-    content: "\e63c";
-}
-
 .icon-pinglun1:before {
     content: "\e638";
 }
@@ -213,6 +209,10 @@
 
 .icon-sousuo2:before {
     content: "\e60a";
+}
+
+.icon-weixin-cycle:before {
+    content: "\e60c";
 }
 
 .icon-qianbao:before {
@@ -285,10 +285,6 @@
 
 .icon-fasongwangpandibugongjulan:before {
     content: "\e622";
-}
-
-.icon-weixin4:before {
-    content: "\e65a";
 }
 
 .icon-bookmark:before {
@@ -371,10 +367,6 @@
     content: "\e645";
 }
 
-.icon-qq-copy:before {
-    content: "\e61d";
-}
-
 .icon-lnicon35:before {
     content: "\e62f";
 }
@@ -413,6 +405,10 @@
 
 .icon-chongzhi:before {
     content: "\e634";
+}
+
+.icon-weixin-square:before {
+    content: "\e675";
 }
 
 .icon-lock:before {
@@ -483,10 +479,6 @@
     content: "\e654";
 }
 
-.icon-microblog:before {
-    content: "\e6ac";
-}
-
 .icon-a2:before {
     content: "\e691";
 }
@@ -551,10 +543,6 @@
     content: "\e6f3";
 }
 
-.icon-jian4:before {
-    content: "\e68f";
-}
-
 .icon-yanzhengma:before {
     content: "\e668";
 }
@@ -579,6 +567,10 @@
     content: "\e66d";
 }
 
+.icon-unionpay-square:before {
+    content: "\e6e9";
+}
+
 .icon-xianhua:before {
     content: "\e66e";
 }
@@ -587,11 +579,15 @@
     content: "\e66f";
 }
 
+.icon-zhifubao-square:before {
+    content: "\e64b";
+}
+
 .icon-suo2:before {
     content: "\e6b4";
 }
 
-.icon-zhifubao2:before {
+.icon-zhifubao-cycle:before {
     content: "\e6e4";
 }
 
@@ -647,10 +643,6 @@
     content: "\e684";
 }
 
-.icon-jiyuSIMqia:before {
-    content: "\e687";
-}
-
 .icon-xingxing1:before {
     content: "\e696";
 }
@@ -669,10 +661,6 @@
 
 .icon-shuji1:before {
     content: "\e6d9";
-}
-
-.icon-fanti:before {
-    content: "\e697";
 }
 
 .icon-mima1:before {
@@ -725,10 +713,6 @@
 
 .icon-xianhua1:before {
     content: "\e6b1";
-}
-
-.icon-fantizhongwen:before {
-    content: "\e6b2";
 }
 
 .icon-chaozhilibao:before {

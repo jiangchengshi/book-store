@@ -25,11 +25,12 @@
         </x-button>
 
         <!-- 打赏 确认-->
-        <c-dialog type="ticketConfirm" :show="show.confirm" :data="reward" @confirm="confirmReward"
-                  @cancel="show.confirm=false"></c-dialog>
+        <c-dialog type="reward" :show="show.reward" :data="reward" @confirm="confirmReward"
+                  @cancel="show.reward=false"></c-dialog>
 
         <!-- 阅币余额不足-->
-        <c-dialog type="balanceLess" :show="show.less" :data="reward" @cancel="show.less=false"></c-dialog>
+        <c-dialog type="balance" :show="show.balance" :data="reward" @confirm="confirmBalance"
+                  @cancel="show.balance=false"></c-dialog>
     </div>
 </template>
 
@@ -50,8 +51,8 @@
                     action: '打赏'
                 },
                 show: {
-                    confirm: false,
-                    less: false
+                    reward: false,
+                    balance: false
                 }
             }
         },
@@ -80,7 +81,7 @@
                     return;
                 }
 
-                this.show.confirm = true;
+                this.show.reward = true;
             },
             confirmReward(){
                 app.ajax.post(app.config.api.book.reward.add, {
@@ -88,13 +89,16 @@
                     price: this.reward.egold,
                     articleid: this.$route.query.id
                 }, (data) => {
+                    this.show.reward = false;
+
                     if (data.result.result == 1) { // 1:成功
                         this.$vux.toast.show({
                             text: '打赏成功'
                         });
+                        this.getData();
                     } else if (data.result.result == 2) {   // 2:余额不足
-                        this.show.less = true;
-                        this.show.confirm = false;
+                        this.show.balance = true;
+                        this.show.reward = false;
                     } else if (data.result.result == 3) {   // 3:书籍不存在
                         this.$vux.toast.show({
                             text: '书籍不存在',
@@ -108,6 +112,9 @@
                     });
                     app.log.error(err);
                 });
+            },
+            confirmBalance(){
+                this.$router.push({path: '/recharge'});
             }
         },
         created(){

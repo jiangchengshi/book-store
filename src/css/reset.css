@@ -44,3 +44,7 @@ i{
 .vux-popup-dialog{
     overflow-y: initial;
 }
+
+.weui-cells_checkbox .weui-check:checked + .weui-icon-checked:before{
+    color: #30a3d5;
+}

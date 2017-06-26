@@ -38,6 +38,7 @@ const MineRecordConsume = resolve => require(['../view/mine/record/Consume.vue']
 const MineRecordReward = resolve => require(['../view/mine/record/Reward.vue'], resolve);
 const MineReview = resolve => require(['../view/mine/Review.vue'], resolve);
 const MineNews = resolve => require(['../view/mine/News.vue'], resolve);
+const MineToken = resolve => require(['../view/mine/Token.vue'], resolve);
 const Entry = resolve => require(['../view/entry/Entry.vue'], resolve);
 const EntryLogin = resolve => require(['../view/entry/Login.vue'], resolve);
 const EntryLogon = resolve => require(['../view/entry/Logon.vue'], resolve);
@@ -184,6 +185,10 @@ const routes = [
             {
                 path: 'news',
                 component: MineNews
+            },
+            {
+                path: 'token',
+                component: MineToken
             }
         ]
     },

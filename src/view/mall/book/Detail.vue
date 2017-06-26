@@ -163,7 +163,7 @@
         </popup>
 
         <!-- 评论 -->
-        <c-dialog type="review" :show="show.review" :data="detail" @publish="publishReview"
+        <c-dialog type="review" :show="show.review" :data="detail" @confirm="publishReview"
                   @cancel="show.review=false"></c-dialog>
     </div>
 </template>

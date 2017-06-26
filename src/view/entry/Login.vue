@@ -24,9 +24,9 @@
         <div class="link" style="margin-top: 80px;">
             <divider>其他登录方式</divider>
             <div style="text-align: center;margin-top: 20px;">
-                <i class="iconfont icon-weibo2" style="background-color: orange;"></i>
-                <i class="iconfont icon-qq4" style="background-color: dodgerblue;"></i>
-                <i class="iconfont icon-weixin5" style="background-color: green;"></i>
+                <i class="iconfont icon-weibo" style="background-color: orange;"></i>
+                <i class="iconfont icon-qq" style="background-color: dodgerblue;"></i>
+                <i class="iconfont icon-weixin" style="background-color: green;"></i>
             </div>
         </div>
     </div>
@@ -50,8 +50,8 @@
                 // 校验用户名、密码
                 if (this.username == '' || this.password == '') {
                     this.$vux.toast.show({
-                        type: 'warn',
                         text: '账号或密码不能为空',
+                        type: 'warn',
                         isShowMask: true
                     });
                     return;
@@ -64,13 +64,13 @@
                 }, (data) => {
                     if (data.result.result == 2) { // 账号密码错误
                         this.$vux.toast.show({
-                            type: 'warn',
-                            text: '账号或密码错误'
+                            text: '账号或密码错误',
+                            type: 'warn'
                         });
                     } else if (data.result.result == 3) {   // 用户不存在
                         this.$vux.toast.show({
-                            type: 'warn',
-                            text: '用户不存在'
+                            text: '用户不存在',
+                            type: 'warn'
                         });
                     } else {
                         app.webSql.insert(app.config.webSql.login, {

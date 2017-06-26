@@ -27,7 +27,7 @@
             // 监听 物理返回键
             if (app.config.setting.isApp) {
                 plus.key.addEventListener('backbutton', function (e) {
-                    console.log(JSON.stringify(e));
+                    this.$router.go(-1);
                 }, false);
             }
         }

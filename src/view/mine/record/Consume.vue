@@ -3,7 +3,11 @@
         <x-header :title="$store.state.header.title"
                   :left-options="{showBack: $store.state.header.showBack, backText: $store.state.header.backText}">
         </x-header>
-        <div v-if="consume && consume.length>0">
+        <div v-if="consume instanceof Array" style="text-align: center;margin-top: 40px;">
+            <img src="../../../image/unMatch.png" width="80px">
+            <div>对不起，暂无新记录！</div>
+        </div>
+        <div v-else>
             <div v-for="(con, key, index) in consume" :key="index">
                 <group :title="key+'月'">
                     <cell :title="detail.articlename" :inline-desc="detail.buytime" v-for="(detail, index) in con"
@@ -13,10 +17,6 @@
                     </cell>
                 </group>
             </div>
-        </div>
-        <div v-else style="text-align: center;margin-top: 40px;">
-            <img src="../../../image/unMatch.png" width="80px">
-            <div>对不起，暂无新记录！</div>
         </div>
     </div>
 </template>

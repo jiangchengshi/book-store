@@ -113,7 +113,7 @@
         <popup v-model="show.progress" class="popup-progress">
             <group>
                 <cell primary="content">
-                    <range :min="chapterId.min" :max="chapterId.max"
+                    <range :min="chapterId.min" :max="chapterId.max" v-if="show.progress"
                            minHTML="<x-button plain @click.native=trunPage('prev')>上一章</x-button>"
                            maxHTML="<span @click=trunPage('next')>下一章</span>"
                            @on-change="changeChapter"></range>
@@ -363,6 +363,24 @@
                         this.chapterId.min = data.result.min_chapterid;
                         this.chapterId.max = data.result.max_chapterid;
                         this.data.chapters = data.result.result;
+
+                        // 书籍详情目录 跳转
+                        if (this.$route.query.chapterid) {
+                            this.chapterId.cur = this.$route.query.chapterId;
+                        } else {
+                            // 加载当前章节以及位置
+                            let chapter = app.util.localStorage('book_' + this.$route.query.id);
+                            if (chapter) {
+                                let chapterJson = JSON.parse(chapter);
+                                this.chapterId.cur = Number(chapterJson.chapter);
+                                this.content.translateX = chapterJson.translateX;
+                            } else {
+                                this.chapterId.cur = this.chapterId.min;
+                            }
+                        }
+
+                        // 获取章节信息
+                        this.getChapterData();
                     }, (err) => {
                         this.$vux.toast.show({
                             text: '系统异常，请稍后重试...',
@@ -396,14 +414,23 @@
                             articlename: item.articlename,
                             content: item.content
                         };
+
+                        // 若存在translateX，则 移动
+                        if (this.content.translateX > 0) {
+                            this.content.switch = false;
+                        }
                     } else {
                         // 2. 请求服务器
                         app.ajax.get(app.config.api.reader.chapter + this.chapterId.cur, {},
                             (data) => {
                                 // 换行
-                                data.result.content = "<p>" + data.result.content.replace(/\r\n\r\n/g, '</p><br/><p>') + "</p>";
-
+                                data.result.content = '<p>' + data.result.content.replace(/\r\n\r\n/g, '</p><br/><p>') + '</p>';
                                 this.data.chapter = data.result;
+
+                                // 若存在translateX，则 移动
+                                if (this.content.translateX > 0) {
+                                    this.content.switch = false;
+                                }
 
                                 // 章节信息：插入websql
                                 app.webSql.insert(app.config.webSql.chapter,
@@ -436,7 +463,6 @@
                     });
             },
             clickContent(e){
-                console.log(e);
                 if (e.y > app.config.setting.height.header
                     && e.y < (app.config.setting.height.screen - app.config.setting.height.tabbar)) {
                     if (e.x >= this.width * 0.3 && e.x <= this.width * 0.7) {
@@ -451,7 +477,6 @@
                 }
             },
             turnPage(direction){
-                console.log(direction);
                 if (direction == 'prev') {
                     if (this.content.translateX <= 0) {
                         if (this.chapterId.cur <= this.chapterId.min) {
@@ -869,14 +894,12 @@
             });
         },
         mounted(){
-            // 目录
+            // 目录 => 章节信息
             this.getCatalogData();
 
             // 书签
             this.getMarkData();
 
-            // 章节信息
-            this.getChapterData();    // range组件初始化change会加载数据
 
             // 书籍详情
             this.getBookData();

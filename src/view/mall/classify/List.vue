@@ -5,11 +5,18 @@
             <grid :rows="2">
                 <grid-item :link="'/mall/classify/detail?id='+child.id+'&name='+child.name"
                            v-for="(child, index) in data.children" :key="index">
-                <span style="float: left;padding-right: 20px;">
-                    <label style="color: #162636;">{{child.name}}</label><br>
-                    <label style="color: #989A9C;font-size: 13px;">{{child.num}}本</label>
-                </span>
-                    <img style="width: 40%;" :src="child.cover"/>
+                    <div style="padding-right: 20px;">
+                        <label style="color: #162636;">{{child.name}}</label><br>
+                        <label style="color: #989A9C;font-size: 13px;">{{child.num}}本</label>
+                    </div>
+                    <div style="margin-top: -45px;" v-if="child.cover">
+                        <img :src="child.cover[1]"
+                             style="width: 45px;height: 60px;transform: scale3d(0.8,0.8,1);position: relative;left: 72px;box-shadow: 2px 5px 2px #888888;">
+                        <img :src="child.cover[2]"
+                             style="width: 45px;height: 60px;transform: scale3d(0.8,0.8,1);position: relative;left: 62px;box-shadow: 2px 5px 2px #888888;">
+                        <img :src="child.cover[0]"
+                             style="width: 45px;height: 60px;transform: scale3d(1,1,1);position: relative;left: -5px;box-shadow: 2px 5px 2px #888888;">
+                    </div>
                 </grid-item>
             </grid>
         </template>
