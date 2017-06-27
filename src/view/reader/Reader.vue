@@ -112,12 +112,13 @@
         <!-- 进度：滑块条 -->
         <popup v-model="show.progress" class="popup-progress">
             <group>
-                <cell primary="content">
-                    <range :min="chapterId.min" :max="chapterId.max" v-if="show.progress"
-                           minHTML="<x-button plain @click.native=trunPage('prev')>上一章</x-button>"
-                           maxHTML="<span @click=trunPage('next')>下一章</span>"
-                           @on-change="changeChapter"></range>
-                </cell>
+                <cell-box :style="{width: (width-30)+'px'}">
+                    <div style="position:relative;top: 10px;font-size: 15px;" @click="turnPage('prev')">上一章</div>
+                    <range v-if="show.progress" :min="chapterId.min" :max="chapterId.max"
+                           minHTML="&nbsp;" maxHTML="&nbsp;"
+                           style="width:200px;margin-left: 70px;" @on-change="changeChapter"></range>
+                    <div style="position:relative;left: 300px;bottom:10px;font-size: 15px;" @click="turnPage('next')">下一章</div>
+                </cell-box>
             </group>
         </popup>
         <!-- 进度：章节信息 -->
@@ -201,23 +202,24 @@
 
         <!-- 打赏： -->
         <popup v-model="show.reward" class="popup-reward">
-            <div style="padding: 10px 0px 20px 10px;">
-                <span style="display: block;font-family: PingFangSC-Regular;font-size: 14px;color: #162636;padding-bottom: 10px;">选择打赏金额</span>
-                <label class="coin" @click="choiceReward" :class="{'c-active': rewardCoin==100}" data-reward-coin="100">100阅币</label>
-                <label class="coin" @click="choiceReward" :class="{'c-active': rewardCoin==500}" data-reward-coin="500">500阅币</label>
-                <label class="coin" @click="choiceReward" :class="{'c-active': rewardCoin==1000}"
-                       data-reward-coin="1000">1000阅币</label>
-                <label class="coin" @click="choiceReward" :class="{'c-active': rewardCoin==2000}"
-                       data-reward-coin="2000">2000阅币</label>
-                <label class="coin" @click="choiceReward" :class="{'c-active': rewardCoin==10000}"
-                       data-reward-coin="10000">10000阅币</label>
-            </div>
-            <group>
-                <x-input title="其他金额" placeholder="输入具体金额打赏作者(单位：阅币)" v-model="rewardCoin"></x-input>
+            <group title="选择打赏金额">
+                <div style="padding: 20px 0px;font-family: PingFangSC-Light;font-size: 16px;color: #57606A;">
+                    <checker v-model="rewardCoin" default-item-class="checker-item"
+                             selected-item-class="checker-item-selected">
+                        <checker-item value="100">100阅币</checker-item>
+                        <checker-item value="500">500阅币</checker-item>
+                        <checker-item value="1000">1000阅币</checker-item>
+                        <checker-item value="2000">2000阅币</checker-item>
+                        <checker-item value="10000">10000阅币</checker-item>
+                    </checker>
+                </div>
+                <x-input title="其他金额" v-model="rewardCoin" placeholder="输入具体金额打赏作者(单位：阅币)"
+                         style="font-family: PingFangSC-Regular;font-size: 14px;color: #162636;"></x-input>
             </group>
-            <x-button type="primary" action-type="button"
-                      style="background: #35B4EB;border-radius: 7px;margin-top: 10px;"
-                      @click.native="clickReward">确定打赏
+            <x-button action-type="button"
+                      style="background: #35B4EB;border-radius: 5px;color: #FFFFFF;margin-top: 15px;"
+                      @click.native="clickReward">
+                确定打赏
             </x-button>
         </popup>
     </div>
@@ -233,10 +235,13 @@
         TabItem,
         Group,
         Cell,
+        CellBox,
         XInput,
         Range,
         Actionsheet,
         XButton,
+        Checker,
+        CheckerItem,
         dateFormat,
         base64
     } from 'vux';
@@ -345,10 +350,13 @@
             TabItem,
             Group,
             Cell,
+            CellBox,
             XInput,
             Range,
             Actionsheet,
             XButton,
+            Checker,
+            CheckerItem,
             CPopupBuy
         },
         methods: {
@@ -401,7 +409,7 @@
 
                 // 1. 查找本地是否已缓存
                 app.webSql.query(app.config.webSql.chapter, {
-                    articleid: this.chapterId.cur
+                    chapterid: this.chapterId.cur
                 }, {}, (rows) => {
                     if (rows && rows.length > 0) {
                         let item = rows.item(0);
@@ -430,8 +438,8 @@
                                 // 章节信息：插入websql
                                 app.webSql.insert(app.config.webSql.chapter,
                                     {
-                                        articleid: this.chapterId.cur,
                                         articlename: data.result.articlename,
+                                        chapterid: this.chapterId.cur,
                                         content: data.result.content
                                     }
                                 )
@@ -583,10 +591,42 @@
                 this.rewardCoin = Number(e.target.dataset.rewardCoin);
             },
             clickReward(){
-                this.$vux.toast.show({
-                    text: '打赏成功',
-                    type: 'info'
-                })
+                let _this = this;
+
+                app.ajax.post(app.config.api.book.reward.add, {
+                    uid: this.$store.state.user.uid,
+                    price: this.rewardCoin,
+                    articleid: this.$route.query.id
+                }, (data) => {
+                    this.show.reward = false;
+
+                    if (data.result.result == 1) { // 1:成功
+                        this.$vux.toast.show({
+                            text: '打赏成功'
+                        });
+                        this.getData();
+                    } else if (data.result.result == 2) {   // 2:余额不足
+                        this.$vux.alert.show({
+                            title: '系統提示',
+                            content: '用户余额不足',
+                            buttonText: '去充值',
+                            onHide(){
+                                _this.$router.push({path: '/recharge'});
+                            }
+                        });
+                    } else if (data.result.result == 3) {   // 3:书籍不存在
+                        this.$vux.toast.show({
+                            text: '书籍不存在',
+                            type: 'warn'
+                        });
+                    }
+                }, (err) => {
+                    this.$vux.toast.show({
+                        text: '系统异常，请稍后重试...',
+                        type: 'warn'
+                    });
+                    app.log.error(err);
+                });
             },
             clickTabbar(index){
                 if (index == 0) {
@@ -1029,6 +1069,10 @@
         right: -45px;
     }
 
+    .reader ~ .popup-progress .vux-cell-box.weui-cell > div:first-child{
+        width: inherit;
+    }
+
     .reader ~ .popup-progress-tip {
         bottom: 56px;
         width: 60%;
@@ -1073,29 +1117,29 @@
         box-shadow: 3px 3px 3px #c7c7c7;
     }
 
-    .reader .actionsheet-more .weui-actionsheet__cell {
-        font-size: 16px;
+    .reader ~ .actionsheet-more .weui-actionsheet__cell, .reader ~ .actionsheet-more .iconfont {
+        font-size: 15px;
     }
 
-    .reader .actionsheet-more .iconfont {
-        font-size: 16px;
-    }
-
-    .reader .popup-buy .batch {
+    .reader ~ .popup-buy .batch, .reader ~ .popup-buy .batch-input, .reader ~ .popup-reward {
         background: #FFFFFF;
     }
 
-    .reader ~ .popup-reward div .coin {
-        display: inline-block;
-        padding: 5px 20px;
-        border: solid 1px #C1CDD6;
+    .reader ~ .popup-reward .checker-item {
+        background: #FFFFFF;
+        border: 1px solid #57606A;
         border-radius: 8px;
-        margin: 8px 10px 8px 0px;
-        font-size: 16px;
+        width: 100px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        margin-left: 15px;
+        margin-bottom: 10px;
     }
 
-    .reader ~ .popup-reward .vux-x-input {
-        font-size: 14px;
+    .reader ~ .popup-reward .checker-item-selected {
+        background: #35B4EB;
+        border-radius: 8px;
     }
 
     .reader ~ .status i {

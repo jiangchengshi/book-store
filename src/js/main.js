@@ -72,8 +72,8 @@ const initWebSql = function () {
     });
     webSql.create(app.config.webSql.chapter, {  // 章节
         // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
-        articleid: 'INTEGER',
         articlename: 'TEXT',
+        chapterid: 'INTEGER',
         content: 'BLOB'
     });
     webSql.create(app.config.webSql.login, {  // 登录用户

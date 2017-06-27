@@ -62,7 +62,7 @@
             </cell>
         </group>
         <group style="margin-top: 10px;">
-            <cell :title="'评论(' + detail.pinfen + ')'" value="全部评论" is-link></cell>
+            <cell :title="'评论(' + detail.pinfen + ')'" value="全部评论" is-link link="/mall/book/review/list"></cell>
             <c-list-view type="review" :list="reviewList"></c-list-view>
             <cell style="text-align: center;">
                 <a slot="inline-desc" style="color: #35B4EB;" @click="handleReview">立即评论</a>
@@ -210,10 +210,14 @@
                                 // 删除 时间最小的一本
                                 app.webSql.delete(app.config.webSql.shelf, {articleid: rows.item(0).articleid});
                             }
-                            app.webSql.insert(
-                                app.config.webSql.shelf,
-                                ['articleid', 'articlename', 'author', 'cover', 'time'],
-                                [this.detail.articleid, this.detail.articlename, this.detail.author, this.detail.cover, new Date()]
+                            app.webSql.insert(app.config.webSql.shelf,
+                                {
+                                    articleid:this.detail.articleid,
+                                    articlename:this.detail.articlename,
+                                    author:this.detail.author,
+                                    cover:this.detail.cover,
+                                    time:new Date()
+                                }
                             );
                             if (typeof callback == "function") {
                                 callback();
@@ -320,24 +324,24 @@
                 this.getRecommendData(++index);
             },
             publishReview(review){
-                app.ajax.post(app.config.api.review.add, {
+                app.ajax.post(app.config.api.book.review.add, {
                     uid: this.$store.state.user.uid,
                     articleid: this.$route.query.id,
                     score: review.score,
                     content: review.content
                 }, (data) => {
-                    if (data.result.result == 1) {
+                    if (data.result.result == 1) {  // 1:成功
                         this.show.review = false;
                         this.$vux.toast.show({
                             text: '发表成功',
                             type: 'info'
                         });
-                    } else if (data.result.result == 2) {
+                    } else if (data.result.result == 2) {   // 2:用户不存在
                         this.$vux.toast.show({
                             text: '用户不存在',
                             type: 'warn'
                         });
-                    } else if (data.result.result == 3) {
+                    } else if (data.result.result == 3) {   // 3：书籍不存在
                         this.$vux.toast.show({
                             text: '书籍不存在',
                             type: 'warn'

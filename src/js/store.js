@@ -15,7 +15,8 @@ const store = new Vuex.Store({
             showBack: false,
             showSearch: false,
             showShare: false,
-            tidyText: '整理'
+            showTidy: false,
+            showReview: false
         },
         reader: {
             header: false,
@@ -41,7 +42,8 @@ const store = new Vuex.Store({
                 backText: '',
                 showSearch: false,
                 showShare: false,
-                tidyText: '整理'
+                showTidy: false,
+                showReview: false
             }, payload);
         },
         updateReaderBar(state, payload){

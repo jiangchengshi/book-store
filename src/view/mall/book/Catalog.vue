@@ -1,14 +1,17 @@
 <template>
     <div class="catalog">
-        <group>
-            <cell v-for="(catalog, index) in dataList" :key="index" @click.native="clickCatalog(catalog)">
+        <scroller :on-infinite="handleInfinite" :height="height+''" style="top: 46px;">
+            <group>
+                <cell v-for="(catalog, index) in dataList" :key="index" @click.native="clickCatalog(catalog)">
                 <span slot="title"
-                      :class="{vip:(catalog.isvip==1&&catalog.is_buy==0), free:!catalog.isvip==0||(catalog.isvip==1&&catalog.is_buy==1)}">
-                    {{catalog.articlename}}
+                      :class="{free:catalog.isvip==0||(catalog.isvip==1&&catalog.is_buy==1), vip:(catalog.isvip==1&&catalog.is_buy==0)}">
+                    {{catalog.chaptername}}
                 </span>
-                <i v-if="catalog.isvip==1&&catalog.is_buy==0" class="iconfont icon-lock" style="font-size: 16px;"></i>
-            </cell>
-        </group>
+                    <i v-if="catalog.isvip==1&&catalog.is_buy==0" class="iconfont icon-lock"
+                       style="font-size: 16px;"></i>
+                </cell>
+            </group>
+        </scroller>
 
         <!-- 章节购买 -->
         <popup v-model="show.buy" class="popup-buy">
@@ -43,6 +46,7 @@
     export default {
         data () {
             return {
+                height: app.config.setting.height.display - app.config.setting.height.header,
                 page: 1,
                 dataList: [],
                 chapterId: {
@@ -63,12 +67,24 @@
             Group, Cell, CellBox, Checklist, XButton, Popup
         },
         methods: {
-            getData(){
+            getData(callback){
                 app.ajax.get(app.config.api.reader.chapters + this.$route.query.id + '/' + this.page + '/' + this.$store.state.user.uid, {},
                     (data) => {
-                        this.chapterId.min = data.result.min_chapterid;
-                        this.chapterId.max = data.result.max_chapterid;
-                        this.dataList = data.result.result;
+                        if (data.result.result && data.result.result.length > 0) {
+                            this.chapterId.min = data.result.min_chapterid;
+                            this.chapterId.max = data.result.max_chapterid;
+                            this.dataList = this.dataList.concat(data.result.result);
+
+                            if (typeof callback == "function") {
+                                callback();
+                            }
+                        } else {
+                            if (typeof callback == "function") {
+                                this.page--;
+
+                                callback(true);
+                            }
+                        }
                     }, (err) => {
                         this.$vux.toast.show({
                             text: '系统异常，请稍后重试...',
@@ -81,7 +97,7 @@
                 if (catalog.isvip == 1 && catalog.is_buy == 0) {
                     this.catalog = catalog;
                     this.show.buy = true;
-                }else{
+                } else {
                     this.showChapter(catalog.chapterid);
                 }
             },
@@ -94,6 +110,9 @@
                     this.show.buy = false;
 
                     if (data.result.result == 1) { // 1：成功
+                        // 是否自动购买
+                        app.util.localStorage("autoBuy", this.autoBuy.length > 0 ? 1 : 2);
+
                         this.showChapter(this.catalog.chapterid);
                     } else if (data.result.result == 2) {   // 2:用户不存在
                         this.$vux.toast.show({
@@ -129,7 +148,18 @@
                 });
             },
             showChapter(chapterId){
-                this.$router.push({path:'/reader', query:{id: this.$route.query.id, chapterId: chapterId}});
+                this.$router.push({path: '/reader', query: {id: this.$route.query.id, chapterId: chapterId}});
+            },
+            handleInfinite(done){
+                if (this.page >= 10) {
+                    done(true);
+                    return;
+                }
+                setTimeout(() => {
+                    this.page++;
+
+                    this.getData(done);
+                }, 1500);
             }
         },
         created(){
@@ -145,13 +175,13 @@
 </script>
 
 <style>
-    .catalog .vip {
+    .catalog .free {
         font-family: PingFangSC-Regular;
         font-size: 16px;
         color: #162636;
     }
 
-    .catalog .free {
+    .catalog .vip {
         font-family: PingFangSC-Regular;
         font-size: 16px;
         color: #989A9C;

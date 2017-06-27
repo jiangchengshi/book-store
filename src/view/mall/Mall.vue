@@ -8,6 +8,7 @@
             <router-link to="/share" slot="right">
                 <i v-show="$store.state.header.showShare" class="iconfont icon-zuihouyibanfenxiang"></i>
             </router-link>
+            <span slot="right" v-show="$store.state.header.showReview">发表评论</span>
         </x-header>
         <div style="overflow: scroll;" :style="{height: height+'px', width: width+'px'}">
             <router-view></router-view>

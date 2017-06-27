@@ -39,7 +39,12 @@ export default {
             free: 'free/',
             special: 'special/',
             detail: 'detail/',
-            review: 'review/',
+            review: {
+                list: 'review/',
+                detail: 'review/info/',
+                add: 'review/add',
+                reply: 'review/reply',
+            },
             ticket: {
                 get: 'vipvote/',
                 add: 'vipvote/add'
@@ -93,14 +98,8 @@ export default {
                 flower: 'actlog/flower/',
                 ticket: 'actlog/vipvote/'
             },
-            review: 'review/user/',
+            review: 'review/member/',
             news: 'message/'
-        },
-        review: {
-            add: 'review/add',
-            info: 'review/info/',
-            reply: 'review/reply',
-            user: 'review/user/'
         },
         sign: 'signin/',
         setting: {

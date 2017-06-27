@@ -3,7 +3,7 @@
         <template v-if="type=='book'">
             <div class="weui-panel weui-panel_access book">
                 <a v-for="item in list" :key="item.id" class="weui-media-box weui-media-box_appmsg"
-                   @click="handleClickBook(item.id)">
+                   @click="clickBook(item.id)">
                     <div class="weui-media-box__hd" v-if="item.image">
                         <img class="weui-media-box__thumb" :src="item.image">
                     </div>
@@ -42,7 +42,7 @@
         </template>
         <template v-else-if="type=='review'">
             <div class="weui-panel weui-panel_access review">
-                <a v-for="item in list" :key="item.id" class="weui-media-box weui-media-box_appmsg">
+                <a v-for="item in list" :key="item.id" class="weui-media-box weui-media-box_appmsg" @click="clickReview(item.reviewid)">
                     <div class="weui-media-box__hd" v-if="item.avatar">
                         <img class="weui-media-box__thumb" :src="item.avatar">
                     </div>
@@ -81,8 +81,11 @@
             Group, Cell, Rater
         },
         methods: {
-            handleClickBook(id){
+            clickBook(id){
                 this.$router.push({path: '/mall/book/detail', query: {id: id}});
+            },
+            clickReview(id){
+                this.$router.push({path: '/mall/book/review/detail', query: {id: id}});
             }
         }
     }
@@ -122,5 +125,4 @@
         font-size: 14px;
         padding-right: 5px;
     }
-
 </style>

@@ -15,6 +15,8 @@ const MallBookTicket = resolve => require(['../view/mall/book/Ticket.vue'], reso
 const MallBookFlower = resolve => require(['../view/mall/book/FLower.vue'], resolve);
 const MallBookReward = resolve => require(['../view/mall/book/Reward.vue'], resolve);
 const MallBookCatalog = resolve => require(['../view/mall/book/Catalog.vue'], resolve);
+const MallBookReviewList = resolve => require(['../view/mall/book/review/List.vue'], resolve);
+const MallBookReviewDetail = resolve => require(['../view/mall/book/review/Detail.vue'], resolve);
 const MallMonthlyList = resolve => require(['../view/mall/monthly/List.vue'], resolve);
 const MallMonthlyDetail = resolve => require(['../view/mall/monthly/Detail.vue'], resolve);
 const MallMonthlyPackage = resolve => require(['../view/mall/monthly/Package.vue'], resolve);
@@ -93,6 +95,14 @@ const routes = [
             {
                 path: 'book/catalog',
                 component: MallBookCatalog
+            },
+            {
+                path: 'book/review/list',
+                component: MallBookReviewList
+            },
+            {
+                path: 'book/review/detail',
+                component: MallBookReviewDetail
             },
             {
                 path: 'monthly/list',

@@ -2,7 +2,7 @@
     <div class="shelf">
         <x-header :title="$store.state.header.title"
                   :left-options="{showBack: $store.state.header.showBack, backText: $store.state.header.backText}">
-            <span slot="right" @click="handleTidy" style="color:#35B4EB;">{{$store.state.header.tidyText}}</span>
+            <span slot="right" @click="handleTidy" style="color:#35B4EB;" v-if="$store.state.header.showTidy">整理</span>
         </x-header>
         <div style="overflow: scroll;background-color: #F8F8F8;" :style="{height: height+'px'}">
             <router-view></router-view>
