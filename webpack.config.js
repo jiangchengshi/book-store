@@ -72,6 +72,8 @@ let webpackConfig = {
         extensions: ['.js', '.vue', '.css'], //后缀名自动补全
     },
     devServer: {
+        // host: '172.16.6.200',   // 默认 localhost
+        port: '8080',
         historyApiFallback: true, //配置为true, 当访问的文件不存在时, 返回根目录下的index.html文件
         noInfo: true
     },

@@ -19,7 +19,7 @@
                       :right-options="{showMore: true}" @on-click-more="show.more=true"
                       :style="{backgroundColor: setting.bgColor.header, color: setting.color.header}">
                 <a class="iconfont icon-dashang2" slot="right" @click="show.reward = true"></a>
-                <a class="iconfont icon-xiazai" slot="right" @click="show.download = true"></a>
+                <a class="iconfont icon-xiazai" slot="right" @click="show.batchBuy = true"></a>
                 <!--<a class="iconfont icon-shuqian_bookmark" slot="right"></a>-->
             </x-header>
             <div class="chapter" style="padding: 0px 10px;"
@@ -192,31 +192,12 @@
         <actionsheet v-model="show.more" :menus="data.menuMore" class="actionsheet-more"
                      @on-click-menu="clickMore"></actionsheet>
 
-        <!-- 下载：书籍购买下载 -->
-        <popup v-model="show.download" class="popup-download">
-            <img :src="data.book.cover"
-                 style="width: 110px; height: 140px; position:absolute;bottom: 140px;left: 10px;border-radius: 5px;box-shadow: 0 3px 3px #c7c7c7;">
-            <div style="padding:20px 0px 20px 140px; height: 80px; border-bottom: dotted 1px #BDBDBD;">
-                <span class="title" style="font-family: PingFangSC-Medium;font-size: 19px;color: #162636;">
-                {{data.book.articlename}}
-                </span>
-                <span style="font-family: PingFangSC-Regular;font-size: 15px;color: #989A9C;">{{data.book.author}}张三丰</span>
-                <span style="font-family: PingFangSC-Regular;font-size: 14px;color: #162636;">
-                    价格：{{data.book.price}}
-                </span>
-            </div>
-            <div style="padding: 10px 0px 10px 10px;">
-                <span style="color: #989A9C;">
-                    共计支付：<label style="color: #EE4D22;">{{data.book.price}}</label>
-                </span>
-                <span style="color: #989A9C;">
-                    账户余额：<label style="color:  #162636;">{{data.book.price}}</label>
-                </span>
-            </div>
-            <x-button type="primary" action-type="button" style="background: #35B4EB;border-radius: 7px;"
-                      @click.native="clickBuy">购买并下载
-            </x-button>
-        </popup>
+        <!-- 下载：章节购买： -->
+        <c-popup-buy type="batchBuy" :show="show.batchBuy" @checkBatchBuyNum="checkBatchBuyNum"
+                     @confirmBatchBuy="confirmBatchBuy"></c-popup-buy>
+        <!-- 章节购买：批量 -->
+        <c-popup-buy type="batchBuyInput" :show="show.batchBuyInput" @inputBatchBuyNum="inputBatchBuyNum"
+                     @inputBack="inputBack" @confirmBatchBuy="confirmBatchBuy"></c-popup-buy>
 
         <!-- 打赏： -->
         <popup v-model="show.reward" class="popup-reward">
@@ -259,6 +240,7 @@
         dateFormat,
         base64
     } from 'vux';
+    import CPopupBuy from '../components/PopupBuy.vue';
 
     export default {
         name: 'reader',
@@ -272,7 +254,8 @@
                     catalog: false,
                     progress: false,
                     setting: false,
-                    download: false,
+                    batchBuy: false,
+                    batchBuyInput: false,
                     reward: false
                 },
                 setting: {
@@ -354,7 +337,19 @@
             }
         },
         components: {
-            XHeader, Tabbar, TabbarItem, Popup, Tab, TabItem, Group, Cell, XInput, Range, Actionsheet, XButton
+            XHeader,
+            Tabbar,
+            TabbarItem,
+            Popup,
+            Tab,
+            TabItem,
+            Group,
+            Cell,
+            XInput,
+            Range,
+            Actionsheet,
+            XButton,
+            CPopupBuy
         },
         methods: {
             getCatalogData(){
@@ -537,11 +532,52 @@
                         break;
                 }
             },
-            clickBuy(){
-                this.$vux.toast.show({
-                    text: '购买成功',
-                    type: 'info'
-                })
+            checkBatchBuyNum(num){
+                this.buyNum = num;
+                if (this.buyNum === '0') {
+                    this.show.batchBuyInput = true;
+                    this.show.batchBuy = false;
+                }
+            },
+            inputBatchBuyNum(num){
+                this.buyNum = num;
+                if (this.buyNum.startsWith('0')) {
+                    this.buyNum = this.buyNum.substring(1);
+                }
+            },
+            inputBack(){
+                this.show.batchBuy = true;
+                this.show.batchBuyInput = false;
+            },
+            confirmBatchBuy(){
+                app.ajax.post(app.config.api.buy.chapters.batch, {
+                    uid: this.$store.state.user.uid,
+                    articleid: this.$route.query.id,
+                    buynum: this.buyNum
+                }, (data) => {
+                    if (data.result.result == 1) {  // 1:成功
+                        this.$vux.toast.show({
+                            text: '购买成功',
+                            type: 'info'
+                        });
+                    } else if (data.result.result == 2) { // 2:用户不存在
+                        this.$vux.toast.show({
+                            type: 'warn',
+                            text: '用户不存在'
+                        });
+                    } else if (data.result.result == 3) {   // 3：书籍不存在
+                        this.$vux.toast.show({
+                            type: 'warn',
+                            text: '书籍不存在'
+                        });
+                    }
+                }, (err) => {
+                    this.$vux.toast.show({
+                        text: '系统异常，请稍后重试...',
+                        type: 'warn'
+                    });
+                    app.log.error(err);
+                });
             },
             choiceReward(e){
                 this.rewardCoin = Number(e.target.dataset.rewardCoin);
@@ -1045,13 +1081,8 @@
         font-size: 16px;
     }
 
-    .reader ~ .popup-download, .reader ~ .popup-reward {
-        background-color: #FFFFFF;
-    }
-
-    .reader ~ .popup-download span {
-        display: block;
-        line-height: 30px;
+    .reader .popup-buy .batch {
+        background: #FFFFFF;
     }
 
     .reader ~ .popup-reward div .coin {

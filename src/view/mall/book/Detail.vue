@@ -91,76 +91,11 @@
         </div>
 
         <!-- 章节购买： -->
-        <popup v-model="show.batchBuy" class="popup-batch-buy" @on-first-show="getBatchBuyData">
-            <div style="font-family: PingFangSC-Regular;font-size: 20px;color: #162636;border-bottom: solid 1px #EDEDED;padding: 8px 0px;text-align: center;">
-                章节购买
-            </div>
-            <div style="font-family: PingFangSC-Regular;font-size: 15px;color: #162636;padding-left: 15px;">您将从第
-                <label style="font-family: PingFangSC-Regular;font-size: 15px;color: #EE4D22;line-height: 40px;">{{batchBuy.input.freecount+1}}</label>
-                章开始购买
-            </div>
-            <group>
-                <div style="padding-top: 10px;font-family: PingFangSC-Light;font-size: 16px;color: #57606A;">
-                    <checker v-model="batchBuy.num" default-item-class="checker-item"
-                             selected-item-class="checker-item-selected" @on-change="changeBatchBuyNum">
-                        <checker-item value="10">后10章</checker-item>
-                        <checker-item value="50">后50章</checker-item>
-                        <checker-item value="100">后100章</checker-item>
-                        <checker-item value="0">更多章节</checker-item>
-                    </checker>
-                </div>
-            </group>
-            <group>
-                <cell title="当前余额">{{$store.state.user.egold}} 阅币</cell>
-                <cell title="应付总额">
-                    <label style="color: #EE4D22;">{{batchBuy.price}} 阅币</label>
-                </cell>
-            </group>
-            <div style="padding: 20px 0px 10px;">
-                <div style="opacity: 0.35;font-family: PingFangSC-Light;font-size: 10px;color: #162636;padding: 5px;">
-                    1、批量购买章节是付费章节,如期间有免费章节和购买章节,下载时将一并下载
-                </div>
-                <div style="opacity: 0.35;font-family: PingFangSC-Light;font-size: 10px;color: #162636;padding: 5px;">
-                    2、免费章节及已购买章节不会重复扣费,请放心购买。
-                </div>
-            </div>
-            <x-button type="primary" action-type="button"
-                      style="background: #35B4EB;border-radius: 2px;margin-top: 10px;" @click.native="confirmBatchBuy">
-                确定购买
-            </x-button>
-        </popup>
+        <c-popup-buy type="batchBuy" :show="show.batchBuy" @checkBatchBuyNum="checkBatchBuyNum"
+                     @confirmBatchBuy="confirmBatchBuy"></c-popup-buy>
         <!-- 章节购买：批量 -->
-        <popup v-model="show.batchBuyInput" class="popup-batch-buy-input">
-            <div style="font-family: PingFangSC-Regular;font-size: 20px;color: #162636;border-bottom: solid 1px #EDEDED;padding: 8px 0px;text-align: center;">
-                <i style="float: left;padding-left: 10px;" class="iconfont icon-iconjiantou-copy"
-                   @click="show.batchBuy=true;show.batchBuyInput=false;"></i>
-                批量购买
-            </div>
-            <div class="buyNum" style="padding: 10px 0px 40px 10px;">
-                <span style="display: block;font-family: PingFangSC-Regular;font-size: 15px;color: #162636;padding-bottom: 10px;">
-                    购买章节数：
-                </span>
-                <x-input v-model="batchBuy.num" placeholder="输入想要购买的章节数" @on-change="inputBatchBuyNum"></x-input>
-                <span style="display: block;font-family: PingFangSC-Regular;font-size: 15px;color: #162636;float: right;padding-right: 15px;">
-                    剩余：<label>{{batchBuy.input.vipcount}}</label> 章
-                </span>
-            </div>
-            <group>
-                <cell title="当前余额">{{$store.state.user.egold}} 阅币</cell>
-                <cell title="应付总额">
-                    <label style="color: #EE4D22;">{{batchBuy.price}} 阅币</label>
-                </cell>
-            </group>
-            <div style="padding: 20px 0px 10px;">
-                <div style="opacity: 0.35;font-family: PingFangSC-Light;font-size: 10px;color: #162636;padding: 5px;">
-                    1、其中免费的10章，不会重复扣费
-                </div>
-            </div>
-            <x-button type="primary" action-type="button"
-                      style="background: #35B4EB;border-radius: 2px;margin-top: 10px;" @click.native="confirmBatchBuy">
-                确定购买
-            </x-button>
-        </popup>
+        <c-popup-buy type="batchBuyInput" :show="show.batchBuyInput" @inputBatchBuyNum="inputBatchBuyNum"
+                     @inputBack="inputBack" @confirmBatchBuy="confirmBatchBuy"></c-popup-buy>
 
         <!-- 评论 -->
         <c-dialog type="review" :show="show.review" :data="detail" @confirm="publishReview"
@@ -172,6 +107,7 @@
     import {Group, Cell, CellBox, Checker, CheckerItem, XInput, XButton, Rater, Popup, Swiper, SwiperItem} from 'vux';
     import CListView from '../../components/ListView.vue';
     import CDialog from '../../components/Dialog.vue';
+    import CPopupBuy from '../../components/PopupBuy.vue';
 
     export default {
         data () {
@@ -179,21 +115,7 @@
                 detail: {},
                 reviewList: [],
                 publicList: [],
-                batchBuy: {
-                    num: 0,
-                    price: 0,
-                    select: {
-                        option: [],
-                        egold: 0,
-                        saleprice: 0
-                    },
-                    input: {
-                        egold: 0,
-                        saleprice: 0,
-                        freecount: 0,
-                        vipcount: 0,
-                    }
-                },
+                buyNum: 0,
                 show: {
                     batchBuy: false,
                     batchBuyInput: false,
@@ -218,7 +140,8 @@
             Swiper,
             SwiperItem,
             CListView,
-            CDialog
+            CDialog,
+            CPopupBuy
         },
         methods: {
             initData(){
@@ -270,75 +193,10 @@
                         app.log.error(err);
                     });
             },
-            getBatchBuyData(){
-                app.ajax.get(app.config.api.buy.chapters.option + this.$route.query.id + "/" + this.$store.state.user.uid, {},
-                    (data) => {
-                        Object.assign(this.batchBuy.select, data.result);
-                    }, (err) => {
-                        this.$vux.toast.show({
-                            text: '系统异常，请稍后重试...',
-                            type: 'warn'
-                        });
-                        app.log.error(err);
-                    });
-                app.ajax.get(app.config.api.buy.chapters.price + this.$store.state.user.uid + "/" + this.$route.query.id, {},
-                    (data) => {
-                        Object.assign(this.batchBuy.input, data.result);
-                    }, (err) => {
-                        this.$vux.toast.show({
-                            text: '系统异常，请稍后重试...',
-                            type: 'warn'
-                        });
-                        app.log.error(err);
-                    });
-            },
             handlePreview(){
                 this.addShelf(() => {
                     this.$router.push({path: '/reader', query: {id: this.$route.query.id}});
                 });
-            },
-            handleBatchBuy(){
-                this.show.batchBuy = true;
-            },
-            handleTicket(){ // 月票
-                this.$router.push({
-                    path: '/mall/book/ticket',
-                    query: {id: this.$route.query.id, name: this.detail.articlename}
-                });
-            },
-            handleFlower(){ // 鲜花
-                this.$router.push({
-                    path: '/mall/book/flower',
-                    query: {id: this.$route.query.id, name: this.detail.articlename}
-                });
-            },
-            handleReward(){ // 打赏
-                this.$router.push({
-                    path: '/mall/book/reward',
-                    query: {id: this.$route.query.id, name: this.detail.articlename}
-                });
-            },
-            handleReview(){
-                this.show.review = true
-            },
-            handlePublic(id){
-                this.$router.push({path: '/mall/book/detail', query: {id: id}});
-            },
-            handleFeedback(){
-                this.$router.push({path: '/feedback'});
-            },
-            changeBatchBuyNum(){
-                if (this.batchBuy.num === '0') {
-                    this.show.batchBuyInput = true;
-                    this.show.batchBuy = false;
-                }
-                this.batchBuy.price = this.batchBuy.select.saleprice * this.batchBuy.num;
-            },
-            inputBatchBuyNum(){
-                if (this.batchBuy.num.startsWith('0')) {
-                    this.batchBuy.num = this.batchBuy.num.substring(1);
-                }
-                this.batchBuy.price = this.batchBuy.input.saleprice * this.batchBuy.num;
             },
             addShelf(callback){
                 // 1. 本地=> 更新websql： 书架
@@ -381,11 +239,58 @@
                     });
                 }
             },
+            handleBatchBuy(){
+                this.show.batchBuy = true;
+            },
+            handleTicket(){ // 月票
+                this.$router.push({
+                    path: '/mall/book/ticket',
+                    query: {id: this.$route.query.id, name: this.detail.articlename}
+                });
+            },
+            handleFlower(){ // 鲜花
+                this.$router.push({
+                    path: '/mall/book/flower',
+                    query: {id: this.$route.query.id, name: this.detail.articlename}
+                });
+            },
+            handleReward(){ // 打赏
+                this.$router.push({
+                    path: '/mall/book/reward',
+                    query: {id: this.$route.query.id, name: this.detail.articlename}
+                });
+            },
+            handleReview(){
+                this.show.review = true
+            },
+            handlePublic(id){
+                this.$router.push({path: '/mall/book/detail', query: {id: id}});
+            },
+            handleFeedback(){
+                this.$router.push({path: '/feedback'});
+            },
+            checkBatchBuyNum(num){
+                this.buyNum = num;
+                if (this.buyNum === '0') {
+                    this.show.batchBuyInput = true;
+                    this.show.batchBuy = false;
+                }
+            },
+            inputBatchBuyNum(num){
+                this.buyNum = num;
+                if (this.buyNum.startsWith('0')) {
+                    this.buyNum = this.buyNum.substring(1);
+                }
+            },
+            inputBack(){
+                this.show.batchBuy = true;
+                this.show.batchBuyInput = false;
+            },
             confirmBatchBuy(){
                 app.ajax.post(app.config.api.buy.chapters.batch, {
                     uid: this.$store.state.user.uid,
                     articleid: this.$route.query.id,
-                    buynum: this.batchBuy.num
+                    buynum: this.buyNum
                 }, (data) => {
                     if (data.result.result == 1) {  // 1:成功
                         this.$vux.toast.show({
@@ -477,38 +382,8 @@
         text-overflow: ellipsis;
     }
 
-    .mall-book-detail .xs-container, .mall-book-detail .vux-popup-dialog, .mall-book-detail .vux-slider {
+    .mall-book-detail .xs-container, .mall-book-detail .vux-slider {
         background: #FFFFFF;
     }
 
-    .mall-book-detail .popup-batch-buy .weui-cells:before {
-        border: initial;
-    }
-
-    .mall-book-detail .popup-batch-buy .checker-item {
-        background: #FFFFFF;
-        border: 1px solid #C1CDD6;
-        border-radius: 8px;
-        width: 160px;
-        height: 40px;
-        line-height: 40px;
-        text-align: center;
-        margin-left: 15px;
-        margin-bottom: 10px;
-    }
-
-    .mall-book-detail .popup-batch-buy .checker-item-selected {
-        background: #35B4EB;
-        border-radius: 8px;
-    }
-
-    .mall-book-detail .popup-batch-buy-input .weui-input {
-        border: 1px solid #C1CDD6;
-        border-radius: 8px;
-        height: 40px;
-    }
-
-    .mall-book-detail .popup-batch-buy-input .buyNum .weui-cell:before {
-        border: initial;
-    }
 </style>
