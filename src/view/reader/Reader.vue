@@ -81,32 +81,63 @@
                 <span>{{data.chapter.articlename}}</span>
                 <span class="iconfont icon-paixu" style="float: right;"></span>
             </div>
-            <tab>
+            <tab v-model="catalog.selected" style="height: 53px;">
                 <tab-item @on-item-click="changeTabItem" selected><i class="iconfont icon-mulu1"></i></tab-item>
                 <tab-item @on-item-click="changeTabItem"><i class="iconfont icon-bookmark"></i></tab-item>
                 <tab-item @on-item-click="changeTabItem"><i class="iconfont icon-biji"></i></tab-item>
             </tab>
-            <div v-show="catalogItem==0">
-                <group>
-                    <cell v-for="(chapter, index) in data.chapters" :key="index">
-                        <span slot="title" v-if="chapter.isvip==0">{{chapter.chaptername}}</span>
-                        <template v-else>
-                            <span slot="title" style="color: #989A9C;">{{chapter.chaptername}}</span>
-                            <i class="iconfont icon-lock"></i>
-                        </template>
-                    </cell>
-                </group>
-            </div>
-            <div v-show="catalogItem==1">
-                <group>
-                    <cell v-for="(mark, index) in data.marks" :key="index">
-                        <span slot="title">{{mark.name}}</span>
-                        <span>{{mark.translateX}}</span>
-                        <span slot="title" style="color: #989A9C;">{{mark.time}}</span>
-                    </cell>
-                </group>
-            </div>
-            <div v-show="catalogItem==2">Container2</div>
+            <swiper v-model="catalog.selected" :show-dots="false" :height="contentHeight+'px'">
+                <swiper-item>
+                    <div v-if="data.chapters && data.chapters.length<=0" style="text-align: center;margin-top: 40px;">
+                        <img src="../../image/unMatch.png" width="60px">
+                        <div style="font-size: 14px;">对不起，没有获取到书籍目录！</div>
+                    </div>
+                    <div v-else>
+                        <scroller :on-infinite="handleInfinite">
+                            <group>
+                                <cell v-for="(chapter, index) in data.chapters" :key="index"
+                                      @click.native="clickCatalog(chapter)">
+                                    <span slot="title" v-if="chapter.isvip==0">{{chapter.chaptername}}</span>
+                                    <template v-else>
+                                        <span slot="title" style="color: #989A9C;">{{chapter.chaptername}}</span>
+                                        <i class="iconfont icon-lock"></i>
+                                    </template>
+                                </cell>
+                            </group>
+                        </scroller>
+                    </div>
+                </swiper-item>
+                <swiper-item>
+                    <div v-if="data.marks && data.marks.length<=0" style="text-align: center;margin-top: 40px;">
+                        <img src="../../image/unMatch.png" width="60px">
+                        <div style="font-size: 14px;">对不起，暂无书签记录！</div>
+                    </div>
+                    <div v-else>
+                        <group>
+                            <cell v-for="(mark, index) in data.marks" :key="index">
+                                <span slot="title">{{mark.name}}</span>
+                                <span>{{mark.translateX}}</span>
+                                <span slot="title" style="color: #989A9C;">{{mark.time}}</span>
+                            </cell>
+                        </group>
+                    </div>
+                </swiper-item>
+                <swiper-item>
+                    <div v-if="data.notes && data.notes.length<=0" style="text-align: center;margin-top: 40px;">
+                        <img src="../../image/unMatch.png" width="60px">
+                        <div style="font-size: 14px;">对不起，暂无笔记记录！</div>
+                    </div>
+                    <div v-else>
+                        <group>
+                            <cell v-for="(note, index) in data.notes" :key="index">
+                                <span slot="title">{{note.name}}</span>
+                                <span>{{note.translateX}}</span>
+                                <span slot="title" style="color: #989A9C;">{{note.time}}</span>
+                            </cell>
+                        </group>
+                    </div>
+                </swiper-item>
+            </swiper>
         </popup>
 
         <!-- 进度：滑块条 -->
@@ -117,7 +148,9 @@
                     <range v-if="show.progress" :min="chapterId.min" :max="chapterId.max"
                            minHTML="&nbsp;" maxHTML="&nbsp;"
                            style="width:200px;margin-left: 70px;" @on-change="changeChapter"></range>
-                    <div style="position:relative;left: 300px;bottom:10px;font-size: 15px;" @click="turnPage('next')">下一章</div>
+                    <div style="position:relative;left: 300px;bottom:10px;font-size: 15px;" @click="turnPage('next')">
+                        下一章
+                    </div>
                 </cell-box>
             </group>
         </popup>
@@ -199,6 +232,9 @@
         <!-- 章节购买：批量 -->
         <c-popup-buy type="batchBuyInput" :show="show.batchBuyInput" @inputBatchBuyNum="inputBatchBuyNum"
                      @inputBack="inputBack" @confirmBatchBuy="confirmBatchBuy"></c-popup-buy>
+        <!-- 目录购买-->
+        <c-popup-buy type="catalog" :show="show.catalogBuy" :data="data.catalog"
+                     @confirmCatalogBuy="confirmCatalogBuy"></c-popup-buy>
 
         <!-- 打赏： -->
         <popup v-model="show.reward" class="popup-reward">
@@ -233,6 +269,8 @@
         Popup,
         Tab,
         TabItem,
+        Swiper,
+        SwiperItem,
         Group,
         Cell,
         CellBox,
@@ -261,6 +299,7 @@
                     setting: false,
                     batchBuy: false,
                     batchBuyInput: false,
+                    catalogBuy: false,
                     reward: false
                 },
                 setting: {
@@ -287,12 +326,13 @@
                         status: 0.56
                     },
                 },
-                catalogItem: 0,
                 data: {
                     book: {},
                     chapter: {},
                     chapters: [],
+                    catalog: {},
                     marks: [],
+                    notes: [],
                     menuMore: [{
                         label: "<i class='iconfont icon-bookmark-add'></i> &nbsp;添加书签",
                         value: 'mark'
@@ -338,7 +378,10 @@
                     progress: 0
                 },
                 rewardCoin: 0,
-                page: 1
+                catalog: {
+                    selected: 0,
+                    page: 1
+                }
             }
         },
         components: {
@@ -348,6 +391,8 @@
             Popup,
             Tab,
             TabItem,
+            Swiper,
+            SwiperItem,
             Group,
             Cell,
             CellBox,
@@ -360,27 +405,46 @@
             CPopupBuy
         },
         methods: {
-            getCatalogData(){
-                app.ajax.get(app.config.api.reader.chapters + this.$route.query.id + '/' + this.page, {},
+            getCatalogData(callback){
+                app.ajax.get(app.config.api.chapter.catalog + this.$route.query.id + '/' + this.catalog.page, {},
                     (data) => {
-                        this.chapterId.min = data.result.min_chapterid;
-                        this.chapterId.max = data.result.max_chapterid;
-                        this.data.chapters = data.result.result;
+                        if (data.result.result && data.result.result.length > 0) {
+                            this.data.chapters = this.data.chapters.concat(data.result.result);
 
-                        // 书籍详情目录 跳转
-                        if (this.$route.query.chapterid) {
-                            this.chapterId.cur = this.$route.query.chapterId;
+                            if (typeof callback == "function") {
+                                if (this.show.catalogBuy) {
+                                    callback();
+                                } else {
+                                    callback(true);
+                                }
+                            }
                         } else {
-                            // 加载当前章节以及位置
-                            let chapter = app.util.localStorage('book_' + this.$route.query.id);
-                            if (chapter) {
-                                let chapterJson = JSON.parse(chapter);
-                                this.chapterId.cur = Number(chapterJson.chapter);
-                                this.content.translateX = chapterJson.translateX;
-                            } else {
-                                this.chapterId.cur = this.chapterId.min;
+                            if (typeof callback == "function") {
+                                this.catalog.page--;
+                                callback(true);
                             }
                         }
+
+                        this.chapterId.min = data.result.min_chapterid;
+                        this.chapterId.max = data.result.max_chapterid;
+
+                        if (!callback) {
+                            // 书籍详情的目录 跳转
+                            if (this.$route.query.chapterId) {
+                                this.chapterId.cur = this.$route.query.chapterId;
+                            } else {
+                                // 加载当前章节以及位置
+                                let chapter = app.util.localStorage('book_' + this.$route.query.id);
+                                if (chapter) {
+                                    let chapterJson = JSON.parse(chapter);
+                                    this.chapterId.cur = Number(chapterJson.chapterId);
+                                    this.content.translateX = chapterJson.translateX;
+                                } else {
+                                    this.chapterId.cur = this.chapterId.min;
+                                }
+                            }
+                        }
+
 
                         // 获取章节信息
                         this.getChapterData();
@@ -399,13 +463,24 @@
                     }
                 });
             },
+            getNoteData(){
+                app.webSql.query(app.config.webSql.note, {}, {}, (rows) => {
+                    if (rows && rows.length > 0) {
+                        this.data.notes = rows;
+                    }
+                });
+            },
             getChapterData(){
                 if (this.chapterId.cur < 0) {
                     return;
                 }
 
-                // 章节进度
+                // 书籍章节进度
                 this.status.progress = ((this.chapterId.cur / this.chapterId.max).toFixed(2)) * 100;
+                app.util.localStorage("book_" + this.$route.query.id, {
+                    chapterId: this.chapterId.cur,
+                    translateX: this.content.translateX
+                });
 
                 // 1. 查找本地是否已缓存
                 app.webSql.query(app.config.webSql.chapter, {
@@ -424,7 +499,7 @@
                         }
                     } else {
                         // 2. 请求服务器
-                        app.ajax.get(app.config.api.reader.chapter + this.chapterId.cur, {},
+                        app.ajax.get(app.config.api.chapter.info + this.chapterId.cur, {},
                             (data) => {
                                 // 换行
                                 data.result.content = '<p>' + data.result.content.replace(/\r\n\r\n/g, '</p><br/><p>') + '</p>';
@@ -558,7 +633,7 @@
                 this.show.batchBuyInput = false;
             },
             confirmBatchBuy(){
-                app.ajax.post(app.config.api.buy.chapters.batch, {
+                app.ajax.post(app.config.api.chapter.batch.buy, {
                     uid: this.$store.state.user.uid,
                     articleid: this.$route.query.id,
                     buynum: this.buyNum
@@ -666,7 +741,80 @@
                 }
             },
             changeTabItem(index){
-                this.catalogItem = index;
+                if (index == 0) {
+                    // 目录信息初始化已获取
+                } else if (index == 1) {
+                    this.getMarkData();
+                } else if (index == 2) {
+                    this.getNoteData();
+                }
+            },
+            handleInfinite(done){
+                if (this.catalog.page >= 10) {
+                    done(true);
+                    return;
+                }
+                setTimeout(() => {
+                    this.catalog.page++;
+
+                    this.getCatalogData(done);
+                }, 1500);
+            },
+            clickCatalog(catalog){
+                if (catalog.isvip == 1 && catalog.is_buy == 0) {
+                    this.data.catalog = catalog;
+                    this.show.catalogBuy = true;
+                } else {
+                    this.chapterId.cur = catalog.chapterid;
+                    this.show.catalog = false;
+                    this.getChapterData();
+                }
+            },
+            confirmCatalogBuy(autoBuy){
+                app.ajax.post(app.config.api.chapter.buy, {
+                    uid: this.$store.state.user.uid,
+                    chapterid: this.catalog.chapterid,
+                    autobuy: autoBuy
+                }, (data) => {
+                    this.show.catalogBuy = false;
+
+                    if (data.result.result == 1) { // 1：成功
+                        // 是否自动购买
+                        app.util.localStorage("autoBuy", autoBuy);
+
+                        this.showChapter(this.catalog.chapterid);
+                    } else if (data.result.result == 2) {   // 2:用户不存在
+                        this.$vux.toast.show({
+                            text: '用户不存在',
+                            type: 'warn'
+                        });
+                    } else if (data.result.result == 3) {   //  3:章节不存在
+                        this.$vux.toast.show({
+                            text: '章节不存在',
+                            type: 'warn'
+                        });
+                    } else if (data.result.result == 4) {   //  4:不是付费章节
+                        this.$vux.toast.show({
+                            text: '不是付费章节',
+                            type: 'warn'
+                        });
+                    } else if (data.result.result == 5) {   //  5:用户余额不足
+                        this.$vux.alert.show({
+                            title: '系統提示',
+                            content: '用户余额不足',
+                            buttonText: '去充值',
+                            onHide(){
+                                _this.$router.push({path: '/recharge'});
+                            }
+                        });
+                    }
+                }, (err) => {
+                    this.$vux.toast.show({
+                        text: '系统异常，请稍后重试...',
+                        type: 'warn'
+                    });
+                    app.log.error(err);
+                });
             },
             changeChapter(value){
                 if (value <= 0) {
@@ -973,10 +1121,6 @@
             // 目录 => 章节信息
             this.getCatalogData();
 
-            // 书签
-            this.getMarkData();
-
-
             // 书籍详情
             this.getBookData();
 
@@ -1044,11 +1188,11 @@
     }
 
     .reader ~ .popup-catalog .weui-cell .vux-label {
-        font-size: 14px;
+        font-size: 15px;
     }
 
     .reader ~ .popup-catalog .iconfont {
-        font-size: 16px;
+        font-size: 22px;
     }
 
     .reader ~ .popup-progress .weui-cell {
@@ -1069,7 +1213,7 @@
         right: -45px;
     }
 
-    .reader ~ .popup-progress .vux-cell-box.weui-cell > div:first-child{
+    .reader ~ .popup-progress .vux-cell-box.weui-cell > div:first-child {
         width: inherit;
     }
 

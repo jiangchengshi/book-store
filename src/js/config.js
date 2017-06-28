@@ -27,7 +27,8 @@ export default {
         chapter: 'chapter',
         setting: 'setting',
         login: 'login',
-        mark: 'mark'
+        mark: 'mark',
+        note: 'note'
     },
     api: {
         focus: 'index/focus',
@@ -74,9 +75,15 @@ export default {
             add: 'bookcase/add',
             delete: 'bookcase/delete'
         },
-        reader: {
-            chapters: 'chapters/',
-            chapter: 'chapters/info/'
+        chapter: {
+            catalog: 'chapters/',
+            info: 'chapters/info/',
+            buy:'chapters/buy',
+            batch: {
+                buy: 'chapters/batchbuy',
+                option: 'batchbuy/option/',
+                price: 'batchbuy/'
+            }
         },
         entry: {
             login: 'member/login',
@@ -104,14 +111,6 @@ export default {
         sign: 'signin/',
         setting: {
             feedback: 'message/add'
-        },
-        buy: {
-            chapter: 'chapters/buy',
-            chapters: {
-                batch: 'chapters/batchbuy',
-                option: 'batchbuy/option/',
-                price: 'batchbuy/'
-            }
         },
         recharge:{
             recharge: 'buy/',

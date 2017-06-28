@@ -4,9 +4,9 @@
                   :left-options="{showBack: $store.state.header.showBack, backText: $store.state.header.backText}">
         </x-header>
         <tab v-model="selected">
-            <tab-item @on-item-click="handleClickTab">打赏</tab-item>
-            <tab-item @on-item-click="handleClickTab">鲜花</tab-item>
-            <tab-item @on-item-click="handleClickTab">月票</tab-item>
+            <tab-item @on-item-click="changeTabItem">打赏</tab-item>
+            <tab-item @on-item-click="changeTabItem">鲜花</tab-item>
+            <tab-item @on-item-click="changeTabItem">月票</tab-item>
         </tab>
         <swiper v-model="selected" :show-dots="false">
             <swiper-item>
@@ -121,7 +121,7 @@
                         app.log.error(err);
                     });
             },
-            handleClickTab(index){
+            changeTabItem(index){
                 if (index == 0) {
                     this.getRewardData();
                 } else if (index == 1) {

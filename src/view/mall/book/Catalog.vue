@@ -14,34 +14,13 @@
         </scroller>
 
         <!-- 章节购买 -->
-        <popup v-model="show.buy" class="popup-buy">
-            <div style="text-align: center;font-family: PingFangSC-Regular;font-size: 20px;color: #162636;line-height: 50px;">
-                购买 {{catalog.articlename}}
-            </div>
-            <div style="padding:0px 10px;">
-                <group style="padding-top: 10px;font-family: PingFangSC-Regular;color: #162636;">
-                    <cell-box>
-                        <label style="font-size: 15px;opacity: 0.56;display:inline-block;width: 70px;">章节价格</label>
-                        <label style="font-size: 17px;">{{catalog.saleprice}} 阅币</label>
-                    </cell-box>
-                    <cell-box is-link link="/recharge">
-                        <label style="font-size: 15px;opacity: 0.56;display:inline-block;width: 70px;">余额</label>
-                        <label style="font-size: 17px;color: #EE4D22;">{{$store.state.user.egold}} 阅币</label>
-                        <label style="font-size:12px;color: #35B4EB;position: absolute;right: 35px;top: 12px;">充值</label>
-                    </cell-box>
-                </group>
-                <checklist v-model="autoBuy" :options="options.autoBuy" :max="1" :min="0"></checklist>
-                <x-button action-type="button" @click.native="confirmBuy"
-                          style="background: #35B4EB;border-radius: 4px;color: #FFFFFF;margin-top:20px;margin-bottom: 10px;">
-                    确定购买
-                </x-button>
-            </div>
-        </popup>
+        <c-popup-buy type="catalog" :show="show.buy" :data="catalog" @confirmBuy="confirmBuy"></c-popup-buy>
     </div>
 </template>
 
 <script>
-    import {Group, Cell, CellBox, Checklist, XButton, Popup} from 'vux';
+    import {Group, Cell} from 'vux';
+    import CPopupBuy from '../../components/PopupBuy.vue';
 
     export default {
         data () {
@@ -49,30 +28,20 @@
                 height: app.config.setting.height.display - app.config.setting.height.header,
                 page: 1,
                 dataList: [],
-                chapterId: {
-                    min: 0,
-                    max: 0
-                },
                 show: {
                     buy: false
                 },
                 catalog: {},
-                autoBuy: ['autoBuy'],
-                options: {
-                    autoBuy: [{key: 'autoBuy', value: '自动订阅下一章并不再提示'}]
-                }
             }
         },
         components: {
-            Group, Cell, CellBox, Checklist, XButton, Popup
+            Group, Cell, CPopupBuy
         },
         methods: {
             getData(callback){
-                app.ajax.get(app.config.api.reader.chapters + this.$route.query.id + '/' + this.page + '/' + this.$store.state.user.uid, {},
+                app.ajax.get(app.config.api.chapter.catalog + this.$route.query.id + '/' + this.page + '/' + this.$store.state.user.uid, {},
                     (data) => {
                         if (data.result.result && data.result.result.length > 0) {
-                            this.chapterId.min = data.result.min_chapterid;
-                            this.chapterId.max = data.result.max_chapterid;
                             this.dataList = this.dataList.concat(data.result.result);
 
                             if (typeof callback == "function") {
@@ -101,17 +70,17 @@
                     this.showChapter(catalog.chapterid);
                 }
             },
-            confirmBuy(){
-                app.ajax.post(app.config.api.buy.chapter, {
+            confirmBuy(autoBuy){
+                app.ajax.post(app.config.api.chapter.buy, {
                     uid: this.$store.state.user.uid,
                     chapterid: this.catalog.chapterid,
-                    autobuy: this.autoBuy.length > 0 ? 1 : 2
+                    autobuy: autoBuy
                 }, (data) => {
                     this.show.buy = false;
 
                     if (data.result.result == 1) { // 1：成功
                         // 是否自动购买
-                        app.util.localStorage("autoBuy", this.autoBuy.length > 0 ? 1 : 2);
+                        app.util.localStorage("autoBuy", autoBuy);
 
                         this.showChapter(this.catalog.chapterid);
                     } else if (data.result.result == 2) {   // 2:用户不存在

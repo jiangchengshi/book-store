@@ -86,8 +86,18 @@ const initWebSql = function () {
         // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
         chapterid: 'INTEGER',
         translateX: 'INTEGER',
-        name: 'TEXT',
-        content: 'TEXT',
+        name: 'TEXT',   // 章节名称
+        content: 'TEXT',    // 章节内容
+        time: 'TIMESTAMP'
+    });
+    webSql.create(app.config.webSql.note, {  // 笔记
+        // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
+        chapterid: 'INTEGER',
+        translateX: 'INTEGER',
+        name: 'TEXT',   // 章节名称
+        content: 'TEXT',    // 章节内容
+        record: 'TEXT', // 笔记记录
+        color: 'TEXT',  // 笔记颜色
         time: 'TIMESTAMP'
     });
 };

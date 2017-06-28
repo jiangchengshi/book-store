@@ -62,7 +62,7 @@
             </cell>
         </group>
         <group style="margin-top: 10px;">
-            <cell :title="'评论(' + detail.pinfen + ')'" value="全部评论" is-link link="/mall/book/review/list"></cell>
+            <cell :title="'评论(' + reviewList.length + ')'" value="全部评论" is-link link="/mall/book/review/list"></cell>
             <c-list-view type="review" :list="reviewList"></c-list-view>
             <cell style="text-align: center;">
                 <a slot="inline-desc" style="color: #35B4EB;" @click="handleReview">立即评论</a>
@@ -167,7 +167,7 @@
                     });
             },
             getReviewData(page){
-                app.ajax.get(app.config.api.book.review + this.$route.query.id + '/' + this.page.review, {},
+                app.ajax.get(app.config.api.book.review.list + this.$route.query.id + '/' + this.page.review + "/" + this.$store.state.user.uid, {},
                     (data) => {
                         this.reviewList = data.result;
                     }, (err) => {
@@ -212,11 +212,11 @@
                             }
                             app.webSql.insert(app.config.webSql.shelf,
                                 {
-                                    articleid:this.detail.articleid,
-                                    articlename:this.detail.articlename,
-                                    author:this.detail.author,
-                                    cover:this.detail.cover,
-                                    time:new Date()
+                                    articleid: this.detail.articleid,
+                                    articlename: this.detail.articlename,
+                                    author: this.detail.author,
+                                    cover: this.detail.cover,
+                                    time: new Date()
                                 }
                             );
                             if (typeof callback == "function") {
@@ -291,7 +291,7 @@
                 this.show.batchBuyInput = false;
             },
             confirmBatchBuy(){
-                app.ajax.post(app.config.api.buy.chapters.batch, {
+                app.ajax.post(app.config.api.chapter.batch.buy, {
                     uid: this.$store.state.user.uid,
                     articleid: this.$route.query.id,
                     buynum: this.buyNum

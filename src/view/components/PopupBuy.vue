@@ -1,6 +1,6 @@
 <template>
     <popup class="popup-buy" v-model="isShow" @on-first-show="getData">
-        <template v-if="type=='batchBuy'">
+        <template v-if="type=='batch'">
             <div class="batch">
                 <div style="font-family: PingFangSC-Regular;font-size: 20px;color: #162636;border-bottom: solid 1px #EDEDED;padding: 8px 0px;text-align: center;">
                     章节购买
@@ -41,7 +41,7 @@
                 </x-button>
             </div>
         </template>
-        <template v-else-if="type=='batchBuyInput'">
+        <template v-else-if="type=='batchInput'">
             <div class="batch-input">
                 <div style="font-family: PingFangSC-Regular;font-size: 20px;color: #162636;border-bottom: solid 1px #EDEDED;padding: 8px 0px;text-align: center;">
                     <i style="float: left;padding-left: 10px;" class="iconfont icon-iconjiantou-copy"
@@ -75,11 +75,34 @@
                 </x-button>
             </div>
         </template>
+        <template v-else-if="catalog">
+            <div style="text-align: center;font-family: PingFangSC-Regular;font-size: 20px;color: #162636;line-height: 50px;">
+                购买 {{catalog.articlename}}
+            </div>
+            <div style="padding:0px 10px;">
+                <group style="padding-top: 10px;font-family: PingFangSC-Regular;color: #162636;">
+                    <cell-box>
+                        <label style="font-size: 15px;opacity: 0.56;display:inline-block;width: 70px;">章节价格</label>
+                        <label style="font-size: 17px;">{{catalog.saleprice}} 阅币</label>
+                    </cell-box>
+                    <cell-box is-link link="/recharge">
+                        <label style="font-size: 15px;opacity: 0.56;display:inline-block;width: 70px;">余额</label>
+                        <label style="font-size: 17px;color: #EE4D22;">{{$store.state.user.egold}} 阅币</label>
+                        <label style="font-size:12px;color: #35B4EB;position: absolute;right: 35px;top: 12px;">充值</label>
+                    </cell-box>
+                </group>
+                <checklist v-model="catalog.autoBuy" :options="catalog.options" :max="1" :min="0"></checklist>
+                <x-button action-type="button" @click.native="confirmBuy"
+                          style="background: #35B4EB;border-radius: 4px;color: #FFFFFF;margin-top:20px;margin-bottom: 10px;">
+                    确定购买
+                </x-button>
+            </div>
+        </template>
     </popup>
 </template>
 
 <script>
-    import {Group, Cell, XButton, Checker, CheckerItem, XInput, Popup} from 'vux';
+    import {Group, Cell, CellBox, XButton, Checker, CheckerItem, Checklist, XInput, Popup} from 'vux';
 
     export default {
         data () {
@@ -87,7 +110,7 @@
                 check: {
                     num: 0,
                     price: 0,
-                    option: [],
+                    options: [],
                     egold: 0,
                     saleprice: 0
                 },
@@ -98,6 +121,12 @@
                     saleprice: 0,
                     freecount: 0,
                     vipcount: 0,
+                },
+                catalog: {
+                    articlename: '',
+                    saleprice: 0,
+                    autoBuy: ['autoBuy'],
+                    options: [{key: 'autoBuy', value: '自动订阅下一章并不再提示'}]
                 }
             }
         },
@@ -115,7 +144,7 @@
             }
         },
         components: {
-            Group, Cell, XButton, Checker, CheckerItem, XInput, Popup
+            Group, Cell, CellBox, XButton, Checker, CheckerItem, Checklist, XInput, Popup
         },
         computed: {
             isShow(){
@@ -124,7 +153,16 @@
         },
         methods: {
             getData(){
-                app.ajax.get(app.config.api.buy.chapters.option + this.$route.query.id + "/" + this.$store.state.user.uid, {},
+                if (this.type == "batch") {
+                    this.getBatchData();
+                } else if (this.type == "batchInput") {
+                    this.getBatchInputData();
+                } else if (this.type == "catalog") {
+                    this.getCatalogData();
+                }
+            },
+            getBatchData(){
+                app.ajax.get(app.config.api.chapter.batch.option + this.$route.query.id + "/" + this.$store.state.user.uid, {},
                     (data) => {
                         Object.assign(this.check, data.result);
                     }, (err) => {
@@ -134,7 +172,9 @@
                         });
                         app.log.error(err);
                     });
-                app.ajax.get(app.config.api.buy.chapters.price + this.$store.state.user.uid + "/" + this.$route.query.id, {},
+            },
+            getBatchInputData(){
+                app.ajax.get(app.config.api.chapter.batch.price + this.$store.state.user.uid + "/" + this.$route.query.id, {},
                     (data) => {
                         Object.assign(this.input, data.result);
                     }, (err) => {
@@ -144,6 +184,9 @@
                         });
                         app.log.error(err);
                     });
+            },
+            getCatalogData(callback){
+                Object.assign(this.catalog, this.data);
             },
             checkBatchBuyNum(){
                 this.check.price = this.check.saleprice * this.check.num;
@@ -156,8 +199,12 @@
             inputBack(){
                 this.$emit('inputBack');
             },
-            confirmBatchBuy(){
-                this.$emit('confirmBatchBuy')
+            confirmBuy(){
+                if (this.type == "batch" || this.type == "batchInput") {
+                    this.$emit('confirmBatchBuy');
+                } else if (this.type == "catalog") {
+                    this.$emit('confirmCatalogBuy', this.catalog.autoBuy.length > 0 ? 1 : 2);
+                }
             }
         }
     }
