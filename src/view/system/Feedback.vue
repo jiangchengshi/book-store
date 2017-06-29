@@ -49,11 +49,12 @@
                     content: this.content,
                     contact: this.contact
                 }, (data) => {
-                    if (data.result == 1) { // 1:成功
+                    if (data.result.result == 1) { // 1:成功
                         this.$vux.toast.show({
                             text: '感谢您的反馈'
                         });
-                    } else if (data.result == 2) {   // 2:用户不存在
+                        this.$router.go(-1);
+                    } else if (data.result.result == 2) {   // 2:用户不存在
                         this.$vux.toast.show({
                             type: 'warn',
                             text: '用户不存在'

@@ -4,7 +4,7 @@
                   :left-options="{showBack: $store.state.header.showBack, backText: $store.state.header.backText}">
         </x-header>
         <group style="margin-top: 10px;">
-            <cell :title="recharge.username" :inline-desc="'余额：'+recharge.egold">
+            <cell :title="recharge.username" :inline-desc="'余额：'+recharge.egold+' 阅币'">
                 <x-button action-type="button" style="background-color: #35B4EB;color: #FFFFFF;">充值</x-button>
             </cell>
         </group>

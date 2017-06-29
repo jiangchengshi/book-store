@@ -20,7 +20,14 @@ export default {
         loginTime: 300000,
         codeTime: 120,
         server: 'http://api.lveshu.com/',
+        appName: '书城',
         debug: true
+    },
+    storage: {
+        welcome: 'welcome',
+        pushMsg: 'pushMsg',
+        wifiDown: 'wifiDown',
+        autoBuy: 'autoBuy'
     },
     webSql: {
         shelf: 'shelf',
@@ -28,7 +35,8 @@ export default {
         setting: 'setting',
         login: 'login',
         mark: 'mark',
-        note: 'note'
+        note: 'note',
+        updates: 'updates'
     },
     api: {
         focus: 'index/focus',
@@ -110,11 +118,13 @@ export default {
         },
         sign: 'signin/',
         setting: {
-            feedback: 'message/add'
+            feedback: 'message/add',
+            updates: 'update'
         },
         recharge:{
             recharge: 'buy/',
             note: 'buy/note'
-        }
+        },
+        share: 'share'
     }
 }

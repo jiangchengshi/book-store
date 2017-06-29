@@ -24,6 +24,7 @@ const store = new Vuex.Store({
         },
         user: {
             uid: 0,
+            username: '',
             egold: 0
         }
     },
@@ -59,6 +60,9 @@ const store = new Vuex.Store({
             if (payload) {
                 if (payload.uid > 0) {
                     state.user.uid = payload.uid;
+                }
+                if (payload.username > 0) {
+                    state.user.username = payload.username;
                 }
                 if (payload.egold > 0) {
                     state.user.egold = payload.egold;

@@ -75,6 +75,7 @@
                     } else {
                         app.webSql.insert(app.config.webSql.login, {
                             uid: data.result.uid,
+                            username: data.result.username,
                             egold: data.result.egold,
                             time: new Date()
                         }, () => {

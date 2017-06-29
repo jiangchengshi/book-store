@@ -78,31 +78,52 @@ const routes = [
             },
             {
                 path: 'book/detail',
-                component: MallBookDetail
+                component: MallBookDetail,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'book/ticket',
-                component: MallBookTicket
+                component: MallBookTicket,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'book/flower',
-                component: MallBookFlower
+                component: MallBookFlower,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'book/reward',
-                component: MallBookReward
+                component: MallBookReward,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'book/catalog',
-                component: MallBookCatalog
+                component: MallBookCatalog,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'book/review/list',
-                component: MallBookReviewList
+                component: MallBookReviewList,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'book/review/detail',
-                component: MallBookReviewDetail
+                component: MallBookReviewDetail,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'monthly/list',
@@ -110,11 +131,17 @@ const routes = [
             },
             {
                 path: 'monthly/detail',
-                component: MallMonthlyDetail
+                component: MallMonthlyDetail,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'monthly/package',
-                component: MallMonthlyPackage
+                component: MallMonthlyPackage,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'classify/list',
@@ -136,7 +163,10 @@ const routes = [
         children: [
             {
                 path: 'index',
-                component: ShelfIndex
+                component: ShelfIndex,
+                meta: {
+                    login: true
+                }
             }
         ]
     },
@@ -154,51 +184,87 @@ const routes = [
         children: [
             {
                 path: 'index',
-                component: MineIndex
+                component: MineIndex,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'info',
-                component: MineInfo
+                component: MineInfo,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'avatar',
-                component: MineAvatar
+                component: MineAvatar,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'password/change',
-                component: MinePassChange
+                component: MinePassChange,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'nickname',
-                component: MineNickName
+                component: MineNickName,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'sex',
-                component: MineSex
+                component: MineSex,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'record/recharge',
-                component: MineRecordRecharge
+                component: MineRecordRecharge,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'record/consume',
-                component: MineRecordConsume
+                component: MineRecordConsume,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'record/reward',
-                component: MineRecordReward
+                component: MineRecordReward,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'review',
-                component: MineReview
+                component: MineReview,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'news',
-                component: MineNews
+                component: MineNews,
+                meta: {
+                    login: true
+                }
             },
             {
                 path: 'token',
-                component: MineToken
+                component: MineToken,
+                meta: {
+                    login: true
+                }
             }
         ]
     },
@@ -226,15 +292,24 @@ const routes = [
     },
     {
         path: '/recharge',
-        component: Recharge
+        component: Recharge,
+        meta: {
+            login: true
+        }
     },
     {
         path: '/feedback',
-        component: SystemFeedback
+        component: SystemFeedback,
+        meta: {
+            login: true
+        }
     },
     {
         path: '/setting',
-        component: SystemSetting
+        component: SystemSetting,
+        meta: {
+            login: true
+        }
     },
     {
         path: '/about',
@@ -261,40 +336,26 @@ vueRouter.beforeEach((to, from, next) => {
         text: text
     });
 
-    switch (to.path) {
-        case '/':
-            if (app.util.localStorage('welcome') == 1) {    // 非首次进入，跳过欢迎轮播页
-                localShelf(function (rows) {
-                    if (rows && rows.length > 0) {  // 书架有书籍信息，则跳转书架
-                        next('/shelf');
-                    } else {  // 反之，则跳转 书城
-                        next('/mall');
-                    }
-                });
-            } else {
-                next('/welcome');
-            }
-            break;
-        case '/mall':
-            next(to.path + '/index');
-            break;
-        case '/shelf':
-        case '/mine':
-            checkLogin(function () {
-                next(to.path + '/index');
+    if (to.path === "/") {
+        if (app.util.localStorage(app.config.storage.welcome) == 1) {    // 非首次进入，跳过欢迎轮播页
+            app.service.checkShelf(function () {
+                next('/shelf/index');     // 书架有书籍信息，则跳转书架
             }, function () {
-                next('/entry/login');
+                next('/mall/index');    // 反之，则跳转 书城
             });
-            break;
-        case '/mall/book/detail':
-        case '/mall/monthly/detail':
-            checkLogin(function () {
+        } else {    // 进入欢迎页
+            next('/welcome');
+        }
+    } else {
+        if (to.meta.login) {  // 需登录后继续
+            app.service.checkLogin(function () {
                 next();
             }, function () {
                 next('/entry/login');
-            });
-        default:
+            })
+        } else {  // 无需登录
             next();
+        }
     }
 });
 
@@ -310,38 +371,5 @@ vueRouter.afterEach((router) => {
         });
     }, interval);
 });
-
-const checkLogin = function (cb_suc, cb_err) {
-    if (app.store.state.user.uid <= 0) {   // 登录过，重新打开应用
-        app.webSql.query(app.config.webSql.login, {}, {}, (rows) => {
-            if (rows && rows.length > 0) {  // 登录过，store赋值
-                let row = rows.item(0);
-                app.store.commit('updateUser', {
-                    uid: row.uid,
-                    egold: row.egold
-                });
-
-                if (typeof cb_suc == "function") {
-                    cb_suc();
-                }
-            } else {  // 未登录，跳转未登录页面
-                if (typeof cb_err == "function") {
-                    cb_err();
-                }
-            }
-        });
-    } else {  // 已登录，跳转业务页面
-        if (typeof cb_suc == "function") {
-            cb_suc();
-        }
-    }
-};
-const localShelf = function (callback) {
-    app.webSql.query(app.config.webSql.shelf, {}, {}, (rows) => {
-        if (typeof callback == "function") {
-            callback(rows);
-        }
-    });
-};
 
 export default vueRouter;

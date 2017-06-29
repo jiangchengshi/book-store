@@ -62,7 +62,7 @@
             </cell>
         </group>
         <group style="margin-top: 10px;">
-            <cell :title="'评论(' + reviewList.length + ')'" value="全部评论" is-link link="/mall/book/review/list"></cell>
+            <cell :title="'评论(' + reviewList.length + ')'" value="全部评论" is-link :link="'/mall/book/review/list?id='+$route.query.id"></cell>
             <c-list-view type="review" :list="reviewList"></c-list-view>
             <cell style="text-align: center;">
                 <a slot="inline-desc" style="color: #35B4EB;" @click="handleReview">立即评论</a>
@@ -354,7 +354,7 @@
                     });
                     app.log.error(err);
                 });
-            },
+            }
         },
         watch: {
             '$route': 'initData'

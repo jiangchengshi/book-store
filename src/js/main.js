@@ -14,7 +14,7 @@ import ajax from "./util/ajax";
 // 引入Util
 import util from "./util/util";
 // 引入Service
-import service from './util/service';
+import service from "./util/service";
 // 引入WebSql
 import webSql from "./util/websql";
 // 引入Log
@@ -22,7 +22,7 @@ import log from "./util/log";
 // 引入Iconfont字体
 import "../css/iconfont.css";
 // 引入Vux公共组件
-import {ToastPlugin, AlertPlugin, ConfirmPlugin, AjaxPlugin} from "vux";
+import {AjaxPlugin, AlertPlugin, ConfirmPlugin, ToastPlugin} from "vux";
 // 引入Vue-Scroller组件
 import VueScroller from "vue-scroller";
 // 主Vue
@@ -64,23 +64,11 @@ const initWebSql = function () {
         author: 'TEXT',
         time: 'TIMESTAMP'
     });
-    webSql.create(app.config.webSql.setting, {  // 设置
-        // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
-        key: 'TEXT',
-        value: 'TEXT',
-        type: 'TEXT'
-    });
     webSql.create(app.config.webSql.chapter, {  // 章节
         // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
         articlename: 'TEXT',
         chapterid: 'INTEGER',
         content: 'BLOB'
-    });
-    webSql.create(app.config.webSql.login, {  // 登录用户
-        // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
-        uid: 'INTEGER',
-        egold: 'INTEGER',
-        time: 'TIMESTAMP'
     });
     webSql.create(app.config.webSql.mark, {  // 书签
         // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
@@ -99,6 +87,24 @@ const initWebSql = function () {
         record: 'TEXT', // 笔记记录
         color: 'TEXT',  // 笔记颜色
         time: 'TIMESTAMP'
+    });
+    webSql.create(app.config.webSql.setting, {  // 设置
+        // _id: 'INTEGER PRIMARY KEY AUTOINCREMENT',
+        key: 'TEXT',
+        value: 'TEXT',
+        type: 'TEXT'
+    });
+    webSql.create(app.config.webSql.login, {  // 登录
+        uid: 'INTEGER',
+        username: 'TEXT',
+        egold: 'INTEGER',
+        time: 'TIMESTAMP'
+    });
+    webSql.create(app.config.webSql.updates, {   // 更新
+        versioncode: 'INTEGER',
+        versionname: 'TEXT',
+        content: 'TEXT',
+        url: 'TEXT'
     });
 };
 

@@ -169,6 +169,20 @@
                 </x-button>
             </div>
         </template>
+        <template v-else-if="type=='updates'">
+            <div class="updates">
+                <group :title="data.versionname">
+                    <div>
+                        {{data.content}}
+                    </div>
+                </group>
+                <div style="text-align: center;padding: 10px 0px;">
+                    <span @click="handleCancel" style="display:inline-block;width: 48%;color: #989A9C;">取消</span>
+                    <span @click="handleConfirm('updates')"
+                          style="display:inline-block;width: 48%;color: #989A9C;">更新</span>
+                </div>
+            </div>
+        </template>
     </x-dialog>
 </template>
 
@@ -211,6 +225,7 @@
                     case 'reward':
                     case 'balance':
                     case 'note':
+                    case 'updates':
                         this.$emit('confirm');
                         break;
                 }

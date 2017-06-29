@@ -24,7 +24,7 @@
             </div>
         </div>
         <tabbar>
-            <tabbar-item link="/mall">
+            <tabbar-item link="/mall/index">
                 <span slot="icon"><i class="iconfont icon-shuchengxuanzhong"></i></span>
                 <span slot="label">书城</span>
             </tabbar-item>
@@ -32,11 +32,11 @@
                 <span slot="icon"><i class="iconfont icon-sousuo2"></i></span>
                 <span slot="label">搜索</span>
             </tabbar-item>
-            <tabbar-item link="/shelf">
+            <tabbar-item link="/shelf/index">
                 <span slot="icon"><i class="iconfont icon-bookshelf"></i></span>
                 <span slot="label">书架</span>
             </tabbar-item>
-            <tabbar-item link="/mine">
+            <tabbar-item link="/mine/index">
                 <span slot="icon"><i class="iconfont icon-wode1"></i></span>
                 <span slot="label">我的</span>
             </tabbar-item>

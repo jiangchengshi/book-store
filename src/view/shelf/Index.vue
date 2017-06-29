@@ -59,6 +59,11 @@
                     app.ajax.get(app.config.api.shelf.list + this.$store.state.user.uid, {},
                         (data) => {
                             this.fillShelf(data.result);
+
+                            // 同步 本地
+                            if (data.result.length > 0) {
+                                this.syncLocal(data.result);
+                            }
                         }, (err) => {
                             this.$vux.toast.show({
                                 text: '系统异常，请稍后重试...',
@@ -212,6 +217,9 @@
                     }
                     this.books.push(book);
                 });
+            },
+            syncLocal(bookArr){
+
             }
         },
         computed: {

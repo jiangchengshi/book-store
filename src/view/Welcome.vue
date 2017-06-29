@@ -23,7 +23,7 @@
             goToIndex(index){
                 if (index == 2) {
                     // 设置welcome状态为1
-                    app.util.localStorage('welcome', 1);
+                    app.util.localStorage(app.config.storage.welcome, 1);
 
                     // 跳转
                     setTimeout(() => {

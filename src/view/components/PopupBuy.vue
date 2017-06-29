@@ -203,9 +203,17 @@
                 if (this.type == "batch" || this.type == "batchInput") {
                     this.$emit('confirmBatchBuy');
                 } else if (this.type == "catalog") {
-                    this.$emit('confirmCatalogBuy', this.catalog.autoBuy.length > 0 ? 1 : 2);
+                    let autoBuy = this.catalog.autoBuy.length > 0 ? 1 : 2;
+
+                    // 存储到localstorage
+                    app.util.localStorage(app.config.storage.autoBuy, autoBuy);
+
+                    this.$emit('confirmCatalogBuy', autoBuy);
                 }
             }
+        },
+        mounted(){
+            this.autoBuy = app.util.localStorage(app.config.storage.autoBuy) == 1 ? ['autoBuy'] : [];
         }
     }
 </script>
