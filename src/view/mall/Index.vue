@@ -177,6 +177,11 @@
             }
         },
         created(){
+            // 非全屏显示
+            if (app.config.setting.isApp) {
+                plus.navigator.setFullscreen(false);
+            }
+
             this.$store.commit('updateHeader', {
                 title: '书城',
                 showSearch: true

@@ -21,12 +21,17 @@
                       @click.native="handleLogin">登 录
             </x-button>
         </div>
-        <div class="link" style="margin-top: 80px;">
+        <div class="link" style="margin-top: 80px;" v-if="services && services.length>0">
             <divider>其他登录方式</divider>
             <div style="text-align: center;margin-top: 20px;">
-                <i class="iconfont icon-weibo" style="background-color: orange;"></i>
-                <i class="iconfont icon-qq" style="background-color: dodgerblue;"></i>
-                <i class="iconfont icon-weixin" style="background-color: green;"></i>
+                <template v-for="(service, index) in services">
+                    <i v-if="service.id=='sinaweibo'" class="iconfont icon-weibo" style="background-color: orange;"
+                       @click="handleOAuth(index)"></i>
+                    <i v-else-if="service.id=='qq'" class="iconfont icon-qq" style="background-color: dodgerblue;"
+                       @click="handleOAuth(index)"></i>
+                    <i v-else-if="service.id=='weixin'" class="iconfont icon-weixin" style="background-color: green;"
+                       @click="handleOAuth(index)"></i>
+                </template>
             </div>
         </div>
     </div>
@@ -39,13 +44,28 @@
         data () {
             return {
                 username: '',
-                password: ''
+                password: '',
+                services: []
             }
         },
         components: {
             Group, Cell, XInput, XButton, Divider
         },
         methods: {
+            getOauthService(){
+                if (app.config.setting.isApp) {
+                    plus.oauth.getServices((services) => {
+                        this.services = services;
+                        app.log.info(JSON.stringify(services));
+                    }, (e) => {
+                        this.$vux.toast.show({
+                            text: '获取授权登录服务失败',
+                            type: 'warn'
+                        });
+                        app.log.error("获取授权登录服务失败：" + e.message + " - " + e.code)
+                    });
+                }
+            },
             handleLogin(e){
                 // 校验用户名、密码
                 if (this.username == '' || this.password == '') {
@@ -101,6 +121,49 @@
             },
             handleLogon(e){
                 this.$router.push({path: '/entry/logon'});
+            },
+            handleOAuth(i){
+                // OAuth 配置参数
+                let authOptions = {};
+                if (i == 0) {   // 微信
+                    authOptions = {
+                        appid: 'wx9ec62c00f58c0532',
+                        appsecret: '9f5da10a12bb519932e783eac1e6611b'
+                    }
+                } else if (i == 1) { // QQ
+                    authOptions = {
+                        appid: '101407616',
+                        appkey: 'b9be0b5a03d22e619e1daf9924e8ab63'
+                    }
+                } else if (i == 2) { // 微博
+                    authOptions = {
+                        appkey: '382241986',
+                        appsecret: '1ac860ccdf3c500ec1d5926b72e96efb',
+                        redirect_url: ''
+                    }
+                }
+
+                // 判断是否已经授权过
+                let service = this.services[i];
+                if (!service.authResult) {
+                    service.login(function (e) {
+                        alert("登录认证成功！");
+                        app.log.info(e.target.authResult.openid);
+                        app.log.info(e.target.authResult.access_token);
+                        app.log.info(e.target.authResult.expires_in);
+                    }, function (e) {
+                        alert("登录认证失败！");
+                        app.log.error(JSON.stringify(e));
+                        app.log.error(JSON.stringify(e.target));
+                    }, authOptions);
+                } else {
+                    let userInfo = service.userInfo;
+                    if (userInfo) {
+                        app.log.info(userInfo.openid);
+                        app.log.info(userInfo.headimgurl);
+                        app.log.info(userInfo.nickname);
+                    }
+                }
             }
         },
         computed: {
@@ -109,6 +172,11 @@
             }
         },
         created(){
+            // 非全屏显示
+            if (app.config.setting.isApp) {
+                plus.navigator.setFullscreen(false);
+            }
+
             this.$store.commit('updateHeader', {
                 title: '登录',
                 showBack: true
@@ -119,6 +187,9 @@
                 this.username = this.$route.query.username;
                 this.password = '';
             }
+        },
+        mounted(){
+            this.getOauthService();
         }
     }
 </script>

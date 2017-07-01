@@ -26,8 +26,27 @@
         mounted(){
             // 监听 物理返回键
             if (app.config.setting.isApp) {
-                plus.key.addEventListener('backbutton', function (e) {
-                    this.$router.go(-1);
+                let first = null;
+                plus.key.addEventListener('backbutton', (e) => {
+                    if (this.$route.path == "/mall/index" || this.$route.path == "/shelf/index") {
+                        if (!first) {
+                            first = new Date().getTime();
+                            this.$vux.toast.show({
+                                text: '再按一次退出',
+                                type: 'text',
+                                position: 'bottom'
+                            });
+                            setTimeout(function () {
+                                first = null;
+                            }, 1500);
+                        } else {
+                            if (new Date().getTime() - first < 1000) {
+                                plus.runtime.quit();
+                            }
+                        }
+                    } else {
+                        this.$router.go(-1);
+                    }
                 }, false);
             }
         }

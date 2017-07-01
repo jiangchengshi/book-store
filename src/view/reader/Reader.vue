@@ -920,7 +920,7 @@
             showBattery(){
                 if (app.config.setting.isApp) {
                     const _this = this;
-                    if (app.config.setting.isAndroid) {
+                    if (app.config.setting.platform == 'Android') {
                         var main = plus.android.runtimeMainActivity();
                         var Intent = plus.android.importClass('android.content.Intent');
                         var recevier = plus.android.implements('io.dcloud.feature.internal.reflect.BroadcastReceiver', {
@@ -934,7 +934,7 @@
                         var IntentFilter = plus.android.importClass('android.content.IntentFilter');
                         var filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
                         main.registerReceiver(recevier, filter);
-                    } else if (app.config.setting.isIOS) {
+                    } else if (app.config.setting.platform == 'IOS') {
                         var UIDevice = plus.ios.import("UIDevice");
                         var dev = UIDevice.currentDevice();
                         if (!dev.isBatteryMonitoringEnabled()) {

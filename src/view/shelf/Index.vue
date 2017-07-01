@@ -139,7 +139,7 @@
             handleClickBook(id){
                 if (!this.tidy) {   // true：非整理状态，点击进入书籍阅读
                     if (id == -1) {
-                        this.$router.push({path: '/mall'});
+                        this.$router.push({path: '/mall/index'});
                     } else {
                         this.$router.push({path: '/reader', query: {id: id}});
                     }

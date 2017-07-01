@@ -5,7 +5,9 @@
         </x-header>
         <group style="margin-top: 10px;">
             <cell :title="recharge.username" :inline-desc="'余额：'+recharge.egold+' 阅币'">
-                <x-button action-type="button" style="background-color: #35B4EB;color: #FFFFFF;">充值</x-button>
+                <x-button action-type="button" style="background-color: #35B4EB;color: #FFFFFF;"
+                          @click.native="handleRecharge">充值
+                </x-button>
             </cell>
         </group>
         <div v-if="recharge.logs instanceof Array" style="text-align: center;margin-top: 40px;">
@@ -53,6 +55,9 @@
                         });
                         app.log.error(err);
                     });
+            },
+            handleRecharge(){
+                this.$router.push({path: '/recharge'});
             }
         },
         created(){

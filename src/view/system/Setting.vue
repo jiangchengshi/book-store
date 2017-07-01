@@ -13,7 +13,7 @@
                 <cell title="清理缓存" @click.native="clearCache">({{cacheSize}}M)</cell>
             </group>
             <group style="margin-top: 10px;">
-                <cell title="给阅读书城评价"></cell>
+                <cell title="给阅读书城评价" @click.native="handleAppraise"></cell>
                 <cell title="关于书城" link="/about"></cell>
             </group>
             <x-button style="height:50px;margin-top: 10px;background: #FFFFFF;color: #35B4EB;" action-type="button"
@@ -41,9 +41,9 @@
         },
         methods: {
             initSettingData(){
-                this.pushMsg = app.util.localStorage(app.config.storage.pushMsg)==1?true:false;
-                this.wifiDown = app.util.localStorage(app.config.storage.wifiDown)==1?true:false;
-                this.autoBuy = app.util.localStorage(app.config.storage.autoBuy)==1?true:false;
+                this.pushMsg = app.util.localStorage(app.config.storage.pushMsg) == 1 ? true : false;
+                this.wifiDown = app.util.localStorage(app.config.storage.wifiDown) == 1 ? true : false;
+                this.autoBuy = app.util.localStorage(app.config.storage.autoBuy) == 1 ? true : false;
                 if (app.config.setting.isApp) {
                     plus.cache.calculate((size) => {
                         this.cacheSize = size;
@@ -77,6 +77,25 @@
                             text: '缓存清理完毕'
                         })
                     });
+                }
+            },
+            handleAppraise(){
+                if (app.config.setting.isApp) {
+                    if (app.config.setting.platform == 'iOS') {
+                        /*
+                        直接进入appStore
+                        */
+                        plus.runtime.openURL('https://itunes.apple.com/cn/app/id1230321620');
+                    } else if (app.config.setting.platform == 'Android') {
+                        /*
+                         第一个参数固定为"market://details?id=xxx"，xxx替换为你已上传到应用市场的apk包名
+                         第二个参数为失败回调
+                         第三个参数为目标程序包名，例如应用宝则为"com.tencent.android.qqdownloader"；若不传第三个参数，则会列出当前所有应用商店，供用户选择。
+
+                         最新版本还需额外配置manifest.json文件，plus节点下增加："schemeWhitelist":["market"]
+                         */
+                        plus.runtime.openURL('market://details?id=com.sjyt.jyf');
+                    }
                 }
             }
         },

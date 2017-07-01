@@ -43,6 +43,7 @@
             checkUpdate(){
                 app.service.checkUpdate((version) => {
                     this.version = version;
+                    this.show.updates = true;
                 }, (version) => {
                     this.version = version;
                     this.$vux.toast.show({
@@ -51,7 +52,36 @@
                 });
             },
             handleUpdate(){
-
+                if (app.config.setting.isApp) {
+                    plus.downloader.createDownload(this.version.url, {filename: "_doc/update/"}, function (d, status) {
+                        if (status == 200) {
+                            this.installPackage(d.filename); // 安装资源包
+                        } else {
+                            this.$vux.toast.show({
+                                text: '下载资源包失败，请稍后重试...',
+                                type: 'warn'
+                            })
+                        }
+                    }).start();
+                }
+            },
+            installPackage(path){
+                plus.runtime.install(path, {}, () => {
+                    this.$vux.alert.show({
+                        title: '系统提示',
+                        content: "应用资源安装完成",
+                        buttonText: '重启',
+                        onHide(){
+                            plus.runtime.restart();
+                        }
+                    });
+                }, (e) => {
+                    app.log.error('[' + e.code + ']:' + e.message);
+                    this.$vux.alert.show({
+                        title: '系统提示',
+                        content: '安装wgt文件失败'
+                    });
+                });
             }
         },
         created(){
