@@ -62,7 +62,8 @@
             </cell>
         </group>
         <group style="margin-top: 10px;">
-            <cell :title="'评论(' + reviewList.length + ')'" value="全部评论" is-link :link="'/mall/book/review/list?id='+$route.query.id"></cell>
+            <cell :title="'评论(' + reviewList.length + ')'" value="全部评论" is-link
+                  :link="'/mall/book/review/list?id='+$route.query.id"></cell>
             <c-list-view type="review" :list="reviewList"></c-list-view>
             <cell style="text-align: center;">
                 <a slot="inline-desc" style="color: #35B4EB;" @click="handleReview">立即评论</a>
@@ -91,11 +92,12 @@
         </div>
 
         <!-- 章节购买： -->
-        <c-popup-buy type="batchBuy" :show="show.batchBuy" @checkBatchBuyNum="checkBatchBuyNum"
-                     @confirmBatchBuy="confirmBatchBuy"></c-popup-buy>
+        <c-popup-buy type="batch" :show="show.batchBuy" @checkBatchBuyNum="checkBatchBuyNum"
+                     @confirmBatchBuy="confirmBatchBuy" @cancel="show.batchBuy=false"></c-popup-buy>
         <!-- 章节购买：批量 -->
-        <c-popup-buy type="batchBuyInput" :show="show.batchBuyInput" @inputBatchBuyNum="inputBatchBuyNum"
-                     @inputBack="inputBack" @confirmBatchBuy="confirmBatchBuy"></c-popup-buy>
+        <c-popup-buy type="batchInput" :show="show.batchBuyInput" @inputBatchBuyNum="inputBatchBuyNum"
+                     @inputBack="inputBack" @confirmBatchBuy="confirmBatchBuy"
+                     @cancel="show.batchBuyInput=false"></c-popup-buy>
 
         <!-- 评论 -->
         <c-dialog type="review" :show="show.review" :data="detail" @confirm="publishReview"

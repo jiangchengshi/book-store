@@ -75,7 +75,7 @@
                 </x-button>
             </div>
         </template>
-        <template v-else-if="catalog">
+        <template v-else-if="type=='catalog'">
             <div style="text-align: center;font-family: PingFangSC-Regular;font-size: 20px;color: #162636;line-height: 50px;">
                 购买 {{catalog.articlename}}
             </div>

@@ -14,7 +14,7 @@
         </scroller>
 
         <!-- 章节购买 -->
-        <c-popup-buy type="catalog" :show="show.buy" :data="catalog" @confirmBuy="confirmBuy"></c-popup-buy>
+        <c-popup-buy type="catalog" :show="show.buy" :data="catalog" @confirmBuy="confirmBuy" @cancel="show.buy=false"></c-popup-buy>
     </div>
 </template>
 

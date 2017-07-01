@@ -227,10 +227,10 @@
                      @on-click-menu="clickMore"></actionsheet>
 
         <!-- 下载：章节购买： -->
-        <c-popup-buy type="batchBuy" :show="show.batchBuy" @checkBatchBuyNum="checkBatchBuyNum"
+        <c-popup-buy type="batch" :show="show.batchBuy" @checkBatchBuyNum="checkBatchBuyNum"
                      @confirmBatchBuy="confirmBatchBuy" @cancel="show.batchBuy=false"></c-popup-buy>
         <!-- 章节购买：批量 -->
-        <c-popup-buy type="batchBuyInput" :show="show.batchBuyInput" @inputBatchBuyNum="inputBatchBuyNum"
+        <c-popup-buy type="batchInput" :show="show.batchBuyInput" @inputBatchBuyNum="inputBatchBuyNum"
                      @inputBack="inputBack" @confirmBatchBuy="confirmBatchBuy"
                      @cancel="show.batchBuyInput=false"></c-popup-buy>
         <!-- 目录购买-->
@@ -470,9 +470,11 @@
                             }
                         }
 
-
                         // 获取章节信息
                         this.getChapterData();
+
+                        // 书签状态
+                        this.getMarkStatus();
                     }, (err) => {
                         this.$vux.toast.show({
                             text: '系统异常，请稍后重试...',
@@ -625,17 +627,8 @@
                     }
                 }
 
-                // 书签
-                app.webSql.query(app.config.webSql.mark, {
-                    chapterid: this.chapterId.cur,
-                    translateX: this.content.translateX
-                }, {}, (rows) => {
-                    if (rows && rows.length > 0) {
-                        this.content.mark = true;
-                    } else {
-                        this.content.mark = false;
-                    }
-                });
+                // 书签标记
+                this.getMarkStatus();
 
                 this.content.switch = false;
             },
@@ -1069,7 +1062,7 @@
                         this.content.mark = false;
                         this.$refs.reader.style.transform = "translate3d(0px, 0px, 0px)";
                         this.$vux.toast.show({
-                            text: '添加成功',
+                            text: '书签：删除成功',
                             type: 'text'
                         });
                     });
@@ -1084,11 +1077,23 @@
                         this.content.mark = true;
                         this.$refs.reader.style.transform = "translate3d(0px, 0px, 0px)";
                         this.$vux.toast.show({
-                            text: '删除成功',
+                            text: '书签：添加成功',
                             type: 'text'
                         });
                     });
                 }
+            },
+            getMarkStatus(){
+                app.webSql.query(app.config.webSql.mark, {
+                    chapterid: this.chapterId.cur,
+                    translateX: this.content.translateX
+                }, {}, (rows) => {
+                    if (rows && rows.length > 0) {
+                        this.content.mark = true;
+                    } else {
+                        this.content.mark = false;
+                    }
+                });
             },
             initSettingDB(){
                 app.webSql.insert(app.config.webSql.setting, {
