@@ -102,7 +102,7 @@
 		"splashscreen": {
 			"autoclose": true,
 			/*是否自动关闭程序启动界面，true表示应用加载应用入口页面后自动关闭；false则需调plus.navigator.closeSplashscreen()关闭*/
-			"waiting": true
+			"waiting": true,"delay":"0"
 		},
 		"popGesture": "close",
 		/*设置应用默认侧滑返回关闭Webview窗口，"none"为无侧滑返回功能，"hide"为侧滑隐藏Webview窗口。参考http://ask.dcloud.net.cn/article/102*/
@@ -267,41 +267,7 @@
 	"dependencies": {
 		"pages": {
 			"index.html": {
-				"resources": [
-					"build/main.7c85f4c1f78c39c5ba47.js",
-					"build/main.ad751717225a6e4e479a.js",
-					"build/main.21c89629a1e1ea09d722.js",
-					"build/main.a42a800ccc7f9612be0d.js",
-					"build/main.44723a0ffd81690d8e58.js",
-					"build/main.ff9191857465ebed2a0f.js",
-					"build/main.8a22ee611112be044764.js",
-					"build/main.719ee414fb261217e164.js",
-					"build/main.57622ffb068b5d3e377b.js",
-					"build/17.57622ffb068b5d3e377b.js",
-					"build/30.0219951681477bc82c85.js",
-					"build/main.0219951681477bc82c85.js",
-					"build/9.0219951681477bc82c85.js",
-					"build/9.e7a3c35dedf07c33c79f.js",
-					"build/30.e7a3c35dedf07c33c79f.js",
-					"build/main.e7a3c35dedf07c33c79f.js",
-					"build/17.e7a3c35dedf07c33c79f.js",
-					"build/main.8304b00b7963fb84fe48.js",
-					"build/main.deb284ea84a652ac3afd.js",
-					"build/main.d16ffa3a5a0f391d5c80.js",
-					"build/main.96a16ea67c97364081ca.js",
-					"build/main.d94ce0c1b655f509aa86.js",
-					"build/main.88874f9d17bfe52df06b.js",
-					"build/main.f8baf2615db132b67b29.js",
-					"build/main.fa1942c527a4f1cfa85c.js",
-					"build/main.5aae03e3a22c90a9ea31.js",
-					"build/main.0a097e528fe23ad96be8.js",
-					"build/main.647a870ce98aeccaa33a.js",
-					"build/main.dd80bdbb0378309d96a0.js",
-					"build/main.a2691ba23c1b85c1d77f.js",
-					"build/main.7e0976dc145f57830101.js",
-					"build/main.707af1493bcdd7d32531.js",
-					"build/main.985a37a57fd3a08fa786.js"
-				],
+				"resources": [],
 				"refer": [],
 				"priority": 0
 			}

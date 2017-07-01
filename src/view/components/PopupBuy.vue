@@ -1,5 +1,5 @@
 <template>
-    <popup class="popup-buy" v-model="isShow" @on-first-show="getData">
+    <popup class="popup-buy" v-model="isShow" @on-first-show="getData" @on-hide="handleCancel">
         <template v-if="type=='batch'">
             <div class="batch">
                 <div style="font-family: PingFangSC-Regular;font-size: 20px;color: #162636;border-bottom: solid 1px #EDEDED;padding: 8px 0px;text-align: center;">
@@ -187,6 +187,9 @@
             },
             getCatalogData(callback){
                 Object.assign(this.catalog, this.data);
+            },
+            handleCancel(){
+                this.$emit('cancel');
             },
             checkBatchBuyNum(){
                 this.check.price = this.check.saleprice * this.check.num;

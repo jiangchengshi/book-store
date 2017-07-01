@@ -1,7 +1,10 @@
 <template>
     <div class="search">
         <search placeholder="输入书名/作者" v-model="keyword" auto-scroll-to-top :auto-fixed="false"
-                @on-submit="handleSubmit" @on-focus="handleFocus" @on-cancel="handleCancel"></search>
+                @on-submit="handleSubmit" @on-focus="handleFocus" @on-cancel="handleCancel">
+            <i slot="left" class="iconfont icon-iconjiantou-copy" style="padding-right: 10px;color: #162636;"
+               @click="handleBack"></i>
+        </search>
         <div style="background: #F8F8F8;overflow: scroll;" :style="{height: height+'px'}">
             <div class="hot" v-if="!showResult">
                 <span class="title">热门搜索</span>
@@ -104,6 +107,9 @@
             handleCancel(){
                 this.showResult = true;
                 this.result = 'index';
+            },
+            handleBack(){
+                this.$router.go(-1);
             }
         },
         mounted(){

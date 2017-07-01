@@ -20,7 +20,7 @@
                       :style="{backgroundColor: setting.bgColor.header, color: setting.color.header}">
                 <a class="iconfont icon-dashang2" slot="right" @click="show.reward = true"></a>
                 <a class="iconfont icon-xiazai" slot="right" @click="show.batchBuy = true"></a>
-                <a class="iconfont icon-shuqian_bookmark" slot="right" @click="show.batchBuy = true"></a>
+                <a class="iconfont icon-shuqian_bookmark" slot="right" @click="toggleMark"></a>
             </x-header>
             <div class="chapter" style="padding: 0px 10px;"
                  :style="{height: screenHeight+'px',backgroundColor: setting.bgColor.chapter,color: setting.color.chapter}">
@@ -228,13 +228,14 @@
 
         <!-- 下载：章节购买： -->
         <c-popup-buy type="batchBuy" :show="show.batchBuy" @checkBatchBuyNum="checkBatchBuyNum"
-                     @confirmBatchBuy="confirmBatchBuy"></c-popup-buy>
+                     @confirmBatchBuy="confirmBatchBuy" @cancel="show.batchBuy=false"></c-popup-buy>
         <!-- 章节购买：批量 -->
         <c-popup-buy type="batchBuyInput" :show="show.batchBuyInput" @inputBatchBuyNum="inputBatchBuyNum"
-                     @inputBack="inputBack" @confirmBatchBuy="confirmBatchBuy"></c-popup-buy>
+                     @inputBack="inputBack" @confirmBatchBuy="confirmBatchBuy"
+                     @cancel="show.batchBuyInput=false"></c-popup-buy>
         <!-- 目录购买-->
         <c-popup-buy type="catalog" :show="show.catalogBuy" :data="data.catalog"
-                     @confirmCatalogBuy="confirmCatalogBuy"></c-popup-buy>
+                     @confirmCatalogBuy="confirmCatalogBuy" @cancel="show.catalogBuy=false"></c-popup-buy>
 
         <!-- 打赏： -->
         <popup v-model="show.reward" class="popup-reward">
@@ -264,7 +265,7 @@
             <group>
                 <cell-box>
                     <div :style="{width:(width-30)+'px'}" style="padding:5px 0px;text-align: center;">
-                        <div v-for="(share, index) in shares" :key="index"
+                        <div v-for="(share, index) in data.shares" :key="index"
                              style="display: inline-block;margin: 0px 10px;">
                             <img :src="share.img">
                             <div style="font-family: PingFangSC-Light;font-size: 12px;color: #989A9C;">
@@ -275,7 +276,9 @@
                 </cell-box>
             </group>
             <group>
-                <x-button action-type="button" style="background: #FFFFFF;" @click.native="show.more=true;show.share=false;">取消</x-button>
+                <x-button action-type="button" style="background: #FFFFFF;"
+                          @click.native="show.more=true;show.share=false;">取消
+                </x-button>
             </group>
         </popup>
     </div>
@@ -495,7 +498,7 @@
             getShareData(){
                 app.ajax.get(app.config.api.share, {},
                     (data) => {
-                        this.shares = data.result;
+                        this.data.shares = data.result;
                     }, (err) => {
                         this.$vux.toast.show({
                             text: '系统异常，请稍后重试...',
@@ -1065,6 +1068,10 @@
                     }, () => {
                         this.content.mark = false;
                         this.$refs.reader.style.transform = "translate3d(0px, 0px, 0px)";
+                        this.$vux.toast.show({
+                            text: '添加成功',
+                            type: 'text'
+                        });
                     });
                 } else {
                     app.webSql.insert(app.config.webSql.mark, {
@@ -1076,6 +1083,10 @@
                     }, () => {
                         this.content.mark = true;
                         this.$refs.reader.style.transform = "translate3d(0px, 0px, 0px)";
+                        this.$vux.toast.show({
+                            text: '删除成功',
+                            type: 'text'
+                        });
                     });
                 }
             },
