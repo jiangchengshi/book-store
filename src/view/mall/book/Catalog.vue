@@ -8,7 +8,7 @@
                     {{catalog.chaptername}}
                 </span>
                     <i v-if="catalog.isvip==1&&catalog.is_buy==0" class="iconfont icon-lock"
-                       style="font-size: 16px;"></i>
+                       style="font-size: 14px;"></i>
                 </cell>
             </group>
         </scroller>

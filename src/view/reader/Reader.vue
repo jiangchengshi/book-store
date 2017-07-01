@@ -20,7 +20,7 @@
                       :style="{backgroundColor: setting.bgColor.header, color: setting.color.header}">
                 <a class="iconfont icon-dashang2" slot="right" @click="show.reward = true"></a>
                 <a class="iconfont icon-xiazai" slot="right" @click="show.batchBuy = true"></a>
-                <!--<a class="iconfont icon-shuqian_bookmark" slot="right"></a>-->
+                <a class="iconfont icon-shuqian_bookmark" slot="right" @click="show.batchBuy = true"></a>
             </x-header>
             <div class="chapter" style="padding: 0px 10px;"
                  :style="{height: screenHeight+'px',backgroundColor: setting.bgColor.chapter,color: setting.color.chapter}">
@@ -170,7 +170,7 @@
         <popup v-model="show.setting" class="popup-setting">
             <group>
                 <cell title="亮度" primary="content">
-                    <range v-model="setting.brightness"
+                    <range v-model="setting.brightness" v-if="show.setting"
                            minHTML="<i style='font-size:16px;' class='iconfont icon-liangdu'></i>"
                            maxHTML="<i style='font-size:24px;' class='iconfont icon-liangdu'></i>"
                            @on-change="changeBrightness"></range>
@@ -258,6 +258,26 @@
                 确定打赏
             </x-button>
         </popup>
+
+        <!-- 分享书籍 -->
+        <popup v-model="show.share" class="popup-share" @on-first-show="getShareData">
+            <group>
+                <cell-box>
+                    <div :style="{width:(width-30)+'px'}" style="padding:5px 0px;text-align: center;">
+                        <div v-for="(share, index) in shares" :key="index"
+                             style="display: inline-block;margin: 0px 10px;">
+                            <img :src="share.img">
+                            <div style="font-family: PingFangSC-Light;font-size: 12px;color: #989A9C;">
+                                {{share.name}}
+                            </div>
+                        </div>
+                    </div>
+                </cell-box>
+            </group>
+            <group>
+                <x-button action-type="button" style="background: #FFFFFF;" @click.native="show.more=true;show.share=false;">取消</x-button>
+            </group>
+        </popup>
     </div>
 </template>
 
@@ -300,7 +320,8 @@
                     batchBuy: false,
                     batchBuyInput: false,
                     catalogBuy: false,
-                    reward: false
+                    reward: false,
+                    share: false
                 },
                 setting: {
                     brightness: 0,
@@ -345,7 +366,8 @@
                     }, {
                         label: "<i class='iconfont icon-fenxiang1'></i> &nbsp;分享本书",
                         value: 'share'
-                    }]
+                    }],
+                    shares: []
                 },
                 chapterId: {
                     cur: -1,
@@ -469,6 +491,18 @@
                         this.data.notes = rows;
                     }
                 });
+            },
+            getShareData(){
+                app.ajax.get(app.config.api.share, {},
+                    (data) => {
+                        this.shares = data.result;
+                    }, (err) => {
+                        this.$vux.toast.show({
+                            text: '系统异常，请稍后重试...',
+                            type: 'warn'
+                        });
+                        app.log.error(err);
+                    });
             },
             getChapterData(){
                 if (this.chapterId.cur < 0) {
@@ -605,13 +639,17 @@
             clickMore(key){
                 switch (key) {
                     case 'mark':
+                        this.toggleMark();
                         break;
                     case 'search':
+                        this.$router.push({path: '/search'});
                         break;
                     case 'detail':
                         this.$router.push({path: '/mall/book/detail', query: {id: this.$route.query.id}});
                         break;
                     case 'share':
+                        this.show.share = true;
+                        this.show.more = false;
                         break;
                 }
             },
@@ -1013,29 +1051,32 @@
                     this.turnPage('prev');
                 } else if (this.content.touch.direction == 'y-down') {  // 下拉：添加书签
                     setTimeout(() => {
-                        if (this.content.mark) {
-                            app.webSql.delete(app.config.webSql.mark, {
-                                chapterid: this.chapterId.cur,
-                                translateX: this.content.translateX
-                            }, () => {
-                                this.content.mark = false;
-                                this.$refs.reader.style.transform = "translate3d(0px, 0px, 0px)";
-                            });
-                        } else {
-                            app.webSql.insert(app.config.webSql.mark, {
-                                chapterid: this.chapterId.cur,
-                                translateX: this.content.translateX,
-                                name: this.data.chapter.articlename,
-                                content: '',
-                                time: new Date()
-                            }, () => {
-                                this.content.mark = true;
-                                this.$refs.reader.style.transform = "translate3d(0px, 0px, 0px)";
-                            });
-                        }
+                        this.toggleMark();
                     }, 500);
                 } else if (this.content.touch.direction == 'none') {
                     this.clickContent({x: e.changedTouches[0].screenX, y: e.changedTouches[0].screenY});
+                }
+            },
+            toggleMark(){
+                if (this.content.mark) {
+                    app.webSql.delete(app.config.webSql.mark, {
+                        chapterid: this.chapterId.cur,
+                        translateX: this.content.translateX
+                    }, () => {
+                        this.content.mark = false;
+                        this.$refs.reader.style.transform = "translate3d(0px, 0px, 0px)";
+                    });
+                } else {
+                    app.webSql.insert(app.config.webSql.mark, {
+                        chapterid: this.chapterId.cur,
+                        translateX: this.content.translateX,
+                        name: this.data.chapter.articlename,
+                        content: '',
+                        time: new Date()
+                    }, () => {
+                        this.content.mark = true;
+                        this.$refs.reader.style.transform = "translate3d(0px, 0px, 0px)";
+                    });
                 }
             },
             initSettingDB(){

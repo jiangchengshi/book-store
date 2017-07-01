@@ -31,7 +31,7 @@
             </tabbar-item>
         </tabbar>
 
-        <!-- 发表评论 -->
+        <!-- 分享书籍 -->
         <popup v-model="show.share" class="popup-share" @on-first-show="getShareData">
             <group>
                 <cell-box>

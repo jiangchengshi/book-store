@@ -91,9 +91,14 @@
 		"NativeObj": {
 			"description": "原生对象"
 		},
-		"Maps": {}
+		"Maps": {},
+		"OAuth": {},
+		"Barcode": {}
 	},
 	"plus": {
+		"schemeWhitelist": [
+			"market"
+		],
 		"splashscreen": {
 			"autoclose": true,
 			/*是否自动关闭程序启动界面，true表示应用加载应用入口页面后自动关闭；false则需调plus.navigator.closeSplashscreen()关闭*/
@@ -129,18 +134,20 @@
 				"aliasname": "",
 				/*Android应用打包使用密钥库中证书的别名*/
 				"permissions": [
-					"<uses-feature android:name=\"android.hardware.camera\"/>",
 					"<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
 					"<uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>",
 					"<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>",
 					"<uses-permission android:name=\"android.permission.VIBRATE\"/>",
-					"<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
 					"<uses-permission android:name=\"android.permission.READ_LOGS\"/>",
-					"<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>",
 					"<uses-permission android:name=\"android.permission.WAKE_LOCK\"/>",
+					"<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
 					"<uses-permission android:name=\"android.permission.CALL_PHONE\"/>",
 					"<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
 					"<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>",
+					"<uses-feature android:name=\"android.hardware.camera.autofocus\"/>",
+					"<uses-feature android:name=\"android.hardware.camera\"/>",
+					"<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+					"<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>",
 					"<uses-permission android:name=\"android.permission.CAMERA\"/>"
 				]
 			},
@@ -215,7 +222,7 @@
 					"iphone": {
 						"default": "",
 						/*iPhone3启动图片选，分辨率：320x480*/
-						"retina35": "",
+						
 						/*3.5英寸设备(iPhone4)启动图片，分辨率：640x960*/
 						"retina40": "",
 						/*4.0 英寸设备(iPhone5/iPhone5s)启动图片，分辨率：640x1136*/
@@ -248,11 +255,11 @@
 					/*普通屏启动图片，分辨率：240x282*/
 					"ldpi": "",
 					/*大屏启动图片，分辨率：320x442*/
-					"hdpi": "",
+					"hdpi": "src/image/icon.png",
 					/*高分屏启动图片，分辨率：480x762*/
-					"xhdpi": "",
+					"xhdpi": "src/image/icon.png",
 					/*720P高分屏启动图片，分辨率：720x1242*/
-					"xxhdpi": ""
+					"xxhdpi": "src/image/icon.png"
 				}
 			}
 		}
@@ -277,7 +284,23 @@
 					"build/9.e7a3c35dedf07c33c79f.js",
 					"build/30.e7a3c35dedf07c33c79f.js",
 					"build/main.e7a3c35dedf07c33c79f.js",
-					"build/17.e7a3c35dedf07c33c79f.js"
+					"build/17.e7a3c35dedf07c33c79f.js",
+					"build/main.8304b00b7963fb84fe48.js",
+					"build/main.deb284ea84a652ac3afd.js",
+					"build/main.d16ffa3a5a0f391d5c80.js",
+					"build/main.96a16ea67c97364081ca.js",
+					"build/main.d94ce0c1b655f509aa86.js",
+					"build/main.88874f9d17bfe52df06b.js",
+					"build/main.f8baf2615db132b67b29.js",
+					"build/main.fa1942c527a4f1cfa85c.js",
+					"build/main.5aae03e3a22c90a9ea31.js",
+					"build/main.0a097e528fe23ad96be8.js",
+					"build/main.647a870ce98aeccaa33a.js",
+					"build/main.dd80bdbb0378309d96a0.js",
+					"build/main.a2691ba23c1b85c1d77f.js",
+					"build/main.7e0976dc145f57830101.js",
+					"build/main.707af1493bcdd7d32531.js",
+					"build/main.985a37a57fd3a08fa786.js"
 				],
 				"refer": [],
 				"priority": 0
